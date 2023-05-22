@@ -11,6 +11,7 @@ assignees: ''
 여기에 간략한 설명을 적어주세요
 
 ## 절차(Task)
-  - [  ] task
+- [ ] task
+- [ ] task
 
 ## 참조
