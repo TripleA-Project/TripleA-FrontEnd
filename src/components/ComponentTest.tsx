@@ -18,7 +18,7 @@ export const ComponentList = {
   Chart: <Chart />,
   Input: <Input />,
   Form: <Form />,
-  StepForm: <StepForm />,
+  StepForm: <StepForm>{'stepForm'}</StepForm>,
   Header: <Header />,
   Nav: <Nav />,
   Select: <Select />,
