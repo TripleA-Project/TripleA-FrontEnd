@@ -1,4 +1,4 @@
-import Test from '@/components/ComponentTest';
+import ComponentTest from '@/components/ComponentTest';
 
 interface UIComponentTestProps {
   params: {
@@ -6,14 +6,13 @@ interface UIComponentTestProps {
   };
 }
 
-async function UIComponentTest({ params: { component } }: UIComponentTestProps) {
+function UIComponentTest({ params: { component } }: UIComponentTestProps) {
   const name = component.length === 1 ? component.join('') : component.join('/');
 
   return (
-    <>
-      {/* @ts-expect-error Async Server Component */}
-      <Test name={name} />
-    </>
+    <div className="box-border flex h-screen w-screen items-center justify-center">
+      <ComponentTest name={name} />
+    </div>
   );
 }
 

@@ -1,9 +1,12 @@
-import Image from "next/image";
+import { Metadata } from 'next';
 
-export default function Home() {
-  return (
-    <main>
-      <div>home</div>
-    </main>
-  );
+export const metadata: Metadata = {
+  title: 'TripleA | 뉴스',
+  description: 'Triple A 뉴스',
+};
+
+function Home() {
+  return <div>home (News)</div>;
 }
+
+export default Home;
