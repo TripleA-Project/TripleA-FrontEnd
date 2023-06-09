@@ -18,7 +18,7 @@ function Select({children, ...props}:SelectComponentProps) {
   const selectedArray = props.selectedArray
   const setSelectedArray= props.setSelectedArray   
 
-  const clickHandler:MouseEventHandler = (e:MouseEvent) => {
+  const clickHandler:MouseEventHandler = (e:MouseEvent<HTMLLIElement> & {target:HTMLLIElement}) => {
     console.log(e.target.innerHTML)
     setSelected(!selected)
     if(selected===false){
