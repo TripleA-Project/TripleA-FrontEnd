@@ -1,0 +1,125 @@
+.registerInput {
+  width: 200px;
+  height: 30px;
+  outline: none;
+  font-size: 14px;
+}
+
+.loginInput {
+  width: 180px;
+  height: 30px;
+  outline: none;
+}
+
+.togglePassword {
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  right: 22px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.verifyInput {
+  width: 180px;
+  height: 30px;
+  outline: none;
+}
+
+.verifyEmail {
+  font-size: 13px;
+  text-decoration-line: underline;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 20px;
+}
+
+.mainSearchInput {
+  width: 300px;
+  height: 22px;
+  font-size: 21.84px;
+  outline: none;
+}
+
+.selectSearchInput {
+  width: 300px;
+  height: 28px;
+  background-color: #f3f3f3;
+  font-size: 14px;
+  outline: none;
+}
+
+.inputContainer {
+  position: relative;
+  width: 323px;
+  margin-bottom: 20px;
+}
+
+.inputContainter input {
+  outline: none;
+}
+
+.registerInputContainer {
+  position: relative;
+  width: 323px;
+  height: 34px;
+  border-radius: 20px;
+  border: 1px solid black;
+  padding-left: 23px;
+  outline: none;
+  font-size: 14px;
+}
+
+.loginInputContainer {
+  position: relative;
+  width: 253px;
+  height: 38px;
+  border-radius: 15px;
+  border: 1px solid #dbdee1;
+  outline: none;
+  padding-left: 23px;
+}
+
+.verifyInputContainer {
+  position: relative;
+  width: 259.67px;
+  height: 34px;
+  padding-left: 20px;
+  border-radius: 20px;
+  border: 1px solid #000000;
+  outline: none;
+}
+
+.verifyEmailContainer {
+  position: relative;
+  font-size: 13px;
+  text-decoration-line: underline;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 20px;
+}
+
+.mainSearchInputContainer {
+  position: relative;
+  width: 340px;
+  height: 26px;
+  font-size: 21.84px;
+  outline: none;
+  padding-left: 10px;
+}
+
+.selectSearchInputContainer {
+  position: relative;
+  width: 337.5px;
+  height: 32px;
+  border: 1px solid #e4e4e4;
+  background-color: #f3f3f3;
+  border-radius: 15px;
+  padding-left: 20px;
+  font-size: 14px;
+  outline: none;
+}
