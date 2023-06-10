@@ -3,7 +3,6 @@ import Button from './Button';
 import Card from './Card';
 import CardList from './CardList';
 import { Chart } from './Chart';
-import Form from './Form';
 import StepForm from './Form/StepForm';
 import Header from './Header';
 import Input from './Input';
@@ -17,8 +16,6 @@ export const ComponentList = {
   CardList: <CardList />,
   Chart: <Chart />,
   Input: <Input />,
-  Form: <Form />,
-  StepForm: <StepForm>{'stepForm'}</StepForm>,
   Header: <Header />,
   Nav: <Nav />,
   Select: <Select />,
