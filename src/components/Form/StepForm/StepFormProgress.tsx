@@ -7,7 +7,6 @@ interface ProgressProps extends React.HTMLAttributes<HTMLDivElement> {
   value: number;
   min: number;
   max: number;
-  className?: string;
 }
 
 const StyeldProgress = styled.div<ProgressProps>`
