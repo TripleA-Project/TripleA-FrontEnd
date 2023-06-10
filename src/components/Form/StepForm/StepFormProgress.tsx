@@ -3,12 +3,11 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
-interface ProgressProps {
+interface ProgressProps extends React.HTMLAttributes<HTMLDivElement> {
   value: number;
   min: number;
   max: number;
   className?: string;
-  [key: string]: any;
 }
 
 const StyeldProgress = styled.div<ProgressProps>`

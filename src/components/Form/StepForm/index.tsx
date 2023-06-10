@@ -28,7 +28,6 @@ interface StepFormProps {
  *   - `isLastStep` : 마지막 Step인 경우 `true`, 아닌 경우 `false`
  *   - `prev()` : 이전 step으로 이동, 시작 step에서 호출된 경우 step은 시작 step으로 보정됨
  * 
- * 
  *   - 별도의 버튼을 생성해서 활용할 경우 type='button' 이 아니면 클릭할 때 submit이 트리거 되서 원하는 동작이 되지 않을수 있기 때문에 주의 
  * 
  *   - 나머지는 useForm에서 제공하는 것과 동일함 (register 등...)
@@ -80,11 +79,10 @@ interface StepFormProps {
     <CompleteLayout /> // 필요할 경우 별도의 완료 Form 컴포넌트를 작성
   </StepForm>
  ```
- * @returns `JSX.Element` | `null`
+ * @returns JSX.Element | null
  */
 const StepForm = ({ renderStepProgressBar = true, children }: StepFormProps) => {
-  if (!Array.isArray(children)) throw new Error('1개 이상의 폼요소가 필요합니다');
-
+  if (!Array.isArray(children)) throw new Error('최소 2개 이상의 폼요소가 필요합니다');
   const methods = useForm();
 
   const [step, setStep] = useState(1);
@@ -122,7 +120,7 @@ const StepForm = ({ renderStepProgressBar = true, children }: StepFormProps) => 
   };
 
   const FormList = Array.from(children as React.ReactElement[]);
-  console.log('renderStep: ', { step });
+
   const CurrentForm = FormList[step - 1] ?? null;
 
   const providerProps = { ...methods, isLastStep, skip, done, prev };
@@ -135,7 +133,7 @@ const StepForm = ({ renderStepProgressBar = true, children }: StepFormProps) => 
 
   return !isComplete ? (
     <FormProvider {...providerProps}>
-      <div className="relative box-border h-full pb-8">
+      <div className="relative box-border h-full">
         {renderStepProgressBar ? <Progress value={step} min={1} max={lastStep} /> : null}
         {CurrentForm}
       </div>
