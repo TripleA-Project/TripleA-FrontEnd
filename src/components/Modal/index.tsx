@@ -9,6 +9,7 @@ const ModalContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
+  background-color: #fff;
 `
 
 const Title = styled.div`
@@ -26,7 +27,7 @@ const Content = styled.p`
 `
 
 function Modal() {
-  const [modalSize, setModalSize] = useState('')
+  const [modalSize, setModalSize] = useState('small')
 
 
 
