@@ -31,7 +31,7 @@ import styled from '@emotion/styled';
 //    ]
 //   }
 // }
-interface NewsItem {
+interface News {
   newsId : number;
   symbol : string;
   logo:string;
@@ -54,7 +54,7 @@ const Card = styled.li`
   height: ${({direction})=> direction === `column`?`364px`:`122px`};
 `
 
-function CardNews({ symbol, logo, source, title, description, thumbnail,publishedDate, sentiment, bookmark}:NewsItem) {
+function CardNews({ symbol, logo, source, title, description, thumbnail,publishedDate, sentiment, bookmark}:News) {
 
   const [cardDirection, setCardDirection] = useState('column')
 
