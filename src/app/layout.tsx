@@ -1,4 +1,4 @@
-import Navbar from '@/components/Nav';
+import Nav from '@/components/Nav';
 import './globals.css';
 import ReactQueryProvider from '@/reactQuery/Provider';
 import ReduxProvider from '@/redux/ReduxProvider';
@@ -26,7 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ReduxProvider>
             <ReactQueryProvider>
               {children}
-              <Navbar/>
+              <Nav/>
             </ReactQueryProvider>
           </ReduxProvider>
         </main>
