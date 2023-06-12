@@ -1,19 +1,18 @@
 "use client"
-import { useState } from "react";
 import styled from "@emotion/styled";
 
 const ModalContainer = styled.div`
   box-sizing: border-box;
   border-radius: 15px;
-  border: 1px solid;
+  /* border: 1px solid; */
   padding: 15px;
   width: ${({size})=> size === 'small'? '250px' : '390px'};
   height: ${({size})=> size === 'small'? '180px' : '357px'};
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  /* background-color: red; */
   text-align: center;
+  box-shadow: ${({size})=> size === 'small' ? '5px 5px 5px rgba(0,0,0,0.2)': 'none'};
 `
 const Title = styled.div`
   display: flex;
@@ -21,7 +20,7 @@ const Title = styled.div`
   align-items: center;
   gap: 25px;
   font-size: 20px;
-  font-weight: bold; //semibold
+  font-weight: 600; 
 `
 const Content = styled.p`
   font-size: 16px;
