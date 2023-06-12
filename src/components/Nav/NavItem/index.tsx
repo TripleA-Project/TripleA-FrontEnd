@@ -12,7 +12,7 @@ interface NavItemProps {
   };
 }
 
-export default function NavItem({ navItem }: NavItemProps) {
+ function NavItem({ navItem }: NavItemProps) {
   const pathName = usePathname();
 
   return (
@@ -26,3 +26,5 @@ export default function NavItem({ navItem }: NavItemProps) {
     </div>
   );
 }
+
+export default NavItem
