@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useEffect, forwardRef, LegacyRef } from "react";
 import { ActionInputProps } from "@/app/interfaces/InputProps";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
