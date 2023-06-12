@@ -1,6 +1,5 @@
 import React, { useState, useEffect, forwardRef, LegacyRef } from "react";
 import { ActionInputProps } from "@/app/interfaces/InputProps";
-import styles from "./ActionInput.module.css";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { MdCancel } from "react-icons/md";
 import { FiSearch } from "react-icons/fi";
@@ -17,68 +16,73 @@ const ActionInput = forwardRef(
     let inputClassName = "";
     let className = "";
 
-    switch (
-      type //type에 따라 스타일, 플레이스홀더, inputType 변경
-    ) {
+    switch (type) {
       case "registerPw":
         placeholder = "";
         inputType = showPassword ? "text" : "password";
-        inputClassName = styles.registerInput;
-        className = styles.registerInputContainer;
+        inputClassName = "w-[200px] h-[30px] text-sm outline-none";
+        className =
+          "relative w-[323px] h-[34px] border text-sm pl-[23px] rounded-[20px] border-solid border-[black] outline-none";
         break;
       case "loginPw":
         placeholder = "";
         inputType = showPassword ? "text" : "password";
-        inputClassName = styles.loginInput;
-        className = styles.loginInputContainer;
+        inputClassName = "w-[180px] h-[30px] outline-none";
+        className =
+          "relative w-[253px] h-[38px] border pl-[23px] rounded-[15px] border-solid border-[#dbdee1] outline-none";
         break;
       case "registerTimer":
         placeholder = "인증코드 입력";
         inputType = "verifyCode";
-        inputClassName = styles.registerInput;
-        className = styles.registerInputContainer;
-        break;
-      case "registerVerify":
-        placeholder = "";
-        inputClassName = styles.verifyInput;
-        className = styles.verifyInputContainer;
+        inputClassName = "w-[200px] h-[30px] text-sm outline-none";
+        className =
+          "relative w-[323px] h-[34px] border text-sm pl-[23px] rounded-[20px] border-solid border-[black] outline-none";
         break;
       case "registerVerifyAgain":
         placeholder = "";
-        inputClassName = styles.registerInput;
-        className = styles.registerInputContainer;
+        inputClassName = "w-[200px] h-[30px] text-sm outline-none";
+        className =
+          "relative w-[323px] h-[34px] border text-sm pl-[23px] rounded-[20px] border-solid border-[black] outline-none";
+        break;
+      case "registerVerify":
+        placeholder = "";
+        inputClassName = "w-[180px] h-[30px] outline-none";
+        className =
+          "relative w-[259.67px] h-[34px] border pl-5 rounded-[20px] border-solid border-black outline-none";
         break;
       case "name":
         placeholder = "";
-        inputClassName = styles.registerInput;
-        className = styles.registerInputContainer;
+        inputClassName = "w-[200px] h-[30px] text-sm outline-none";
+        className =
+          "relative w-[323px] h-[34px] border text-sm pl-[23px] rounded-[20px] border-solid border-[black] outline-none";
         break;
       case "mainSearch":
         placeholder = "뉴스/종목(기업명) 검색";
-        inputClassName = styles.mainSearchInput;
-        className = styles.mainSearchInputContainer;
+        inputClassName = "w-[300px] h-[22px] text-[21.84px] outline-none";
+        className =
+          "relative w-[340px] h-[26px] text-[21.84px] pl-2.5 outline-none";
         break;
       case "selectSearch":
         placeholder = "카테고리를 검색해보세요!";
-        inputClassName = styles.selectSearchInput;
-        className = styles.selectSearchInputContainer;
+        inputClassName = "w-[300px] h-7 bg-[#f3f3f3] text-sm outline-none";
+        className =
+          "relative w-[337.5px] h-8 border bg-[#f3f3f3] text-sm pl-5 rounded-[15px] border-solid border-[#e4e4e4] outline-none";
         break;
       case "loginEmail":
         placeholder = "";
-        inputClassName = styles.loginInput;
-        className = styles.loginInputContainer;
+        inputClassName = "w-[180px] h-[30px] outline-none";
+        className =
+          "relative w-[253px] h-[38px] border pl-[23px] rounded-[15px] border-solid border-[#dbdee1] outline-none";
         break;
       default:
         break;
     }
 
     const handleTogglePassword = () => {
-      //패스워드 보이기, 숨기기
       setShowPassword((prevShowPassword) => !prevShowPassword);
     };
 
     useEffect(() => {
-      //타이머
       let intervalId: NodeJS.Timeout | null = null;
 
       if (type === "registerTimer") {
@@ -93,7 +97,6 @@ const ActionInput = forwardRef(
           });
         }, 1000);
       }
-
       return () => {
         if (intervalId !== null) {
           clearInterval(intervalId);
@@ -102,12 +105,11 @@ const ActionInput = forwardRef(
     }, [type]);
 
     const buttonMap = {
-      //type에 따른 버튼 구현
       registerPw: (
         <button
           style={{ fontSize: "20px" }}
           onClick={handleTogglePassword}
-          className={styles.togglePassword}
+          className="justify-center items-center absolute -translate-y-2/4 text-[13px] font-bold right-[22px] top-2/4"
         >
           {showPassword ? <AiFillEyeInvisible /> : <AiFillEye />}
         </button>
@@ -116,13 +118,16 @@ const ActionInput = forwardRef(
         <button
           style={{ fontSize: "20px", right: 14 }}
           onClick={handleTogglePassword}
-          className={styles.togglePassword}
+          className="justify-center items-center absolute -translate-y-2/4 text-[13px] font-bold right-[22px] top-2/4"
         >
           {showPassword ? <AiFillEyeInvisible /> : <AiFillEye />}
         </button>
       ),
       registerTimer: (
-        <div style={{ color: "#b6e0f9" }} className={styles.togglePassword}>
+        <div
+          style={{ color: "#b6e0f9" }}
+          className="justify-center items-center absolute -translate-y-2/4 text-[13px] font-bold right-[22px] top-2/4"
+        >
           {Math.floor(timer / 60)
             .toString()
             .padStart(2, "0")}
@@ -132,13 +137,16 @@ const ActionInput = forwardRef(
       registerVerifyAgain: (
         <button
           style={{ color: "#6d6d6d", textDecorationLine: "underline" }}
-          className={styles.togglePassword}
+          className="justify-center items-center absolute -translate-y-2/4 text-[13px] font-bold right-[22px] top-2/4"
         >
           코드 재발송
         </button>
       ),
       registerVerify: (
-        <button style={{ color: "#6d6d6d" }} className={styles.verifyEmail}>
+        <button
+          style={{ color: "#6d6d6d" }}
+          className="text-[13px] underline absolute -translate-y-2/4 right-5 top-2/4"
+        >
           인증
         </button>
       ),
@@ -146,7 +154,7 @@ const ActionInput = forwardRef(
       mainSearch: (
         <button
           style={{ color: "#e5e7ec", fontSize: "22px", right: "1px" }}
-          className={styles.togglePassword}
+          className="justify-center items-center absolute -translate-y-2/4 text-[13px] font-bold right-[22px] top-2/4"
         >
           <MdCancel />
         </button>
@@ -154,7 +162,7 @@ const ActionInput = forwardRef(
       selectSearch: (
         <button
           style={{ color: "black", fontSize: "16px", right: "8px" }}
-          className={styles.verifyEmail}
+          className="text-[13px] underline absolute -translate-y-2/4 right-5 top-2/4"
         >
           <FiSearch />
         </button>
