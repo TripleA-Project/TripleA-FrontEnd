@@ -1,7 +1,14 @@
+import { NewsData } from '@/interfaces/NewsData'
 
+import { ReactNode } from 'react'
 import Bar from './Bar'
 import styled from '@emotion/styled'
 
+
+interface NewsProps extends Partial<NewsData> {
+  hole1: ReactNode;
+  hole2: ReactNode;
+}
 
 const NewsContainer = styled.div`
   display:flex;
@@ -10,21 +17,21 @@ const Hole1 = styled.div`
 `
 const Hole2 = styled.div``
 
-export default function News({title, source , date , sentiment , hole1, hole2}:NewsProps) {
+export default function News({title, source , publishedDate , sentiment , hole1, hole2 }:NewsProps) {
 
 
   return (
     <NewsContainer>
-      <Bar/>
-      <Hole1 className='hole1'>
+      <Bar sentiment={sentiment}/>
+      <Hole1>
         {hole1}
       </Hole1>
       <div>
         <h3>{title}</h3>
-        <span>{board}</span>
-        <span>{time}</span>
+        <span>{source}</span>
+        <span>{publishedDate}</span>
       </div>
-     <Hole2 className='hole2'>
+     <Hole2>
       {hole2}
      </Hole2>
     </NewsContainer>
