@@ -1,19 +1,19 @@
+//NOTE -  초기값들이 어떻게 들어오는 지 확인하기
+
 export interface NewsData {
   newsId : number;
-  symbol?: string;
+  //NOTE - symbol 데이터 형태 바뀔 예정
+  symbol: string;
   logo?:string;
-  source?: string;
+  source: string;
   title: string;
-  description?: string;
+  description: string;
   thumbnail?:string;
   publishedDate: string;
-  sentiment?:number;
-  bookmark?: {
-    count?: number;
-    isBookmark?: boolean;
-}
+  sentiment:number;
+  bookmark: Bookmark;
 }
 export interface Bookmark {
-  count?: number;
-  isBookmark?: boolean;
+  count: number;
+  isBookmark: boolean;
 }
