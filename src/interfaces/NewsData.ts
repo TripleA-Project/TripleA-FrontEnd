@@ -11,5 +11,9 @@ export interface NewsData {
   bookmark?: {
     count?: number;
     isBookmark?: boolean;
-  }     
+}
+
+export interface Bookmark {
+  count?: number;
+  isBookmark?: boolean;
 }
