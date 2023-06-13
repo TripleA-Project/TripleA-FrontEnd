@@ -47,7 +47,11 @@ interface News {
   }     
 }
 
-const Card = styled.li`
+interface CardProps {
+  direction: string ;
+}
+
+const Card = styled.li<CardProps>`
   display: flex;
   flex-direction: column;
   width: ${({direction})=> direction ===`column`? `296px`:`357px`};
@@ -67,7 +71,7 @@ function CardNews({ symbol, logo, source, title, description, thumbnail,publishe
         </div>
         <div>
           <ChipContainer symbol={symbol} logo={logo}/>
-          <News title={title} description={description} board={source} time={publishedDate} hole1={<Fragment/>} hole2={<Fragment/>}/>
+          <News title={title} description={description} source={source} date={publishedDate} sentiment={sentiment} hole1={<Fragment/>} hole2={<Fragment/>}/>
           <ButtonContainer bookmark={bookmark}/>
         </div>
       </>):(
@@ -76,7 +80,7 @@ function CardNews({ symbol, logo, source, title, description, thumbnail,publishe
           <ChipContainer symbol={symbol} logo={logo}/>
         </div>
         <div>
-          <News title={title} description={description} board={source} time={publishedDate} hole1={<NewsImage src={thumbnail}/>} hole2={<ButtonContainer bookmark={bookmark}/>}/>
+          <News title={title} description={description} source={source} date={publishedDate} sentiment={sentiment} hole1={<NewsImage src={thumbnail}/>} hole2={<ButtonContainer bookmark={bookmark}/>}/>
         </div>
       </>
       )}
