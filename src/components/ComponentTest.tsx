@@ -1,6 +1,6 @@
 import Avatar from './Avatar';
 import Button from './Button';
-import Card from './Card';
+import Card from './CardNews';
 import CardList from './CardList';
 import { Chart } from './Chart';
 import StepForm from './Form/StepForm';
