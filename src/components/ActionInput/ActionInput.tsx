@@ -1,80 +1,71 @@
-'use client'
+'use client';
 
-import React, { useState, useEffect, forwardRef, LegacyRef } from "react";
-import { ActionInputProps } from "@/app/interfaces/InputProps";
-import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
-import { MdCancel } from "react-icons/md";
-import { FiSearch } from "react-icons/fi";
+import React, { useState, useEffect, forwardRef, LegacyRef } from 'react';
+import { ActionInputProps } from '@/interfaces/InputProps';
+import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
+import { MdCancel } from 'react-icons/md';
+import { FiSearch } from 'react-icons/fi';
 
 const ActionInput = forwardRef(
-  (
-    { type, value, onChange }: ActionInputProps,
-    ref: LegacyRef<HTMLInputElement>
-  ) => {
+  ({ type, placeholder, onClick, className, ...props }: ActionInputProps, ref: LegacyRef<HTMLInputElement>) => {
     const [showPassword, setShowPassword] = useState(false);
     const [timer, setTimer] = useState(180);
-    let placeholder = "";
-    let inputType = "";
-    let inputClassName = "";
-    let className = "";
+
+    let inputPlaceholder = placeholder ?? '';
+    let inputType = '';
+    let inputClassName = '';
+    let containerClassName = '';
 
     switch (type) {
-      case "registerPw":
-        placeholder = "";
-        inputType = showPassword ? "text" : "password";
-        inputClassName = "w-[200px] h-[30px] text-sm outline-none";
-        className =
-          "relative w-[323px] h-[34px] border text-sm pl-[23px] rounded-[20px] border-solid border-[black] outline-none";
+      case 'registerPw':
+        inputType = showPassword ? 'text' : 'password';
+        inputClassName = 'w-[200px] h-[30px] text-sm outline-none';
+        containerClassName =
+          'relative w-[323px] h-[34px] border text-sm pl-[23px] rounded-[20px] border-solid border-[black] outline-none';
         break;
-      case "loginPw":
-        placeholder = "";
-        inputType = showPassword ? "text" : "password";
-        inputClassName = "w-[180px] h-[30px] outline-none";
-        className =
-          "relative w-[253px] h-[38px] border pl-[23px] rounded-[15px] border-solid border-[#dbdee1] outline-none";
+      case 'loginPw':
+        inputType = showPassword ? 'text' : 'password';
+        inputClassName = 'w-[180px] h-[30px] outline-none';
+        containerClassName =
+          'relative w-[253px] h-[38px] border pl-[23px] rounded-[15px] border-solid border-[#dbdee1] outline-none';
         break;
-      case "registerTimer":
-        placeholder = "인증코드 입력";
-        inputType = "verifyCode";
-        inputClassName = "w-[200px] h-[30px] text-sm outline-none";
-        className =
-          "relative w-[323px] h-[34px] border text-sm pl-[23px] rounded-[20px] border-solid border-[black] outline-none";
+      case 'registerTimer':
+        inputPlaceholder = '인증코드 입력';
+        inputType = 'verifyCode';
+        inputClassName = 'w-[200px] h-[30px] text-sm outline-none';
+        containerClassName =
+          'relative w-[323px] h-[34px] border text-sm pl-[23px] rounded-[20px] border-solid border-[black] outline-none';
         break;
-      case "registerVerifyAgain":
-        placeholder = "";
-        inputClassName = "w-[200px] h-[30px] text-sm outline-none";
-        className =
-          "relative w-[323px] h-[34px] border text-sm pl-[23px] rounded-[20px] border-solid border-[black] outline-none";
+      case 'registerVerifyAgain':
+        inputClassName = 'w-[200px] h-[30px] text-sm outline-none';
+        containerClassName =
+          'relative w-[323px] h-[34px] border text-sm pl-[23px] rounded-[20px] border-solid border-[black] outline-none';
         break;
-      case "registerVerify":
-        placeholder = "";
-        inputClassName = "w-[180px] h-[30px] outline-none";
-        className =
-          "relative w-[259.67px] h-[34px] border pl-5 rounded-[20px] border-solid border-black outline-none";
+      case 'registerVerify':
+        inputClassName = 'w-[180px] h-[30px] outline-none';
+        containerClassName =
+          'relative w-[259.67px] h-[34px] border pl-5 rounded-[20px] border-solid border-black outline-none';
         break;
-      case "name":
-        placeholder = "";
-        inputClassName = "w-[200px] h-[30px] text-sm outline-none";
-        className =
-          "relative w-[323px] h-[34px] border text-sm pl-[23px] rounded-[20px] border-solid border-[black] outline-none";
+      case 'name':
+        inputClassName = 'w-[200px] h-[30px] text-sm outline-none';
+        containerClassName =
+          'relative w-[323px] h-[34px] border text-sm pl-[23px] rounded-[20px] border-solid border-[black] outline-none';
         break;
-      case "mainSearch":
-        placeholder = "뉴스/종목(기업명) 검색";
-        inputClassName = "w-[300px] h-[22px] text-[21.84px] outline-none";
-        className =
-          "relative w-[340px] h-[26px] text-[21.84px] pl-2.5 outline-none";
+      case 'mainSearch':
+        inputPlaceholder = '뉴스/종목(기업명) 검색';
+        inputClassName = 'w-[300px] h-[22px] text-[21.84px] outline-none';
+        containerClassName = 'relative w-[340px] h-[26px] text-[21.84px] pl-2.5 outline-none';
         break;
-      case "selectSearch":
-        placeholder = "카테고리를 검색해보세요!";
-        inputClassName = "w-[300px] h-7 bg-[#f3f3f3] text-sm outline-none";
-        className =
-          "relative w-[337.5px] h-8 border bg-[#f3f3f3] text-sm pl-5 rounded-[15px] border-solid border-[#e4e4e4] outline-none";
+      case 'selectSearch':
+        inputPlaceholder = '카테고리를 검색해보세요!';
+        inputClassName = 'w-[300px] h-7 bg-[#f3f3f3] text-sm outline-none';
+        containerClassName =
+          'relative w-[337.5px] h-8 border bg-[#f3f3f3] text-sm pl-5 rounded-[15px] border-solid border-[#e4e4e4] outline-none';
         break;
-      case "loginEmail":
-        placeholder = "";
-        inputClassName = "w-[180px] h-[30px] outline-none";
-        className =
-          "relative w-[253px] h-[38px] border pl-[23px] rounded-[15px] border-solid border-[#dbdee1] outline-none";
+      case 'loginEmail':
+        inputClassName = 'w-[180px] h-[30px] outline-none';
+        containerClassName =
+          'relative w-[253px] h-[38px] border pl-[23px] rounded-[15px] border-solid border-[#dbdee1] outline-none';
         break;
       default:
         break;
@@ -87,7 +78,7 @@ const ActionInput = forwardRef(
     useEffect(() => {
       let intervalId: NodeJS.Timeout | null = null;
 
-      if (type === "registerTimer") {
+      if (type === 'registerTimer') {
         intervalId = setInterval(() => {
           setTimer((prevTimer) => {
             if (prevTimer === 0 && intervalId) {
@@ -109,45 +100,50 @@ const ActionInput = forwardRef(
     const buttonMap = {
       registerPw: (
         <button
-          style={{ fontSize: "20px" }}
+          type="button"
+          style={{ fontSize: '20px' }}
           onClick={handleTogglePassword}
-          className="justify-center items-center absolute -translate-y-2/4 text-[13px] font-bold right-[22px] top-2/4"
+          className="absolute right-[22px] top-2/4 -translate-y-2/4 items-center justify-center text-[13px] font-bold"
         >
           {showPassword ? <AiFillEyeInvisible /> : <AiFillEye />}
         </button>
       ),
       loginPw: (
         <button
-          style={{ fontSize: "20px", right: 14 }}
+          type="button"
+          style={{ fontSize: '20px', right: 14 }}
           onClick={handleTogglePassword}
-          className="justify-center items-center absolute -translate-y-2/4 text-[13px] font-bold right-[22px] top-2/4"
+          className="absolute right-[22px] top-2/4 -translate-y-2/4 items-center justify-center text-[13px] font-bold"
         >
           {showPassword ? <AiFillEyeInvisible /> : <AiFillEye />}
         </button>
       ),
       registerTimer: (
         <div
-          style={{ color: "#b6e0f9" }}
-          className="justify-center items-center absolute -translate-y-2/4 text-[13px] font-bold right-[22px] top-2/4"
+          style={{ color: '#b6e0f9' }}
+          className="absolute right-[22px] top-2/4 -translate-y-2/4 items-center justify-center text-[13px] font-bold"
         >
           {Math.floor(timer / 60)
             .toString()
-            .padStart(2, "0")}
-          :{(timer % 60).toString().padStart(2, "0")}
+            .padStart(2, '0')}
+          :{(timer % 60).toString().padStart(2, '0')}
         </div>
       ),
       registerVerifyAgain: (
         <button
-          style={{ color: "#6d6d6d", textDecorationLine: "underline" }}
-          className="justify-center items-center absolute -translate-y-2/4 text-[13px] font-bold right-[22px] top-2/4"
+          type="button"
+          style={{ color: '#6d6d6d', textDecorationLine: 'underline' }}
+          className="absolute right-[22px] top-2/4 -translate-y-2/4 items-center justify-center text-[13px] font-bold"
+          onClick={onClick}
         >
           코드 재발송
         </button>
       ),
       registerVerify: (
         <button
-          style={{ color: "#6d6d6d" }}
-          className="text-[13px] underline absolute -translate-y-2/4 right-5 top-2/4"
+          type="button"
+          style={{ color: '#6d6d6d' }}
+          className="absolute right-5 top-2/4 -translate-y-2/4 text-[13px] underline"
         >
           인증
         </button>
@@ -155,16 +151,20 @@ const ActionInput = forwardRef(
       name: null,
       mainSearch: (
         <button
-          style={{ color: "#e5e7ec", fontSize: "22px", right: "1px" }}
-          className="justify-center items-center absolute -translate-y-2/4 text-[13px] font-bold right-[22px] top-2/4"
+          type="button"
+          style={{ color: '#e5e7ec', fontSize: '22px', right: '1px' }}
+          className="absolute right-[22px] top-2/4 -translate-y-2/4 items-center justify-center text-[13px] font-bold"
+          onClick={onClick}
         >
           <MdCancel />
         </button>
       ),
       selectSearch: (
         <button
-          style={{ color: "black", fontSize: "16px", right: "8px" }}
-          className="text-[13px] underline absolute -translate-y-2/4 right-5 top-2/4"
+          type="button"
+          style={{ color: 'black', fontSize: '16px', right: '8px' }}
+          className="absolute right-5 top-2/4 -translate-y-2/4 text-[13px] underline"
+          onClick={onClick}
         >
           <FiSearch />
         </button>
@@ -173,21 +173,20 @@ const ActionInput = forwardRef(
     };
 
     return (
-      <div className={className}>
+      <div className={containerClassName}>
         <input
           ref={ref}
           type={inputType}
-          placeholder={placeholder}
-          value={value}
-          onChange={onChange}
-          className={inputClassName}
+          className={`${inputClassName} ${className}`}
+          {...(inputPlaceholder && { placeholder: inputPlaceholder })}
+          {...props}
         />
         {buttonMap[type] || null}
       </div>
     );
-  }
+  },
 );
 
-ActionInput.displayName = "ActionInput";
+ActionInput.displayName = 'ActionInput';
 
 export default ActionInput;
