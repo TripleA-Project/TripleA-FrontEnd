@@ -20,7 +20,7 @@ const Card = styled.li<CardProps>`
   height: ${({direction})=> direction === `column`?`364px`:`122px`};
 `
 
-function CardNews({ symbol, logo, source, title, description, thumbnail,publishedDate, sentiment, bookmark}:NewsData) {
+function CardNews({ newsId,symbol, logo, source, title, description, thumbnail,publishedDate, sentiment, bookmark}:NewsData) {
 
   const [cardDirection, setCardDirection] = useState('column')
 
@@ -33,8 +33,8 @@ function CardNews({ symbol, logo, source, title, description, thumbnail,publishe
         </div>
         <div>
           <ChipContainer symbol={symbol} logo={logo}/>
-          <News title={title} description={description} source={source} publishedDate={publishedDate} sentiment={sentiment} hole1={<Fragment/>} hole2={<Fragment/>}/>
-          <ButtonContainer bookmark={bookmark}/>
+          <News title={title} source={source} publishedDate={publishedDate} sentiment={sentiment} hole1={''} hole2={''}/>
+          <ButtonContainer newsId={newsId} bookmark={bookmark}/>
         </div>
       </>):(
       <>
@@ -42,7 +42,7 @@ function CardNews({ symbol, logo, source, title, description, thumbnail,publishe
           <ChipContainer symbol={symbol} logo={logo}/>
         </div>
         <div>
-          <News title={title} description={description} source={source} publishedDate={publishedDate} sentiment={sentiment} hole1={<NewsImage thumbnail={thumbnail}/>} hole2={<ButtonContainer bookmark={bookmark}/>}/>
+          <News title={title} source={source} publishedDate={publishedDate} sentiment={sentiment} hole1={<NewsImage thumbnail={thumbnail}/>} hole2={<ButtonContainer bookmark={bookmark} newsId={newsId}/>  }/>
         </div>
       </>
       )}
