@@ -1,7 +1,14 @@
 "use client"
 import styled from "@emotion/styled";
 
-const ModalContainer = styled.div`
+interface ModalProps {
+  size: string;
+  title: string;
+  content?: string;
+  mainBtn: string;
+  subBtn?: string;
+}
+const ModalContainer = styled.div<Pick<ModalProps,'size'>>`
   box-sizing: border-box;
   border-radius: 15px;
   /* border: 1px solid; */
@@ -46,7 +53,7 @@ const SubBtn = styled.button`
 `
 
 
-function Modal({size, title, content, mainBtn, subBtn}) {
+function Modal({size, title, content, mainBtn, subBtn}:ModalProps) {
 
 
 
