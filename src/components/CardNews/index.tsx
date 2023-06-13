@@ -4,48 +4,10 @@ import NewsImage from './NewsImage'
 import ChipContainer from './ChipContainer';
 import News from './News'
 import ButtonContainer from './ButtonContainerComponent';
-import styled from '@emotion/styled';
 
-// {
-//   "status":200,
-//   "msg": "성공",
-//   "data": {
-//    "nextPage": 5555,
-//    "news": [
-//      {
-//        "newsId": 1,
-//        ”symbol”:”symbol”,
-//        ”logo”:”logo”,
-//        "source": "source",
-//        "title": "title",
-//        "description": "description",
-//        ”thumbnail”:”thumbnail”,
-//        "publishedDate": "2023-05-05T00:00:00",
-//        ”sentiment”:2,
-//        "bookmark": {
-//          "count": 10,
-//          "isBookmark": true
-//         }
-//      },
-//      ...
-//    ]
-//   }
-// }
-interface News {
-  newsId : number;
-  symbol : string;
-  logo:string;
-  source: string;
-  title: string;
-  description: string;
-  thumbnail:string;
-  publishedDate: string;
-  sentiment:number;
-  bookmark: {
-    count: number;
-    isBookmark: boolean;
-  }     
-}
+import { NewsData } from '@/interfaces/NewsData';
+
+import styled from '@emotion/styled';
 
 interface CardProps {
   direction: string ;
@@ -58,7 +20,7 @@ const Card = styled.li<CardProps>`
   height: ${({direction})=> direction === `column`?`364px`:`122px`};
 `
 
-function CardNews({ symbol, logo, source, title, description, thumbnail,publishedDate, sentiment, bookmark}:News) {
+function CardNews({ symbol, logo, source, title, description, thumbnail,publishedDate, sentiment, bookmark}:NewsData) {
 
   const [cardDirection, setCardDirection] = useState('column')
 
@@ -67,7 +29,7 @@ function CardNews({ symbol, logo, source, title, description, thumbnail,publishe
       {cardDirection==='column'?(
       <>
         <div>
-          <NewsImage src={thumbnail}/>
+          <NewsImage thumbnail={thumbnail}/>
         </div>
         <div>
           <ChipContainer symbol={symbol} logo={logo}/>
