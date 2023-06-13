@@ -1,0 +1,35 @@
+.NewsDetailContainer{
+
+}
+
+.NewsCompanyName {
+    font-weight: 600;
+    font-size:15px;
+    color:#616161;
+    position:absolute;
+    left:20px;
+}
+
+.Date{
+
+}
+
+.ShareBtn{
+
+}
+
+.BookMarkBtn{
+
+}
+
+.test {
+    font-weight: 400;
+    font-size: 15px;
+    color: #656565;
+    position:absolute;
+    right:20px;
+}
+
+.test2{
+
+}
