@@ -1,35 +1,42 @@
-.NewsDetailContainer{
-
+.NewsDetailContainer {
 }
 
 .NewsCompanyName {
-    font-weight: 600;
-    font-size:15px;
-    color:#616161;
-    position:absolute;
-    left:20px;
+  font-weight: 600;
+  font-size: 15px;
+  color: #616161;
+  position: absolute;
+  left: 20px;
 }
 
-.Date{
-
+.Date {
 }
 
-.ShareBtn{
-
+.ShareBtn {
 }
 
-.BookMarkBtn{
-
+.BookMarkBtn {
 }
 
 .test {
-    font-weight: 400;
-    font-size: 15px;
-    color: #656565;
-    position:absolute;
-    right:20px;
+  border-radius: 20px;
+  border: solid 1px #dedede;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #616161;
+  padding: 5px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 16px;
 }
 
-.test2{
-
+.test2 {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 20px;
+  right: 70px;
 }
