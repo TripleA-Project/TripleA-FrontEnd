@@ -24,7 +24,7 @@ function Detail() {
         <button className="absolute left-[10px] top-[80%] translate-y-[-50%] text-[25px]">
           <IoIosArrowBack />
         </button>
-        <ActionInput type="selectSearch" onChange={handleSearchChange} />
+        <ActionInput type="newsDetailSearch" onChange={handleSearchChange} />
       </div>
       <NewsDetail />
     </>

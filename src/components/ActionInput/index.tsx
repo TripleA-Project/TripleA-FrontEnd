@@ -67,6 +67,11 @@ const ActionInput = forwardRef(
         containerClassName =
           'relative w-[253px] h-[38px] border pl-[23px] rounded-[15px] border-solid border-[#dbdee1] outline-none';
         break;
+      case 'newsDetailSearch':
+        inputClassName = 'w-[300px] h-[30px] outline-none';
+        containerClassName =
+          'flex absolute left-[40px] top-[80%] translate-y-[-50%] w-[340px] h-[38px] outline-none items-center ';
+        break;
       default:
         break;
     }
@@ -170,6 +175,16 @@ const ActionInput = forwardRef(
         </button>
       ),
       loginEmail: null,
+      newsDetailSearch: (
+        <button
+          type="button"
+          style={{ color: 'black', fontSize: '16px', right: '8px' }}
+          className="absolute right-5 top-2/4 -translate-y-2/4 text-[15px] underline"
+          onClick={onClick}
+        >
+          <FiSearch />
+        </button>
+      ),
     };
 
     return (

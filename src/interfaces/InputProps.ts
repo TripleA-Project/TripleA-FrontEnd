@@ -15,6 +15,7 @@ export interface ActionInputProps extends Omit<React.HTMLAttributes<HTMLInputEle
     | 'name'
     | 'mainSearch'
     | 'selectSearch'
+    | 'newsDetailSearch'
     | 'loginEmail';
   onClick?: (e: React.MouseEvent<HTMLButtonElement> & { target: HTMLButtonElement }) => void;
 }
