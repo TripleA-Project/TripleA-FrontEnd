@@ -63,7 +63,7 @@ export default function IconButton({
   className,
   fullWidth = false,
   type,
-  sizeTheme = 'medium',
+  sizeTheme = 'icon',
   bgColorTheme,
   icon,
   textColorTheme,
@@ -76,7 +76,7 @@ export default function IconButton({
     small: `h-12 ${fullWidth ? 'w-full' : 'w-28'}`,
     medium: `h-10 ${fullWidth ? 'w-full' : 'w-72'}`,
     large: `h-14 ${fullWidth ? 'w-full' : 'w-40'}`,
-    icon: 'h-auto w-auto',
+    icon: 'h-7 w-7',
   };
 
   const backgroundColor = {
@@ -122,7 +122,7 @@ export default function IconButton({
       type={type}
       {...props}
     >
-      <div className={`flex items-center gap-5 ${iconPosition === 'right' ? 'flex-row-reverse' : ''}`}>
+      <div className={`flex-col items-center justify-center gap-5 ${iconPosition === 'right' ? 'flex-row-reverse' : ''}`}>
         {typeof icon === 'string'
           ? presetIcon[icon as keyof typeof presetIcon]
           : icon({ style: { fontSize: iconSize } })}
