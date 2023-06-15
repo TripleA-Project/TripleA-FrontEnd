@@ -5,8 +5,9 @@ import { NewsData } from '@/interfaces/NewsData'
 interface ColorBarProps extends Pick<NewsData, 'sentiment'> {}
 
 const ColorBar = styled.div<ColorBarProps>`
+  margin: 0 10px 0 0;
   width: 5px;
-  height: 72px;
+  /* height: 72px; */
   border-radius:5px ;
   background-color: ${({sentiment})=>{
     if(sentiment>= -10 && sentiment < 0.5){

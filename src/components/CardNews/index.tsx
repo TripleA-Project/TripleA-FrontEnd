@@ -3,46 +3,56 @@ import React, {Fragment, useState} from 'react';
 import NewsImage from './NewsImage'
 import ChipContainer from './ChipContainer';
 import News from './News'
-import ButtonContainer from './ButtonContainerComponent';
+import ButtonContainer from './ButtonContainer';
 
 import { NewsData } from '@/interfaces/NewsData';
 
 import styled from '@emotion/styled';
 
 interface CardProps {
-  direction: string ;
+  cardDirection: string ;
 }
 
 const Card = styled.li<CardProps>`
+  overflow:hidden;
+  box-sizing: border-box;
+  /* border-radius: 20px; */
+  border: 1px solid black;
   display: flex;
   flex-direction: column;
-  width: ${({direction})=> direction ===`column`? `296px`:`357px`};
-  height: ${({direction})=> direction === `column`?`364px`:`122px`};
+  justify-content: space-between;
+  width: ${({cardDirection})=> cardDirection ===`column`? `296px`:`357px`};
+  max-height: ${({cardDirection})=> cardDirection === `column`?`364px`:`122px`};
+  .chipContainer {
+  
+  }
 `
 
-function CardNews({ newsId,symbol, logo, source, title, description, thumbnail,publishedDate, sentiment, bookmark}:NewsData) {
+
+
+function CardNews({ newsId,symbol,logo, source, title, description, thumbnail,publishedDate, sentiment, bookmark}:NewsData) {
 
   const [cardDirection, setCardDirection] = useState('column')
 
   return (
-    <Card direction={cardDirection} >
+    <Card cardDirection={cardDirection} >
       {cardDirection==='column'?(
       <>
-        <div>
-          <NewsImage thumbnail={thumbnail}/>
+        <div >
+          <NewsImage thumbnail={thumbnail} cardDirection={cardDirection}/>
         </div>
-        <div>
+        <div className='newsContainer'>
           <ChipContainer symbol={symbol} logo={logo}/>
-          <News title={title} source={source} publishedDate={publishedDate} sentiment={sentiment} hole1={''} hole2={''}/>
+          <News title={title} source={source} publishedDate={publishedDate} sentiment={sentiment} hole1={''} hole2={''} cardDirection={cardDirection}/>
           <ButtonContainer newsId={newsId} bookmark={bookmark}/>
         </div>
       </>):(
       <>
-        <div>
+        <div className='chipContainer'>
           <ChipContainer symbol={symbol} logo={logo}/>
         </div>
         <div>
-          <News title={title} source={source} publishedDate={publishedDate} sentiment={sentiment} hole1={<NewsImage thumbnail={thumbnail}/>} hole2={<ButtonContainer bookmark={bookmark} newsId={newsId}/>  }/>
+          <News title={title} source={source} publishedDate={publishedDate} sentiment={sentiment} hole1={<NewsImage thumbnail={thumbnail}/>} hole2={<ButtonContainer bookmark={bookmark} newsId={newsId}/>} cardDirection={cardDirection}/>
         </div>
       </>
       )}
