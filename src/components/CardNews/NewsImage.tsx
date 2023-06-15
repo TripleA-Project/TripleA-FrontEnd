@@ -1,19 +1,27 @@
-
 import styled from '@emotion/styled'
+import Image from 'next/image';
 import { NewsData } from '@/interfaces/NewsData';
 
 
-const ImageContainer = styled.div<Pick<NewsData, 'thumbnail'>>`
-  width: 66px;
-  height: 66px;
-  background-image: url(${({thumbnail})=>thumbnail});
-  background-repeat: no-repeat;
-  background-size: cover;
+interface NewsImageProps extends Pick<NewsData,'thumbnail'>{
+  cardDirection: 'column' | 'row';
+}
+interface ImageContainerProps extends NewsImageProps{
+  
+}
+const ImageContainer = styled.div<ImageContainerProps>`
+  overflow: hidden;
+  border-top-left-radius: 10px ;
+  border-top-right-radius: 10px;
+  border-bottom-left-radius: 10px ;
+  border-bottom-right-radius: 10px ;
 `
 
-export default function NewsImage({thumbnail}:Partial<NewsData>) {
+export default function NewsImage({thumbnail='https://giphy.com/gifs/running-muppets-7kn27lnYSAE9O', cardDirection}:NewsImageProps) {
   return (
-    <ImageContainer thumbnail={thumbnail&&thumbnail}/>
+    <ImageContainer thumbnail={thumbnail} cardDirection={cardDirection}>
+      {/* {thumbnail && <Image loader={'https://giphy.com/gifs/running-muppets-7kn27lnYSAE9O'} src={thumbnail} alt='thumbnail' width={66} height={66}/>} */}
+    </ImageContainer>
   )
 }
 
