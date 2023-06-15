@@ -20,7 +20,7 @@ import { RiPencilFill } from 'react-icons/ri';
 import { FiSearch, FiX } from 'react-icons/fi';
 import { IconType } from 'react-icons/lib';
 
-interface IconButtonProps extends ButtonProps {
+export interface IconButtonProps extends ButtonProps {
   icon:
     | 'heart'
     | 'heartfill'
