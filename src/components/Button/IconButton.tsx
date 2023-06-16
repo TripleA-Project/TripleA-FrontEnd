@@ -42,6 +42,7 @@ interface IconButtonProps extends ButtonProps {
     | IconType;
   iconPosition?: 'left' | 'right';
   iconSize?: string;
+  isBookmark?: boolean;
 }
 
 /**
@@ -69,6 +70,8 @@ export default function IconButton({
   textColorTheme,
   iconPosition = 'left',
   iconSize = '16px',
+  clickHandler,
+  isBookmark,
   children,
   ...props
 }: IconButtonProps) {
@@ -119,14 +122,16 @@ export default function IconButton({
       className={`flex cursor-pointer items-center justify-center rounded-xl ${textColor[textColorTheme]} ${
         sizeClassNames[sizeTheme]
       } ${backgroundColor[bgColorTheme]} ${className ? ` ${className}` : ''}`}
-      type={type}
+      type={type} onClick={clickHandler}
       {...props}
     >
-      <div className={`flex-col items-center justify-center gap-5 ${iconPosition === 'right' ? 'flex-row-reverse' : ''}`}>
-        {typeof icon === 'string'
-          ? presetIcon[icon as keyof typeof presetIcon]
-          : icon({ style: { fontSize: iconSize } })}
-        <span className="break-all text-start">{children}</span>
+      <div>
+        <div className={`flex-col items-center justify-center gap-5 relative ${iconPosition === 'right' ? 'flex-row-reverse' : ''}`}>
+          {typeof icon === 'string'
+            ? presetIcon[icon as keyof typeof presetIcon]
+            : icon({ style: { fontSize: iconSize } })}
+        </div>
+        <span className="break-all text-start absolute top-3 right-1">{children}</span>
       </div>
     </button>
   );
