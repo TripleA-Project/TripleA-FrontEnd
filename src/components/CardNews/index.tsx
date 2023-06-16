@@ -11,6 +11,7 @@ import styled from '@emotion/styled';
 
 interface CardProps {
   cardDirection: string; //column, row, tile
+  sentimentColor: string;
   children: ReactNode;
 }
 
@@ -18,27 +19,39 @@ const Card = styled.li<CardProps>`
   overflow:hidden;
   box-sizing: border-box;
   margin: 10px;
-  border: 1px solid black;
+  padding: ${({cardDirection})=> cardDirection === `tile` && `12px`};
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  width: ${({cardDirection})=> cardDirection ===`column`? `358px`:`357px`};
-  min-height: ${({cardDirection})=> cardDirection === `column`?`344px`:`122px`};
-  background-color: #fff;
+  width: ${({cardDirection})=> cardDirection ===`column`? `358px`:( cardDirection === `row` ? `357px` : `106px`)};
+  min-height: ${({cardDirection})=> cardDirection === `column`?`344px`:( cardDirection === `row` ? `122px` : `auto`)};
+  height : ${({cardDirection})=>cardDirection === `tile` && `106px`};
+  background-color:${({cardDirection, sentimentColor})=> cardDirection === `tile` ? `${sentimentColor}` : `#fff`} ;
   .title {
-    width: 106px;
-    height: 106px;
+    width: ${({cardDirection})=>cardDirection === `tile` ? `auto` : `106px`};
+    /* height: 106px; */
+    font-size: ${({cardDirection})=> cardDirection === `tile` && `14px`};
+    font-weight:${({cardDirection})=>cardDirection === `tile` && `600`};
+    overflow: hidden; /*자르세요*/
+    text-overflow: ellipsis;/* 생략하세요 */
   }
-  
+  .time {
+    text-align: right;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+  }
 `
 
 
 
-function CardNews({ newsId,symbol,logo, source, title, description, thumbnail,publishedDate, sentiment, bookmark}:NewsData) {
+function CardNews({ newsId,symbol,logo, source, title, thumbnail,publishedDate, sentiment, bookmark}:NewsData) {
 
-  const [cardDirection, setCardDirection] = useState('row')
+  const [cardDirection, setCardDirection] = useState('tile')
 
-  const getSentimentColor = (sentiment)=> { if(sentiment >= -10 && sentiment < 0.5){
+  const getSentimentColor = (sentiment:number)=> { 
+    if(sentiment >= -10 && sentiment < 0.5){
       return '#786BE4'
     } else if (sentiment >= 0.5 && sentiment < 1.5){
       return '#759DEB'
@@ -57,7 +70,7 @@ function CardNews({ newsId,symbol,logo, source, title, description, thumbnail,pu
 
 
   return (
-    <Card cardDirection={cardDirection}>
+    <Card cardDirection={cardDirection} sentimentColor={sentimentColor}>
       {cardDirection==='column'?
       <div className='column'>
         <div >
@@ -79,10 +92,10 @@ function CardNews({ newsId,symbol,logo, source, title, description, thumbnail,pu
         </div>
       </div>
       :
-      <div className='tile'>
-        <div>{title}</div>
-        <div>{publishedDate}</div>
-      </div>
+      <>
+        <div className='title'>{title}</div>
+        <div className='time'>{publishedDate}</div>
+      </>
       }
     </Card>
   )
