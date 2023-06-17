@@ -2,7 +2,7 @@ import { type APIResponse } from '../Core';
 
 // AI 뉴스 분석
 export interface AINewsAnalysisParam {
-  id: string;
+  id: number;
 }
 
 export interface AINewsAnalysisPayload {

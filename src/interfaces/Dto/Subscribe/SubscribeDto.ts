@@ -1,6 +1,6 @@
 import { type APIResponse } from '../Core';
 
-// 구독 신청
+// 구독
 interface SubscribePayload {
   payment: string;
 }

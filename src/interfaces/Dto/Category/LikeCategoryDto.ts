@@ -6,14 +6,14 @@ export interface GetLikeCategoryResponse extends APIResponse<CategoryPayload> {}
 
 // 관심 카테고리 생성
 export interface LikeCategoryParam {
-  id: string;
+  id: number;
 }
 
 export interface LikeCategoryResponse extends APIResponse {}
 
 // 관심 카테고리 삭제
 export interface DisLikeCategoryParam {
-  id: string;
+  id: number;
 }
 
 export interface DisLikeCategoryResponse extends APIResponse {}
