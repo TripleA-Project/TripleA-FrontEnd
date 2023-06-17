@@ -42,6 +42,7 @@ export interface IconButtonProps extends ButtonProps {
     | IconType;
   iconPosition?: 'left' | 'right';
   iconSize?: string;
+  onClick: () => void;
 }
 
 /**
@@ -70,6 +71,7 @@ export default function IconButton({
   iconPosition = 'left',
   iconSize = '16px',
   children,
+  onClick,
   ...props
 }: IconButtonProps) {
   const sizeClassNames = {
@@ -121,6 +123,7 @@ export default function IconButton({
         sizeClassNames[sizeTheme]
       } ${backgroundColor[bgColorTheme]} ${className ? ` ${className}` : ''}`}
       type={type}
+      onClick={onClick}
       {...props}
     >
       <div className={`flex items-center gap-5 ${iconPosition === 'right' ? 'flex-row-reverse' : ''}`}>
