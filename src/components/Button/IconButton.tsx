@@ -91,6 +91,7 @@ export default function IconButton({
     black: 'text-black',
     gray: 'text-gray-500',
     orange: 'text-[#FD954A]',
+    none: '',
   };
 
   const presetIcon = {

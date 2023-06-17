@@ -1,12 +1,15 @@
 'use client';
 
+import React, { MouseEvent, MouseEventHandler } from 'react';
+
 export interface ButtonProps extends Omit<React.HTMLProps<HTMLButtonElement>, 'size' | 'type'> {
   type?: 'button' | 'submit' | 'reset' | undefined;
   sizeTheme?: 'small' | 'medium' | 'large' | 'icon';
   fullWidth?: boolean;
   bgColorTheme: 'blue' | 'gray' | 'violet' | 'orange' | 'none';
-  textColorTheme: 'white' | 'black' | 'gray' | 'orange';
+  textColorTheme: 'white' | 'black' | 'gray' | 'orange' | 'none';
   bg?: string;
+  onClick: () => void;
 }
 
 export default function Button({
@@ -17,6 +20,7 @@ export default function Button({
   bgColorTheme,
   textColorTheme,
   children,
+  onClick,
   ...props
 }: ButtonProps) {
   const sizeClassNames = {
@@ -38,6 +42,7 @@ export default function Button({
     black: 'text-black',
     gray: 'text-gray-500',
     orange: 'text-[#FD954A]',
+    none: 'none',
   };
 
   return (
@@ -46,6 +51,7 @@ export default function Button({
         sizeClassNames[sizeTheme]
       } ${backgroundColor[bgColorTheme]} ${className ? ` ${className}` : ''}`}
       type={type}
+      onClick={onClick}
       {...props}
     >
       {children}
