@@ -1,12 +1,12 @@
 "use client"
 import Button from "@/components/Button/Button";
 import styled from "@emotion/styled";
-import { ReactElement, ReactNodeArray } from "react";
+import { ReactElement, ReactNode} from "react";
 
 interface ModalProps {
   size: string;
   title: ReactElement;
-  content?: ReactElement;
+  content?: ReactNode;
   mainBtn: string;
   subBtn?: string;
 }
