@@ -1,6 +1,6 @@
 'use client';
 
-import { BsBookmark, BsBookmarkFill, BsFillShareFill } from 'react-icons/bs';
+import { BsBookmark, BsBookmarkFill, BsFillShareFill, BsGrid3X3GapFill } from 'react-icons/bs';
 import { ButtonProps } from './Button';
 import {
   AiOutlineSearch,
@@ -18,6 +18,7 @@ import { MdCancel } from 'react-icons/md';
 import { TfiExport } from 'react-icons/tfi';
 import { RiPencilFill } from 'react-icons/ri';
 import { FiSearch, FiX } from 'react-icons/fi';
+import {GiHamburgerMenu} from 'react-icons/gi'
 import { IconType } from 'react-icons/lib';
 
 interface IconButtonProps extends ButtonProps {
@@ -39,6 +40,8 @@ interface IconButtonProps extends ButtonProps {
     | 'xfill'
     | 'export'
     | 'pencil'
+    | 'hamburgermenu'
+    | 'gridmenu'
     | IconType;
   iconPosition?: 'left' | 'right';
   iconSize?: string;
@@ -115,6 +118,8 @@ export default function IconButton({
     x: <FiX />,
     xfill: <MdCancel />,
     pencil: <RiPencilFill />,
+    hamburgermenu : <GiHamburgerMenu/>,
+    gridmenu : <BsGrid3X3GapFill/>
   };
 
   return (
