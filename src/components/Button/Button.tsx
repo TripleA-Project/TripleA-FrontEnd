@@ -6,10 +6,10 @@ export interface ButtonProps extends Omit<React.HTMLProps<HTMLButtonElement>, 's
   type?: 'button' | 'submit' | 'reset' | undefined;
   sizeTheme?: 'small' | 'medium' | 'large' | 'icon';
   fullWidth?: boolean;
-  bgColorTheme: 'blue' | 'gray' | 'violet' | 'orange' | 'none';
+  bgColorTheme: 'blue' | 'gray' | 'violet' | 'orange' | 'none' | 'lightgray';
   textColorTheme: 'white' | 'black' | 'gray' | 'orange' | 'none';
   bg?: string;
-  onClick: () => void;
+  onClick?: () => void;
 }
 
 export default function Button({
@@ -35,6 +35,7 @@ export default function Button({
     gray: 'bg-gray-600',
     violet: 'bg-[#5645F6] hover:bg-[#3E2AF0]',
     orange: 'bg-[#FD954A] hover:bg-[#E97624]',
+    lightgray: 'bg-[#DBDEE1]',
     none: 'none',
   };
   const textColor = {

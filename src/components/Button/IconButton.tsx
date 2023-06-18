@@ -86,6 +86,7 @@ export default function IconButton({
     gray: 'bg-gray-600',
     violet: 'bg-[#5645F6]',
     orange: 'bg-[#FD954A]',
+    lightgray: 'bg-[#DBDEE1]',
     none: 'none',
   };
   const textColor = {
@@ -126,7 +127,9 @@ export default function IconButton({
       onClick={onClick}
       {...props}
     >
-      <div className={`flex-col items-center justify-center gap-5 ${iconPosition === 'right' ? 'flex-row-reverse' : ''}`}>
+      <div
+        className={`flex-col items-center justify-center gap-5 ${iconPosition === 'right' ? 'flex-row-reverse' : ''}`}
+      >
         {typeof icon === 'string'
           ? presetIcon[icon as keyof typeof presetIcon]
           : icon({ style: { fontSize: iconSize } })}
