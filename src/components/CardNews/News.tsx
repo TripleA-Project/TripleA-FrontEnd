@@ -27,6 +27,7 @@ interface HoleProps {
 
 const NewsContainer = styled.div<NewsContainerProps>`
   display:flex;
+  width: 100%;
   /* justify-content: space-evenly; */
   /* padding: 15px 15px 0; */
 
@@ -46,8 +47,8 @@ const NewsContainer = styled.div<NewsContainerProps>`
   }
 `
 const Container = styled.div<ContainerProps>`
-  display: ${({cardDirection})=> cardDirection ==='row' ? 'grid' : 'block'};
-  grid-template-columns: ${({cardDirection})=> cardDirection==='row'?'1fr 3fr 1fr' : 'none'};
+  display: ${({cardDirection})=> cardDirection ==='row' ? 'grid' : (cardDirection === 'column' ? 'block': 'flex' )};
+  grid-template-columns: ${({cardDirection})=> cardDirection === 'row' && '1fr 9fr 1.5fr'};
   justify-content: space-evenly;
 `
 
