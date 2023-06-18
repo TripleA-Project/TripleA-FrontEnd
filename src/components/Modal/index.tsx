@@ -1,11 +1,12 @@
 "use client"
 import Button from "@/components/Button/Button";
 import styled from "@emotion/styled";
+import { ReactElement, ReactNodeArray } from "react";
 
 interface ModalProps {
   size: string;
-  title: string;
-  content?: string;
+  title: ReactElement;
+  content?: ReactElement;
   mainBtn: string;
   subBtn?: string;
 }
@@ -43,9 +44,7 @@ font-size:${({size})=>size === 'small'? '14px': '16px'};
 
 `
 const SubBtn = styled.button`
-  text-decoration: underline;
-  font-size: 12px;
-  padding: 6px 0 0 ;
+
 `
 
 
@@ -55,13 +54,13 @@ function Modal({size, title, content, mainBtn, subBtn}:ModalProps) {
 
 
   return (
-  <ModalContainer size={size}>
+  <ModalContainer className="bg-white" size={size} >
     <Title size={size}>{title}</Title>
     {content && <Content>{content}</Content>}
     <BtnWrapper size={size}>
       <Button className="large" type="button" sizeTheme="large"  bgColorTheme="orange" textColorTheme="white" clickHandler={()=>{ alert('메인버튼이 눌렸습니다')}}>{mainBtn}</Button>
     </BtnWrapper>
-    {subBtn && <SubBtn>{subBtn}</SubBtn>}
+    {subBtn && <div className="underline text-xs pt-1.5 pb-0 px-0 p-5 rounded-t-xl">{subBtn}</div>}
   </ModalContainer>
   )
 }
