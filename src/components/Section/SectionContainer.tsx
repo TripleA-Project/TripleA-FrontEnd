@@ -1,23 +1,26 @@
 "use client"
 import React, {useState} from 'react'
-import styled from '@emotion/styled'
 import { NewsData } from '@/interfaces/NewsData'
-
-import SectionHeader from './SectionHeader'
+import {MdOutlineLocalFireDepartment} from 'react-icons/md'
 import {BiNews} from 'react-icons/bi'
-import CardNews from '../CardNews'
+import SectionHeader from './SectionHeader'
+import CardNews from '@/components/CardNews'
 
-import { newsArr } from '@/constants/newsArr'
+interface SectionContainerProps {
+  newsArr: NewsData[],
+  type: 'hotNews'|'currentNews',
+}
 
-
-export default function SectionContainer({newsArr}:{newsArr:NewsData[]}) {
- 
+export default function SectionContainer({newsArr, type}:SectionContainerProps) {
+  const firstCardDirection = type === 'hotNews' ? 'column' : 'row'
+  const [cardDirection, setCardDirection] = useState(firstCardDirection)
+  
   return (
-    <div className='bg-white'>
-      <SectionHeader icon={<BiNews className='text-[24px]'/>} title={'최신 뉴스'}/>
+    <div className='bg-white px-[16px]'>
+      {type==='hotNews'?<SectionHeader type={'hotNews'} icon={<MdOutlineLocalFireDepartment className='text-[24px]'/>} title={'요즘 뉴스'}/>:<SectionHeader type={'currentNews'} icon={<BiNews className='text-[24px]'/>} title={'최신 뉴스'} setCardDirection={setCardDirection}/>}
     <div className='flex flex-wrap gap-[10px]'>
     {newsArr.map((news:NewsData)=>
-      <CardNews cardDirection='tile' key={news.newsId} newsId={news.newsId} symbol={news.symbol} source={news.source} title={news.title}  thumbnail={news.thumbnail} publishedDate={news.publishedDate} sentiment={news.sentiment} bookmark={news.bookmark}/>
+      <CardNews cardDirection={cardDirection} key={news.newsId} newsId={news.newsId} symbol={news.symbol} source={news.source} title={news.title}  thumbnail={news.thumbnail} publishedDate={news.publishedDate} sentiment={news.sentiment} bookmark={news.bookmark}/>
     )}
     </div>
    </div>
