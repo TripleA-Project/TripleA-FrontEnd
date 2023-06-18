@@ -20,7 +20,7 @@ const ModalSubTitle = styled.h4`
 
 export default function EmotionalScoreModal() {
   return (
-    <div className='min-w-[173px] min-h-[163px] rounded-lg p-[20px] m-[20px] bg-white flex flex-col gap-[20px] shadow-[5px_5px_5px_rgba(0,0,0,0.2)]'>
+    <div className='min-w-[250px] min-h-[163px] rounded-lg p-[20px] m-[20px] bg-white flex flex-col gap-[20px] shadow-[5px_5px_5px_rgba(0,0,0,0.2)] absolute -bottom-[100px] right-0 z-10'>
       <div className="title">
         <ModalTitle><MdInfoOutline/><span>AI 감성 분석</span></ModalTitle>
         <ModalSubTitle>(최근 3시간 기준)</ModalSubTitle>
