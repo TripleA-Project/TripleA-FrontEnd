@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
-      <body className={notoSans.className}>
+      <body className={notoSans.className + ' bg-[#F5F7F9] min-w-[390px] max-w-[768px] m-auto'}>
         <main>
           <ReduxProvider>
             <ReactQueryProvider>{children}</ReactQueryProvider>
