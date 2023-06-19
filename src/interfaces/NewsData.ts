@@ -13,6 +13,8 @@ export interface NewsData {
   sentiment:number;
   bookmark: Bookmark;
 }
+export type CardNewsData = Omit<NewsData,  'description'>
+
 export interface Bookmark {
   count: number;
   isBookmark: boolean;
