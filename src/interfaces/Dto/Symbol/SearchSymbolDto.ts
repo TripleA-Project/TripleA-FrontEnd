@@ -4,7 +4,7 @@ import { type Symbol } from '@/interfaces/Symbol';
 
 // 심볼 검색
 export interface SearchSymbolSearchParam {
-  search: string;
+  symbol: string;
 }
 
 export interface SearchSymbolRequestConfig extends AxiosRequestConfig {

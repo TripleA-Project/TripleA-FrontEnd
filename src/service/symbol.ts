@@ -36,10 +36,10 @@ export async function getLikeSymbol() {
  *
  * `search` 검색할 심볼 문자열 [**string**]
  */
-export async function searchSymbol({ search }: SearchSymbolSearchParam) {
+export async function searchSymbol({ symbol }: SearchSymbolSearchParam) {
   const searchSymbolResponse = await axiosInstance.get<SearchSymbolResponse>('/api/symbol', {
     params: {
-      search,
+      symbol,
     },
   } as SearchSymbolRequestConfig);
 

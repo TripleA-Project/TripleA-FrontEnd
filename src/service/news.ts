@@ -35,7 +35,7 @@ import {
  *
  * 기본 **10**
  */
-export async function latestNews({ page = 0, size = 10 }: LatestNewsSearchParam) {
+export async function latestNews({ page = 0, size = 10 }: LatestNewsSearchParam = {}) {
   const latestNewsResponse = await axiosInstance.get<LatestNewsResponse>('/api/news/latest', {
     params: {
       page,
@@ -74,7 +74,6 @@ export async function searchSymbolNews({ symbol, page = 0, size = 10 }: SearchSy
       size,
     },
   } as SearchSymbolNewsRequestConfig);
-
   return searchSymbolNewsResponse;
 }
 
