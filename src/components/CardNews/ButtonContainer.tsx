@@ -18,16 +18,16 @@ export default function ButtonContainer({newsId,bookmark}:ButtonContainerProps){
   const [isMarked, setIsMarked] = useState(isBookmark)
   
   const bookmarkClickHandler = () => {
-  setIsMarked(!isBookmark)
+  setIsMarked(!isMarked)
   alert('북마크 버튼이 눌렸습니다')
   }
   const shareClickHandler = () => {
     alert('공유 버튼이 눌렸습니다')
   }
   return (
-    <div className="flex flex-row justify-end align-center p-[4px]">
+    <div className="flex flex-row justify-end items-center gap-[6px] ml-[10px]">
       <IconButton icon='export' bgColorTheme='none' textColorTheme='black' clickHandler={shareClickHandler}/>
-      {isBookmark ? 
+      {isMarked ? 
         <IconButton icon='bookmarkfill' bgColorTheme='none' textColorTheme='black' clickHandler={bookmarkClickHandler} isBookmark={isBookmark}>{count && count}</IconButton>
         :
         <IconButton icon='bookmark' bgColorTheme='none' textColorTheme='black'clickHandler={bookmarkClickHandler} isBookmark={isBookmark}>{count && count}</IconButton>
