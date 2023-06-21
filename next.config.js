@@ -5,7 +5,7 @@ const nextConfig = {
   },
   server: {
     host: '54.180.102.131',
-    port: 3000
+    port: '3000'
   }
 };
 
