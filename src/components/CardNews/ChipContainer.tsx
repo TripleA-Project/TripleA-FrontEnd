@@ -19,6 +19,7 @@ export default function ChipContainer({symbol, logo}:Pick<NewsData, 'symbol'|'lo
 const ChipsWrapper = styled.div`
   display: flex;
   align-items: center;
+  padding: 0 0 5px;
 `
 
 const Chip = styled.div`
@@ -31,21 +32,21 @@ const Chip = styled.div`
   padding: 8px 0;
   position: relative;
   background-color: #fff;
-  margin: 0 20px 15px 17.5px;
   font-size: 12px;
+  margin: 0 20px;
   &::before {
-    content: '';
+    content: ' ';
     position: absolute;
     z-index:-1;
     left: -14px;
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    background-color: #fff;
+    background-color: red;
     border:1.5px solid #E5E7EC;
   }
   &::after {
-    content: '';
+    content: ' ';
     position: absolute;
     z-index:-1;
     right: -14px; 
@@ -53,7 +54,7 @@ const Chip = styled.div`
     height: 28px;
     border-radius: 50%;
     border: 1.5px solid #E5E7EC;
-    background-color: #fff;
+    background-color: red;
   }
 `
 

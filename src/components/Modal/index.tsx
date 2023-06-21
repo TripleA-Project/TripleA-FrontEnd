@@ -1,71 +1,41 @@
 "use client"
+import Button from "@/components/Button/Button";
 import styled from "@emotion/styled";
+import { ReactElement, ReactNode} from "react";
 
 interface ModalProps {
   size: string;
-  title: string;
-  content?: string;
+  title: ReactElement;
+  content?: ReactNode;
   mainBtn: string;
   subBtn?: string;
 }
+//styleComponent
 const ModalContainer = styled.div<Pick<ModalProps,'size'>>`
-  box-sizing: border-box;
-  border-radius: 15px;
-  /* border: 1px solid; */
-  padding: 15px;
-  width: ${({size})=> size === 'small'? '250px' : '390px'};
-  height: ${({size})=> size === 'small'? '180px' : '357px'};
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  text-align: center;
-  box-shadow: ${({size})=> size === 'small' ? '5px 5px 5px rgba(0,0,0,0.2)': 'none'};
+  border-radius: ${({size})=> size === 'small'? '16px': '16px 16px 0 0'};
+  min-width: ${({size})=>size === 'small'? 'auto': '390px'};
+  width: ${({size})=> size === 'small'? '215px' : '92%'};
+  height: ${({size})=> size === 'small'? 'auto' : '357px'};
+  box-shadow: ${({size})=> size === 'small' ? '5px 5px 5px rgba(0,0,0,0.2)': '0px 0px 10px rgba(0,0,0,0.2)'};
 `
-const Title = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 25px;
-  font-size: 20px;
-  font-weight: 600; 
+const Title = styled.div<{size:string}>`
+  font-size: ${({size})=>size==='small'? '16px':'20px'};
 `
-const Content = styled.p`
-  font-size: 16px;
-  text-align: center;
-
-`
-const BtnWrapper = styled.div`
-display: flex;
-justify-content: center;
-
-`
-const BtnLarge = styled.button`
-  border-radius: 5px;
-  width: 90%;
-  padding: 10px;
-  background-color: #FD954A;
-  color: #fff;
-
-`
-const SubBtn = styled.button`
-  text-decoration: underline;
-  font-size: 15px;
+const BtnWrapper = styled.div<{size:string}>`
+  font-size:${({size})=>size === 'small'? '14px': '16px'};
 `
 
 
 function Modal({size, title, content, mainBtn, subBtn}:ModalProps) {
 
-
-
-
   return (
-  <ModalContainer size={size}>
-    <Title>{title}</Title>
-    {content && <Content>{content}</Content>}
-    <BtnWrapper>
-      <BtnLarge>{mainBtn}</BtnLarge>
+  <ModalContainer className="bg-white m-auto p-[16px] border-box flex flex-col justify-evenly align-center" size={size} >
+    <Title className="flex flex-col align-center gap-[25px] font-bold p-[6px]" size={size}>{title}</Title>
+    {content && <p className="font-[16px] text-center">{content}</p>}
+    <BtnWrapper className="flex justify-center" size={size}>
+      <Button className="large" type="button" sizeTheme="large"  bgColorTheme="orange" textColorTheme="white" clickHandler={()=>{ alert('메인버튼이 눌렸습니다')}}>{mainBtn}</Button>
     </BtnWrapper>
-    {subBtn && <SubBtn>{subBtn}</SubBtn>}
+    {subBtn && <div className="underline text-xs pt-1.5 pb-0 px-0 p-5 rounded-t-xl">{subBtn}</div>}
   </ModalContainer>
   )
 }
