@@ -20,16 +20,16 @@ function RightIcon({ clickHandle, rightIcon }: RightIconProps) {
     if (pathName === '/') {
       router.push('/search');
     }
-    if (pathName === `/chart/${params.slug}`) {
+    if (pathName === `/chart/symbol`) {
       setIsClicked(!isClicked);
     }
   };
   return (
     <div
       className={`${
-        pathName === `/chart/${params.slug}` && isClicked
+        pathName === `/chart/symbol` && isClicked
           ? 'text-[#FD954A]'
-          : pathName === `/chart/${params.slug}` && 'text-neutral-400'
+          : pathName === `/chart/symbol` && 'text-neutral-400'
       }`}
     >
       <IconButton

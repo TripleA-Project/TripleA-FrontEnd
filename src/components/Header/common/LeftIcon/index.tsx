@@ -13,11 +13,11 @@ function LeftIcon({ clickHandle, leftIcon }: leftIconProps) {
   const params = useParams()
   const router = useRouter();
   const iconClickHandle = () => {
-    if(pathName ===`/chart/${params.slug}`)
+    if(pathName ===`/chart/symbol`)
     router.push('/chart')
   }
   return (
-    <div className={`${(pathName === '/chart')|| (pathName ==='/login') ? 'text-[#FD954A]' : ''} ${pathName ===`/chart/${params.slug}`? 'text-neutral-400': ''}`}>
+    <div className={`${(pathName === '/chart')|| (pathName ==='/login') ? 'text-[#FD954A]' : ''} ${pathName ===`/chart/symbol`? 'text-neutral-400': ''}`}>
       {leftIcon === 'LogoIcon'? <LogoIcon/>:<IconButton icon={leftIcon} textColorTheme='none' bgColorTheme="none" sizeTheme="icon" iconSize="30px" onClick={iconClickHandle}/>}
     </div>
   );
