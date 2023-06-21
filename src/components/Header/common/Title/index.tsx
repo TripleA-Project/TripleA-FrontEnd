@@ -1,5 +1,6 @@
 'use client';
-import { usePathname } from 'next/navigation';
+import { useParams, usePathname } from 'next/navigation';
+import path from 'path';
 import React from 'react';
 
 interface TitleProps {
@@ -8,11 +9,15 @@ interface TitleProps {
 
 function Title({ title }: TitleProps) {
   const pathName = usePathname();
+  const params = useParams();
   return (
     <div
       className={`${
-        pathName === '/chart' ? 'absolute left-9 top-[0.8]' : 'absolute left-[50%] -translate-x-1/2 transform'
-      } text-center text-lg font-extrabold text-[#131F3C]`}
+        pathName === '/chart'? 'absolute left-9 top-[0.8] text-center text-lg font-extrabold text-[#131F3C]':''
+      } ${
+        pathName === `/chart/${params.slug}` ?
+        'transform-translate-x-1/2 absolute left-[50%] text-center text-lg font-extrabold text-[#131F3C]': ''
+      } ${pathName === '/login'? 'ml-[10px]': ''} ${pathName ==='/read'? 'text-center': ''}`}
     >
       {title}
     </div>
