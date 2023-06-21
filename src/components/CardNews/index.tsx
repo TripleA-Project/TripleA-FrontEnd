@@ -11,6 +11,7 @@ import styled from '@emotion/styled';
 
 interface CardNewsProps extends CardNewsData{
   cardDirection: string;
+  description: string;
 }
 
 interface CardProps {
@@ -43,7 +44,7 @@ const Card = styled.li<CardProps>`
 
 
 
-function CardNews({ newsId,symbol,logo, source, title, thumbnail,publishedDate, sentiment, bookmark, cardDirection}:CardNewsProps) {
+function CardNews({ newsId,symbol,logo, source, title, thumbnail,publishedDate, sentiment, bookmark, cardDirection }:CardNewsProps) {
 
   const getSentimentColor = (sentiment:number)=> { 
     if(sentiment >= -10 && sentiment < 0.5){

@@ -10,9 +10,7 @@ const Container = styled.div`
   font-size: 24px;
 `
 
-export default function ButtonContainer({children}) {
-  
-  
+export default function ButtonContainer({children}:{children: React.ReactNode}) {
   return (
     <Container>{children}</Container>
   )
