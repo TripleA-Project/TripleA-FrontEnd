@@ -6,6 +6,8 @@ import { Bookmark } from "@/interfaces/NewsData"
 import IconButton from "@/components/Button/IconButton"
 //styles
 import styled from "@emotion/styled"
+import { addNewsBookmark, deleteNewsBookmark } from "@/service/bookmark"
+
 
 interface ButtonContainerProps {
   newsId: number;
@@ -17,8 +19,10 @@ export default function ButtonContainer({newsId,bookmark}:ButtonContainerProps){
   const isBookmark = bookmark?.isBookmark
   const [isMarked, setIsMarked] = useState(isBookmark)
   
-  const bookmarkClickHandler = () => {
+  const bookmarkClickHandler = async() => {
+  const res = isMarked ? await deleteNewsBookmark(newsId) : await addNewsBookmark(newsId)
   setIsMarked(!isMarked)
+  console.log(res)
   alert('북마크 버튼이 눌렸습니다')
   }
   const shareClickHandler = () => {
