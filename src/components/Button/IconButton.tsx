@@ -2,6 +2,7 @@
 
 import { BsBookmark, BsBookmarkFill, BsFillShareFill, BsGrid3X3GapFill } from 'react-icons/bs';
 import { ButtonProps } from './Button';
+import { BiNews } from 'react-icons/bi';
 import {
   AiOutlineSearch,
   AiFillHeart,
@@ -14,12 +15,13 @@ import {
   AiFillCheckCircle,
   AiOutlineRight,
 } from 'react-icons/ai';
-import { MdCancel } from 'react-icons/md';
+import { MdCancel, MdOutlineLocalFireDepartment, MdInfoOutline } from 'react-icons/md';
 import { TfiExport } from 'react-icons/tfi';
+import { GiHamburgerMenu } from 'react-icons/gi';
 import { RiPencilFill } from 'react-icons/ri';
 import { FiSearch, FiX } from 'react-icons/fi';
-import {GiHamburgerMenu} from 'react-icons/gi'
 import { IconType } from 'react-icons/lib';
+import {HeartIcon} from './Icons'
 
 export interface IconButtonProps extends ButtonProps {
   icon:
@@ -40,8 +42,11 @@ export interface IconButtonProps extends ButtonProps {
     | 'xfill'
     | 'export'
     | 'pencil'
-    | 'hamburgermenu'
+    | 'news'
     | 'gridmenu'
+    | 'fire'
+    | 'info'
+    | 'hamburgermenu'
     | IconType;
   iconPosition?: 'left' | 'right';
   iconSize?: string;
@@ -103,7 +108,7 @@ export default function IconButton({
   };
 
   const presetIcon = {
-    heart: <AiOutlineHeart style={{ fontSize: iconSize }} />,
+    heart: <HeartIcon/>,
     heartfill: <AiFillHeart />,
     bookmark: <BsBookmark className="text-2xl" />,
     bookmarkfill: <BsBookmarkFill />,
@@ -121,8 +126,11 @@ export default function IconButton({
     x: <FiX />,
     xfill: <MdCancel />,
     pencil: <RiPencilFill />,
-    hamburgermenu : <GiHamburgerMenu/>,
-    gridmenu : <BsGrid3X3GapFill/>
+    news: <BiNews />,
+    gridmenu: <BsGrid3X3GapFill />,
+    fire: <MdOutlineLocalFireDepartment />,
+    info: <MdInfoOutline />,
+    hamburgermenu: <GiHamburgerMenu />,
   };
 
   return (

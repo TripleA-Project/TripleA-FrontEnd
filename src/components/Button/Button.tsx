@@ -26,7 +26,7 @@ export default function Button({
   
   const sizeClassNames = {
     small: `h-12 ${fullWidth ? 'w-full' : 'w-28'}`,
-    medium: `h-10 ${fullWidth ? 'w-full' : 'w-72'}`,
+    medium: `h-[54px] ${fullWidth ? 'w-full' : 'w-[358px]'}`,
     large: `h-14 ${fullWidth ? 'w-full' : 'w-40'}`,
     icon: `h-10 w-10`,
   };
