@@ -5,44 +5,44 @@ import styled from '@emotion/styled';
 
 interface SelectComponentProps {
   children : string;
-  selectedArray : string[] | [];
-  setSelectedArray: any;
+  selectedArr : string[] | [];
+  setSelectedArr: any;
 }
-interface NewsCategoryItemProps {
+interface SelectItemProps {
   selected: boolean;
 }
 
-function Select({children, ...props}:SelectComponentProps) {
+function Select({children, selectedArr, setSelectedArr}:SelectComponentProps) {
+  const [selected, setSelected] = useState(false)  
   
-  const [selected, setSelected] = useState(false)
-  const selectedArray = props.selectedArray
-  const setSelectedArray= props.setSelectedArray   
-
   const clickHandler:MouseEventHandler = (e:MouseEvent<HTMLLIElement> & {target:HTMLLIElement}) => {
     console.log(e.target.innerHTML)
     setSelected(!selected)
     if(selected===false){
-      setSelectedArray([...selectedArray, e.target.innerHTML])
+      setSelectedArr([...selectedArr, e.target.innerHTML])
     } else {
-      const filteredArray:string[]|[] = selectedArray.filter((item) => item !== e.target.innerText)
-      setSelectedArray(filteredArray)
+      const filteredArray:string[]|[] = selectedArr.filter((item) => item !== e.target.innerText)
+      setSelectedArr(filteredArray)
     }
   }
   
   
   return (
-  <NewsCategoryItem className={selected? 'selectItem selected': 'selectItem'} onClick={clickHandler} selected={selected}>{children}</NewsCategoryItem>)
+  <SelectItem className={selected? 'selectItem selected': 'selectItem'} onClick={clickHandler} selected={selected}>{children}</SelectItem>)
 }
 
 export default Select;
 
 //style
-const NewsCategoryItem = styled.li<NewsCategoryItemProps>`
+const SelectItem = styled.li<SelectItemProps>`
   display: inline-block;
-  border: 1px solid ${({selected})=> selected ? '#6A6A6A': '#000'};
+  border: 1px solid ${({selected})=> selected ? '#FD954A': '#DBDEE1'};
   border-radius: 25px;
   margin: 5px;
-  padding: 10px 20px;
-  background-color:${({selected})=>selected? '#6A6A6A' : '#E0E0E0'};
-  color: #fff;
+  padding: 8px 12px;
+  background-color:${({selected})=>selected? '#FFF0E4' : '#FFF'};
+  color: #000;
+  &:hover {
+    cursor: pointer;
+  }
 `
