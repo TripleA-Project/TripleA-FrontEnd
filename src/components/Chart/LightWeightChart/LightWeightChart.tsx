@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useRef, useState, useLayoutEffect } from "react";
-import { ChartOptions, IChartApi, createChart } from "lightweight-charts";
-import LightWeightChartContainer from "./LightWeightChartContainer";
+import { useRef, useState, useLayoutEffect } from 'react';
+import { ChartOptions, IChartApi } from 'lightweight-charts';
+import LightWeightChartContainer from './LightWeightChartContainer';
 
 export interface ChartProps {
   options?: Partial<ChartOptions>;
@@ -29,14 +29,15 @@ function LightWeightChart({ options, children }: ChartProps) {
   return (
     <div ref={chartContainerRef}>
       {container ? (
-        <LightWeightChartContainer
-          ref={chartAPIRef}
-          container={container}
-          options={{ height: 300 }}
-        >
+        <LightWeightChartContainer ref={chartAPIRef} container={container} options={{ height: 300 }}>
           {children}
         </LightWeightChartContainer>
-      ) : null}
+      ) : (
+        <>
+          {/* 나중에 스켈레톤과 같은 UI적용할 예정 */}
+          <div className="animate-pulse bg-orange-400">차트를 로딩중...</div>
+        </>
+      )}
     </div>
   );
 }
