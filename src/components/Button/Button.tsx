@@ -4,7 +4,7 @@ import React, { MouseEvent, MouseEventHandler } from 'react';
 
 export interface ButtonProps extends Omit<React.HTMLProps<HTMLButtonElement>, 'size' | 'type'> {
   type?: 'button' | 'submit' | 'reset' | undefined;
-  sizeTheme?: 'small' | 'medium' | 'large' | 'icon';
+  sizeTheme?: 'small' | 'medium' | 'large' | 'fullWidth' |'icon';
   fullWidth?: boolean;
   bgColorTheme: 'blue' | 'gray' | 'violet' | 'orange' | 'none' | 'lightgray';
   textColorTheme: 'white' | 'black' | 'gray' | 'orange' | 'none';
@@ -28,6 +28,7 @@ export default function Button({
     small: `h-12 ${fullWidth ? 'w-full' : 'w-28'}`,
     medium: `h-[54px] ${fullWidth ? 'w-full' : 'w-[358px]'}`,
     large: `h-14 ${fullWidth ? 'w-full' : 'w-40'}`,
+    fullWidth: 'h-[54px] w-full',
     icon: `h-10 w-10`,
   };
 
@@ -49,7 +50,7 @@ export default function Button({
 
   return (
     <button onClick={onClick}
-      className={`flex cursor-pointer items-center justify-center rounded-xl px-[16px] py-[15px] w-full font-bold ${textColor[textColorTheme]} ${
+      className={`flex cursor-pointer items-center justify-center rounded-xl font-bold ${textColor[textColorTheme]} ${
         sizeClassNames[sizeTheme]
       } ${backgroundColor[bgColorTheme]} ${className ? ` ${className}` : ''}`}
       type={type}
