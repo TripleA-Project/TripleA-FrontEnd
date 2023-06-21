@@ -1,5 +1,4 @@
 import React from 'react';
-import { VisibilityContext } from 'react-horizontal-scrolling-menu';
 
 export function Categories({
   icon,
@@ -12,14 +11,8 @@ export function Categories({
   percentage: string | null;
   color: string | null;
 }) {
-  const visibility = React.useContext(VisibilityContext);
-  const visible = visibility.isItemVisible(label);
-
   return (
-    <div
-      className="flex h-[36px] items-center justify-center whitespace-nowrap rounded-full border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-500"
-      style={{ backgroundColor: visible ? 'white' : 'gray' }}
-    >
+    <div className="mr-[10px] flex h-[36px] items-center justify-center whitespace-nowrap rounded-full border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-500">
       {icon}
       {label}
       {percentage && color
