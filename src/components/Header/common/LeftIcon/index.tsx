@@ -17,9 +17,8 @@ function LeftIcon({ clickHandle, leftIcon }: leftIconProps) {
     router.push('/chart')
   }
   return (
-    <div className={`${pathName === '/chart' ? 'text-[#FD954A]' : ''} ${pathName ===`/chart/${params.slug}`? 'text-neutral-400': ''}`}>
+    <div className={`${(pathName === '/chart')|| (pathName ==='/login') ? 'text-[#FD954A]' : ''} ${pathName ===`/chart/${params.slug}`? 'text-neutral-400': ''}`}>
       {leftIcon === 'LogoIcon'? <LogoIcon/>:<IconButton icon={leftIcon} textColorTheme='none' bgColorTheme="none" sizeTheme="icon" iconSize="30px" onClick={iconClickHandle}/>}
-      
     </div>
   );
 }
