@@ -26,7 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ReduxProvider>
             <ReactQueryProvider>
               {children}
-              <Nav/>
+              <Nav />
             </ReactQueryProvider>
           </ReduxProvider>
         </main>
