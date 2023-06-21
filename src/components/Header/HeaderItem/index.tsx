@@ -9,29 +9,34 @@ import ActionInput from '@/components/ActionInput/ActionInput';
 import { HeaderProps } from '..';
 
 
-function HeaderItem({leftIcon,rightIcon, title} : HeaderProps) {
+function HeaderItem({ leftIcon, rightIcon, title }: HeaderProps) {
   const pathName = usePathname();
-
   const [isClicked, setIsClicked] = useState(false);
   const clickHandle = () => {
-      setIsClicked(!isClicked);
+    setIsClicked(!isClicked);
+    if (pathName === '/') {
+    }
   };
 
-  useEffect(()=>{
-   setIsClicked(false) 
-  },[pathName])
+  useEffect(() => {
+    setIsClicked(false);
+  }, [pathName]);
 
   return (
-    <div className="px-5 my-3 w-screen ">
-      {(isClicked && pathName === '/') || (isClicked && pathName === '/chart') || pathName === '/search' ? (
-        <ActionInput type="mainSearch" onClick={clickHandle} />
-      ) : (
-        <div className="relative flex items-center justify-between text-2xl">
-          {leftIcon && <LeftIcon leftIcon={leftIcon} clickHandle={clickHandle}/>}
-          {title && <Title title={title}/>}
-          {rightIcon && <RightIcon rightIcon={rightIcon}clickHandle={clickHandle} />}
-        </div>
-      )}
+    <div className="my-3 w-screen px-6 ">
+      <div
+        className={`flex ${
+          pathName === '/login'|| pathName === '/read' ? ' item-center justify-center' : ' relative  items-center justify-between text-2xl'
+        } `}
+      >
+        {leftIcon && <LeftIcon leftIcon={leftIcon} clickHandle={clickHandle} />}
+        {pathName === '/search' ? (
+          <ActionInput type="mainSearch" onClick={clickHandle} />
+        ) : (
+          title && <Title title={title} />
+        )}
+        {rightIcon && <RightIcon rightIcon={rightIcon} clickHandle={clickHandle} />}
+      </div>
     </div>
   );
 }
