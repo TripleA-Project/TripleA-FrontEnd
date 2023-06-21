@@ -1,6 +1,6 @@
 'use client';
 
-import { BsBookmark, BsBookmarkFill, BsFillShareFill } from 'react-icons/bs';
+import { BsBookmark, BsBookmarkFill, BsFillShareFill, BsGrid3X3GapFill } from 'react-icons/bs';
 import { ButtonProps } from './Button';
 import {
   AiOutlineSearch,
@@ -18,6 +18,7 @@ import { MdCancel } from 'react-icons/md';
 import { TfiExport } from 'react-icons/tfi';
 import { RiPencilFill } from 'react-icons/ri';
 import { FiSearch, FiX } from 'react-icons/fi';
+import {GiHamburgerMenu} from 'react-icons/gi'
 import { IconType } from 'react-icons/lib';
 
 export interface IconButtonProps extends ButtonProps {
@@ -39,10 +40,13 @@ export interface IconButtonProps extends ButtonProps {
     | 'xfill'
     | 'export'
     | 'pencil'
+    | 'hamburgermenu'
+    | 'gridmenu'
     | IconType;
   iconPosition?: 'left' | 'right';
   iconSize?: string;
   onClick: () => void;
+  isBookmark?: boolean;
 }
 
 /**
@@ -70,6 +74,7 @@ export default function IconButton({
   textColorTheme,
   iconPosition = 'left',
   iconSize = '16px',
+  isBookmark,
   children,
   onClick,
   ...props
@@ -116,6 +121,8 @@ export default function IconButton({
     x: <FiX />,
     xfill: <MdCancel />,
     pencil: <RiPencilFill />,
+    hamburgermenu : <GiHamburgerMenu/>,
+    gridmenu : <BsGrid3X3GapFill/>
   };
 
   return (
@@ -123,17 +130,16 @@ export default function IconButton({
       className={`flex cursor-pointer items-center justify-center rounded-xl ${textColor[textColorTheme]} ${
         sizeClassNames[sizeTheme]
       } ${backgroundColor[bgColorTheme]} ${className ? ` ${className}` : ''}`}
-      type={type}
-      onClick={onClick}
+      type={type} onClick={onClick}
       {...props}
     >
-      <div
-        className={`flex-col items-center justify-center gap-5 ${iconPosition === 'right' ? 'flex-row-reverse' : ''}`}
-      >
-        {typeof icon === 'string'
-          ? presetIcon[icon as keyof typeof presetIcon]
-          : icon({ style: { fontSize: iconSize } })}
-        <span className="break-all text-start">{children}</span>
+      <div>
+        <div className={`flex-col items-center justify-center gap-5 relative ${iconPosition === 'right' ? 'flex-row-reverse' : ''}`}>
+          {typeof icon === 'string'
+            ? presetIcon[icon as keyof typeof presetIcon]
+            : icon({ style: { fontSize: iconSize } })}
+        </div>
+        <span className="break-all text-start absolute top-3 right-1">{children}</span>
       </div>
     </button>
   );

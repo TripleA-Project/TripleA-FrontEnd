@@ -23,6 +23,7 @@ export default function Button({
   onClick,
   ...props
 }: ButtonProps) {
+  
   const sizeClassNames = {
     small: `h-12 ${fullWidth ? 'w-full' : 'w-28'}`,
     medium: `h-10 ${fullWidth ? 'w-full' : 'w-72'}`,
@@ -47,12 +48,11 @@ export default function Button({
   };
 
   return (
-    <button
-      className={`flex cursor-pointer items-center justify-center rounded-xl ${textColor[textColorTheme]} ${
+    <button onClick={onClick}
+      className={`flex cursor-pointer items-center justify-center rounded-xl px-[16px] py-[15px] w-full font-bold ${textColor[textColorTheme]} ${
         sizeClassNames[sizeTheme]
       } ${backgroundColor[bgColorTheme]} ${className ? ` ${className}` : ''}`}
       type={type}
-      onClick={onClick}
       {...props}
     >
       {children}

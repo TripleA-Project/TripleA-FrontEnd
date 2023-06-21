@@ -149,16 +149,7 @@ const ActionInput = forwardRef(
         </button>
       ),
       name: null,
-      mainSearch: (
-        <button
-          type="button"
-          style={{ color: '#e5e7ec', fontSize: '22px', right: '1px' }}
-          className="absolute right-[22px] top-2/4 -translate-y-2/4 items-center justify-center text-[13px] font-bold"
-          onClick={onClick}
-        >
-          <MdCancel />
-        </button>
-      ),
+      mainSearch: null,
       selectSearch: (
         <button
           type="button"
