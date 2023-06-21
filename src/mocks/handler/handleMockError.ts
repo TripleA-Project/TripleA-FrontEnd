@@ -9,7 +9,7 @@ interface MSWHandleObject {
   ctx: RestContext;
 }
 
-export function handleMockError(error: unknown, { req, res, ctx }: MSWHandleObject) {
+export function handleMockError(error: unknown, { res, ctx }: MSWHandleObject) {
   if (error instanceof RegisterdAppError) {
     const { status, message, payload } = error.cause as AppError;
 

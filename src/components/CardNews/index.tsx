@@ -1,11 +1,11 @@
 "use client"
-import React, { ReactNode, useState} from 'react';
+import React, { ReactNode } from 'react';
 import NewsImage from './NewsImage'
 import ChipContainer from './ChipContainer';
 import News from './News'
 import ButtonContainer from './ButtonContainer';
 
-import { CardNewsData, NewsData } from '@/interfaces/NewsData';
+import { CardNewsData } from '@/interfaces/NewsData';
 
 import styled from '@emotion/styled';
 

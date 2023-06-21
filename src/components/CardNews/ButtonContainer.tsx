@@ -5,7 +5,7 @@ import { Bookmark } from "@/interfaces/NewsData"
 //components
 import IconButton from "@/components/Button/IconButton"
 //styles
-import styled from "@emotion/styled"
+// import styled from "@emotion/styled"
 
 interface ButtonContainerProps {
   newsId: number;

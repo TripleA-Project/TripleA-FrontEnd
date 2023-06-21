@@ -29,7 +29,7 @@ function LightWeightChart({ options, children }: ChartProps) {
   return (
     <div ref={chartContainerRef}>
       {container ? (
-        <LightWeightChartContainer ref={chartAPIRef} container={container} options={{ height: 300 }}>
+        <LightWeightChartContainer ref={chartAPIRef} container={container} options={{ height: 300, ...options }}>
           {children}
         </LightWeightChartContainer>
       ) : (

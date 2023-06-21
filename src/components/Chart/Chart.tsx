@@ -20,6 +20,7 @@ function Chart({ symbol, resample }: ChartProps) {
   oneYearBefore.setTime(oneYearBefore.setFullYear(today.getFullYear() - 1));
 
   console.log({
+    symbol,
     today: today.toISOString().substring(0, 10),
     oneYearBefore: oneYearBefore.toISOString().substring(0, 10),
   });

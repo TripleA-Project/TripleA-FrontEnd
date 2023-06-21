@@ -20,7 +20,7 @@ export default function SectionContainer({newsArr, type}:SectionContainerProps) 
       {type==='hotNews'?<SectionHeader type={'hotNews'} icon={<MdOutlineLocalFireDepartment className='text-[24px]'/>} title={'요즘 뉴스'}/>:<SectionHeader type={'currentNews'} icon={<BiNews className='text-[24px]'/>} title={'최신 뉴스'} setCardDirection={setCardDirection}/>}
     <div className='flex flex-wrap gap-[10px]'>
     {newsArr.map((news:NewsData)=>
-      <CardNews cardDirection={cardDirection} key={news.newsId} newsId={news.newsId} symbol={news.symbol} source={news.source} title={news.title}  thumbnail={news.thumbnail} publishedDate={news.publishedDate} sentiment={news.sentiment} bookmark={news.bookmark}/>
+      <CardNews description='' cardDirection={cardDirection} key={news.newsId} newsId={news.newsId} symbol={news.symbol} source={news.source} title={news.title}  thumbnail={news.thumbnail} publishedDate={news.publishedDate} sentiment={news.sentiment} bookmark={news.bookmark}/>
     )}
     </div>
    </div>

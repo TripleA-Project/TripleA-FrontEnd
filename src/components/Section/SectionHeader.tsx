@@ -1,8 +1,6 @@
 "use client"
-import React, {ReactNode, SetStateAction, useState} from 'react'
+import React, { ReactNode, useState } from 'react'
 import styled from '@emotion/styled'
-import { IconType } from 'react-icons'
-import {BiNews} from 'react-icons/bi'
 import ButtonContainer from '@/components/Button/ButtonContainer'
 import { GiHamburgerMenu } from 'react-icons/gi'
 import { BsGrid3X3GapFill } from 'react-icons/bs'
@@ -67,7 +65,7 @@ export default function SectionHeader({type, icon, title, setCardDirection}:Sect
           }
         </ButtonContainer>
       </div>
-      {isClicked3 && <EmotionalScoreModal className=''/>}
+      {isClicked3 && <EmotionalScoreModal />}
     </SectionHeaderContainer>
   )
 }

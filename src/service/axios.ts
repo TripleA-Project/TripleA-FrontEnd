@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getURL } from '@/util/url';
+// import { getURL } from '@/util/url';
 import { getCookie } from '@/util/cookies';
 
 function createAxiosInstance() {
