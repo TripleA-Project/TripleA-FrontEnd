@@ -10,7 +10,6 @@ import {
   type EmailVerifyRequest,
   type EmailVerifyResponse,
   type LogoutResponse,
-  type RequestAccessTokenRequest,
   type RequestAccessTokenResponse,
 } from '@/interfaces/Dto/Auth';
 
@@ -31,10 +30,10 @@ export async function login({ email, password }: LoginRequest) {
 }
 
 /**
- * 로그아웃 API (GET)
+ * 로그아웃 API (POST)
  */
 export async function logout() {
-  const logoutResponse = await axiosInstance.get<LogoutResponse>('/api/logout');
+  const logoutResponse = await axiosInstance.post<LogoutResponse>('/api/logout');
 
   return logoutResponse;
 }
@@ -69,16 +68,12 @@ export async function signup({ email, password, passwordCheck, fullName, newsLet
 }
 
 /**
- * 액세스토큰 요청 API (GET)
+ * 액세스토큰 요청 API (POST)
  *
- * `refreshToken` 리프레시 토큰 [**string**] - Bearer
+ * `refreshToken` 쿠키가 요청헤더에 포함되어있어야 함
  */
-export async function requestAccessToken({ refreshToken }: RequestAccessTokenRequest) {
-  const requestAccessTokenResponse = await axiosInstance.get<RequestAccessTokenResponse>('/auth', {
-    headers: {
-      Authorization: `Bearer ${refreshToken}`,
-    },
-  });
+export async function requestAccessToken() {
+  const requestAccessTokenResponse = await axiosInstance.post<RequestAccessTokenResponse>('/api/refresh');
 
   return requestAccessTokenResponse;
 }
