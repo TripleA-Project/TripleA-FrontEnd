@@ -21,7 +21,7 @@ import { FiSearch, FiX } from 'react-icons/fi';
 import {GiHamburgerMenu} from 'react-icons/gi'
 import { IconType } from 'react-icons/lib';
 
-interface IconButtonProps extends ButtonProps {
+export interface IconButtonProps extends ButtonProps {
   icon:
     | 'heart'
     | 'heartfill'

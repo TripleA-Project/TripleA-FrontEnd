@@ -1,3 +1,4 @@
+import Nav from '@/components/Nav';
 import './globals.css';
 import ReactQueryProvider from '@/reactQuery/Provider';
 import ReduxProvider from '@/redux/ReduxProvider';
@@ -23,7 +24,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={notoSans.className + ' bg-[#F5F7F9] min-w-[390px] max-w-[768px] m-auto'}>
         <main>
           <ReduxProvider>
-            <ReactQueryProvider>{children}</ReactQueryProvider>
+            <ReactQueryProvider>
+              {children}
+              <Nav/>
+            </ReactQueryProvider>
           </ReduxProvider>
         </main>
       </body>
