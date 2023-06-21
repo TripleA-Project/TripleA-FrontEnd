@@ -1,7 +1,6 @@
 'use client';
 import IconButton, { IconButtonProps } from '@/components/Button/IconButton';
-
-import { useParams, usePathname } from 'next/navigation';
+import { useParams, usePathname, useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
 interface RightIconProps {
@@ -12,12 +11,15 @@ interface RightIconProps {
 function RightIcon({ clickHandle, rightIcon }: RightIconProps) {
   const [isClicked, setIsClicked] = useState(false);
   const pathName = usePathname();
-  const params = useParams()
+  const router = useRouter();
+  const params = useParams();
   const iconClickHandle = () => {
-    if (pathName === '/' || '/chart') {
-      clickHandle();
+    if (pathName === '/chart') {
+      router.push('/search');
     }
-
+    if (pathName === '/') {
+      router.push('/search');
+    }
     if (pathName === `/chart/${params.slug}`) {
       setIsClicked(!isClicked);
     }
