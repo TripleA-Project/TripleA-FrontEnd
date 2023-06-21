@@ -10,6 +10,7 @@ import { BsPiggyBank } from 'react-icons/bs';
 import styles from './index.module.css';
 import Switch from 'react-switch';
 import { Categories } from '../Categories';
+import Marquee from 'react-fast-marquee';
 
 export function NewsDetail() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -17,33 +18,23 @@ export function NewsDetail() {
   const [scrollState, setScrollState] = useState('right');
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (containerRef.current) {
-        const container = containerRef.current;
-        const isScrolledRight = container.scrollLeft === 0;
-        const isScrolledLeft = container.scrollLeft + container.clientWidth >= container.scrollWidth;
+    const containerElement = containerRef.current;
 
-        if (isScrolledRight) {
-          setScrollState('right');
-        } else if (isScrolledLeft) {
-          setScrollState('left');
-        } else {
-          setScrollState('both');
-        }
-      }
-    };
+    function handleScroll() {
+      if (!containerElement) return;
 
-    handleScroll();
+      const scrollPercentage =
+        containerElement.scrollLeft / (containerElement.scrollWidth - containerElement.clientWidth);
+      const gradientStartOpacity = 1 - scrollPercentage;
+      const gradientEndOpacity = scrollPercentage;
 
-    if (containerRef.current) {
-      handleScroll();
-      containerRef.current.addEventListener('scroll', handleScroll);
+      containerElement.style.backgroundImage = `linear-gradient(to left, rgba(255, 255, 255, ${gradientStartOpacity}), rgba(255, 255, 255, ${gradientEndOpacity}))`;
     }
 
+    containerElement?.addEventListener('scroll', handleScroll);
+
     return () => {
-      if (containerRef.current) {
-        containerRef.current.removeEventListener('scroll', handleScroll);
-      }
+      containerElement?.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
@@ -86,7 +77,7 @@ export function NewsDetail() {
   ];
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col overflow-x-hidden">
       <div className="p-4 text-xl font-semibold">
         Bank of America Securities는 Coupan에 대해 중립을 유지하고 목표가를 $19로 높입니다.{' '}
       </div>
@@ -100,28 +91,47 @@ export function NewsDetail() {
         </button>
       </div>
 
-      <div className={`container ml-[16px] flex overflow-x-auto ${scrollState}`} ref={containerRef}>
+      <div className={`gradient`}>
         <style jsx>{`
+          .gradient {
+            position: relative;
+          }
+          .gradient::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 16px;
+            height: 36px;
+            background: linear-gradient(to left, rgba(255, 255, 255, 0.001), white);
+          }
+          .gradient::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 20px;
+            height: 36px;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0.001), white);
+          }
           .container::-webkit-scrollbar {
             display: none;
           }
-          .container {
-            position: relative;
-          }
         `}</style>
-        {categories.map((category, index) => (
-          <div key={index} className="category-slide mr-[10px]">
-            <div className="flex h-[36px] items-center justify-center whitespace-nowrap rounded-full border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-500">
-              {category.icon}
-              {category.label}
-              {category.percentage && (
-                <span className="ml-[5px]" style={{ color: category.color }}>
-                  {category.percentage}
-                </span>
-              )}
+        <div className={`container flex overflow-x-auto pl-[16px]`} ref={containerRef}>
+          {categories.map((category, index) => (
+            <div key={index} className="category-slide mr-[10px]">
+              <div className="flex h-[36px] items-center justify-center whitespace-nowrap rounded-full border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-500">
+                {category.icon}
+                {category.label}
+                {category.percentage && (
+                  <span className="ml-[5px]" style={{ color: category.color }}>
+                    {category.percentage}
+                  </span>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       <div className="relative h-[40px] pt-[16px]">
