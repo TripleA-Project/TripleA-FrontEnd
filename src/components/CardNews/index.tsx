@@ -35,7 +35,7 @@ const Card = styled.li<CardProps>`
   height : ${({cardDirection})=>cardDirection === `tile` && `106px`};
   background-color:${({cardDirection, sentimentColor})=> cardDirection === `tile` ? `${sentimentColor}` : `#fff`} ;
   .title {
-    max-height: ${({cardDirection})=> cardDirection === `tile` && `40px`};
+    max-height: ${({cardDirection})=> cardDirection === `tile` && `70px`};
     font-size: ${({cardDirection})=> cardDirection === `tile` && `14px`};
     font-weight:${({cardDirection})=>cardDirection === `tile` && `600`};
   }
