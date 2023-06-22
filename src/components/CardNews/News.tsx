@@ -26,17 +26,6 @@ interface HoleProps {
 }
 
 const NewsContainer = styled.div<NewsContainerProps>`
-  display:flex;
-  width: 100%;
-  /* justify-content: space-evenly; */
-  /* padding: 15px 15px 0; */
-
-  h3 {
-    position: relative;
-    min-height: 40px;
-    max-height: 66px;
-    margin: 0 0 0 10px;
-  }
   .subText {
     position: absolute;
     bottom: ${({cardDirection})=>cardDirection==='column'?'-50px':'0px'};
@@ -48,37 +37,33 @@ const NewsContainer = styled.div<NewsContainerProps>`
 `
 const Container = styled.div<ContainerProps>`
   display: ${({cardDirection})=> cardDirection ==='row' ? 'grid' : (cardDirection === 'column' ? 'block': 'flex' )};
-  grid-template-columns: ${({cardDirection})=> cardDirection === 'row' && '1fr 9fr 1.5fr'};
-  justify-content: space-evenly;
+  grid-template-columns: ${({cardDirection})=> cardDirection === 'row' && '1fr 8fr 2fr'};
 `
 
 const Hole1 = styled.div<HoleProps>`
-    overflow: hidden;
     width: ${({cardDirection})=> cardDirection==='row'?'66px':'100%'};
     height: ${({cardDirection})=> cardDirection==='row'?'66px':'170px'};
     background-color: red;
 `
 const Hole2 = styled.div<HoleProps>`
-overflow: hidden;
-display: flex;
-align-items: center;
+
 `  
 
 
 export default function News({title, source , publishedDate , sentimentColor , hole1, hole2, cardDirection }:NewsProps) {
   return (
-    <NewsContainer cardDirection={cardDirection}>
+    <NewsContainer className='flex w-full ' cardDirection={cardDirection}>
       <Bar sentimentColor={sentimentColor}/>
-      <Container cardDirection={cardDirection}>
-        {hole1 && <Hole1 cardDirection={cardDirection}>{hole1}</Hole1>}
-        <h3>
+      <Container className='justify-evenly' cardDirection={cardDirection}>
+        {hole1 && <Hole1 className='overflow-hidden' cardDirection={cardDirection}>{hole1}</Hole1>}
+        <h3 className='ml-[10px] relative min-h-[40px] max-h-[66px]'>
           {title}
           <div className='subText'>
             <span>[{source}]</span>
             <span>{publishedDate}</span>
           </div>
         </h3>
-        {hole2 && <Hole2 cardDirection={cardDirection}>{hole2}</Hole2>}
+        {hole2 && <Hole2 className='overflow-hidden flex items-center justify-end' cardDirection={cardDirection}>{hole2}</Hole2>}
       </Container>
      
     </NewsContainer>

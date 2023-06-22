@@ -23,7 +23,7 @@ export default function ChipContainer({symbol, logo='ddd'}:Pick<NewsData, 'symbo
 const ChipsWrapper = styled.div`
   display: flex;
   align-items: center;
-  padding: 0 0 5px;
+  padding: 0 0 10px;
   z-index: -1;
 `
 

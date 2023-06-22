@@ -4,8 +4,7 @@ import { useState } from "react"
 import { Bookmark } from "@/interfaces/NewsData"
 //components
 import IconButton from "@/components/Button/IconButton"
-//styles
-import styled from "@emotion/styled"
+
 import { addNewsBookmark, deleteNewsBookmark } from "@/service/bookmark"
 
 
@@ -29,7 +28,7 @@ export default function ButtonContainer({newsId,bookmark}:ButtonContainerProps){
     alert('공유 버튼이 눌렸습니다')
   }
   return (
-    <div className="flex flex-row justify-end items-center gap-[6px] ml-[10px]">
+    <div className="flex flex-row justify-end items-center gap-[6px]">
       <IconButton icon='export' bgColorTheme='none' textColorTheme='black' clickHandler={shareClickHandler}/>
       {isMarked ? 
         <IconButton icon='bookmarkfill' bgColorTheme='none' textColorTheme='black' clickHandler={bookmarkClickHandler} isBookmark={isBookmark}>{count && count}</IconButton>

@@ -12,6 +12,21 @@ interface SelectItemProps {
   selected: boolean;
 }
 
+//style
+const SelectItem = styled.li<SelectItemProps>`
+  display: inline-flex;
+  justify-content: space-evenly;
+  border: 1px solid ${({selected})=> selected ? '#FD954A': '#DBDEE1'};
+  border-radius: 25px;
+  margin: 5px;
+  padding: 8px 12px;
+  background-color:${({selected})=>selected? '#FFF0E4' : '#FFF'};
+  color: #000;
+  &:hover {
+    cursor: pointer;
+  }
+`
+
 function Select({children, selectedArr, setSelectedArr}:SelectComponentProps) {
   const [selected, setSelected] = useState(false)  
   
@@ -32,17 +47,3 @@ function Select({children, selectedArr, setSelectedArr}:SelectComponentProps) {
 }
 
 export default Select;
-
-//style
-const SelectItem = styled.li<SelectItemProps>`
-  display: inline-block;
-  border: 1px solid ${({selected})=> selected ? '#FD954A': '#DBDEE1'};
-  border-radius: 25px;
-  margin: 5px;
-  padding: 8px 12px;
-  background-color:${({selected})=>selected? '#FFF0E4' : '#FFF'};
-  color: #000;
-  &:hover {
-    cursor: pointer;
-  }
-`

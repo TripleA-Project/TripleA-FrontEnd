@@ -8,16 +8,22 @@ interface SelectContainerProps {
   type: string,
   selectedArr?: [],
   setSelectedArr?: Function,
+  number? : boolean
 }
 
-export default function SelectContainer({arr,type, selectedArr, setSelectedArr}:SelectContainerProps) {
+export default function SelectContainer({arr,type, selectedArr, setSelectedArr, number=false}:SelectContainerProps) {
 
   return (
-    <div className='flex flex-wrap gap-[4px] justify-start pl-[28px]'>
-    {
+    <div className='inline-flex flex-col gap-[6px] justify-start'>
+    
+{
       type === 'category' 
       ? arr.map((item)=>{return <Select key={item.categoryId} selectedArr={selectedArr} setSelectedArr={setSelectedArr} >{item.label}</Select>})
       : arr.map((item)=>{return <Select key={item.symbolId} selectedArr={selectedArr} setSelectedArr={setSelectedArr}>{item.logo}{item.symbol}{item.companyName}</Select>})
+    }
+ 
+    {
+      number && <div></div>
     }
     </div>
   )
