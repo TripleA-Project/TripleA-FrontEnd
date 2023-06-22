@@ -16,7 +16,7 @@ export default function InterestSection({title, arr, type}:InterestSectionProps)
   const router = useRouter()
   console.log(router)
   return (
-      <div className=''>
+      <div>
         <h2 className='flex align-center gap-1 my-[10px]'>
           {isOpened
           ?<IconButton className=' text-[28px]' icon='right' sizeTheme='icon' bgColorTheme='none' textColorTheme='black' clickHandler={()=>{setIsOpened(!isOpened)}}/>
