@@ -1,10 +1,7 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
-import { BiBookmark, BiUpload, BiBot, BiSmile } from 'react-icons/bi';
-import { HiLink } from 'react-icons/hi';
-import { RiThumbDownLine, RiThumbUpLine } from 'react-icons/ri';
-import { BiBarChartSquare } from 'react-icons/bi';
+import React, { useState, useRef } from 'react';
+import { BiBookmark, BiUpload, BiBot, BiSmile, BiBarChartSquare } from 'react-icons/bi';
 import { BsPiggyBank } from 'react-icons/bs';
 import { MdLink } from 'react-icons/md';
 import Switch from 'react-switch';
@@ -53,6 +50,17 @@ export function NewsDetail() {
       color: '#000000',
     },
   ];
+
+  function upButton() {
+    const scrollToTop = () => {
+      if (window.scrollY > 0) {
+        window.scrollTo(0, window.scrollY - 100);
+        requestAnimationFrame(scrollToTop);
+      }
+    };
+
+    scrollToTop();
+  }
 
   return (
     <div className="flex flex-col overflow-x-hidden">
@@ -188,12 +196,12 @@ export function NewsDetail() {
 
       <div className="py-[20px] pl-[16px] text-[20px] font-semibold">관심 종목에 추가하기</div>
       <div className="align-center flex items-center justify-center">
-        <button className="border-solidborder-[#d9d9d9] mb-[20px] flex h-[54px] w-[358px] items-center justify-center rounded-lg border text-[16px] font-bold">
+        <button className="border-solidborder-[#d9d9d9] mb-[20px] flex h-[54px] w-[358px] items-center justify-center rounded-lg border text-[16px] font-bold" onClick={upButton}>
           <IoIosArrowUp />
-          <span className="ml-[10px] text-[16px] font-bold">맨 위로</span>
+          <span className="ml-[10px] text-[16px] font-bold" >맨 위로</span>
         </button>
       </div>
-
+      
       <div className="h-[50px]"></div>
     </div>
   );
