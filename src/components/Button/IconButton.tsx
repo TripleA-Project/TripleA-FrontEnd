@@ -2,6 +2,7 @@
 
 import { BsBookmark, BsBookmarkFill, BsFillShareFill, BsGrid3X3GapFill } from 'react-icons/bs';
 import { ButtonProps } from './Button';
+import { BiNews } from 'react-icons/bi';
 import {
   AiOutlineSearch,
   AiFillHeart,
@@ -20,6 +21,7 @@ import { RiPencilFill } from 'react-icons/ri';
 import { FiSearch, FiX } from 'react-icons/fi';
 import {GiHamburgerMenu} from 'react-icons/gi'
 import {LuShare} from 'react-icons/lu'
+
 import { IconType } from 'react-icons/lib';
 
 export interface IconButtonProps extends ButtonProps {
@@ -41,11 +43,15 @@ export interface IconButtonProps extends ButtonProps {
     | 'xfill'
     | 'export'
     | 'pencil'
-    | 'hamburgermenu'
+    | 'news'
     | 'gridmenu'
+    | 'fire'
+    | 'info'
+    | 'hamburgermenu'
     | IconType;
   iconPosition?: 'left' | 'right';
   iconSize?: string;
+  onClick: () => void;
   isBookmark?: boolean;
 }
 
@@ -74,9 +80,9 @@ export default function IconButton({
   textColorTheme,
   iconPosition = 'left',
   iconSize = '16px',
-  clickHandler,
   isBookmark,
   children,
+  onClick,
   ...props
 }: IconButtonProps) {
   const sizeClassNames = {
@@ -91,6 +97,7 @@ export default function IconButton({
     gray: 'bg-gray-600',
     violet: 'bg-[#5645F6]',
     orange: 'bg-[#FD954A]',
+    lightgray: 'bg-[#DBDEE1]',
     none: 'none',
   };
   const textColor = {
@@ -98,10 +105,11 @@ export default function IconButton({
     black: 'text-black',
     gray: 'text-gray-500',
     orange: 'text-[#FD954A]',
+    none: '',
   };
 
   const presetIcon = {
-    heart: <AiOutlineHeart style={{ fontSize: iconSize }} />,
+    heart: <HeartIcon/>,
     heartfill: <AiFillHeart />,
     bookmark: <BsBookmark className="text-2xl" />,
     bookmarkfill: <BsBookmarkFill className="text-2xl"/>,
@@ -119,8 +127,11 @@ export default function IconButton({
     x: <FiX />,
     xfill: <MdCancel />,
     pencil: <RiPencilFill />,
-    hamburgermenu : <GiHamburgerMenu/>,
-    gridmenu : <BsGrid3X3GapFill/>
+    news: <BiNews />,
+    gridmenu: <BsGrid3X3GapFill />,
+    fire: <MdOutlineLocalFireDepartment />,
+    info: <MdInfoOutline />,
+    hamburgermenu: <GiHamburgerMenu />,
   };
 
   return (
@@ -128,7 +139,7 @@ export default function IconButton({
       className={`flex cursor-pointer items-center justify-center rounded-xl ${textColor[textColorTheme]} ${
         sizeClassNames[sizeTheme]
       } ${backgroundColor[bgColorTheme]} ${className ? ` ${className}` : ''}`}
-      type={type} onClick={clickHandler}
+      type={type} onClick={onClick}
       {...props}
     >
       <div>
