@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { FocusEvent, Ref } from 'react';
 import HeaderItem from './HeaderItem';
 import { IconButtonProps } from '../Button/IconButton';
 
@@ -8,6 +8,7 @@ export interface HeaderProps {
   leftIcon?: IconButtonProps['icon'] |'LogoIcon' ;
   rightIcon?: IconButtonProps['icon'];
   title?: string
+  ref?: Ref<HTMLInputElement> | undefined
 }
 
 /**
@@ -32,10 +33,10 @@ export interface HeaderProps {
  *
  * @returns JSX.Element
  */
-function Header({leftIcon, rightIcon, title}:HeaderProps) {
+function Header({leftIcon, rightIcon, title, ref}:HeaderProps) {
   return (
-    <header>
-      <HeaderItem leftIcon={leftIcon} rightIcon={rightIcon} title={title}/>
+    <header className='bg-[#ffff]'>
+      <HeaderItem leftIcon={leftIcon} rightIcon={rightIcon} title={title} ref={ref}/>
     </header>
   );
 }
