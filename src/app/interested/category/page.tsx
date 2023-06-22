@@ -27,7 +27,7 @@ export default function InterestedCategoryPage() {
             </h3>
             <p className='text-center text-[14px]'>선택한 카테고리에 해당하는<br/>뉴스 기사를 모아볼 수 있습니다.</p>
           </div>
-          <input type="text" className='min-w-[358px] h-[46px] outline-0 border border-solid border-[#454C52] rounded-lg px-[10px] placeholder:text-[#DBDEE1] m-auto' placeholder='카테고리 검색' onChange={inputChangeHandler}/>
+          <input type="text" className='w-full h-[46px] outline-0 border border-solid border-[#454C52] rounded-lg px-[10px] placeholder:text-[#DBDEE1] m-auto' placeholder='카테고리 검색' onChange={inputChangeHandler}/>
         </div>
         <SelectContainer arr={arr} type='category' selectedArr={selectedArr} setSelectedArr={setSelectedArr}/>
         <Button type='button' sizeTheme='large' bgColorTheme='orange' textColorTheme='white' clickHandler={()=>{console.log('ddd')}}>선택 완료</Button>

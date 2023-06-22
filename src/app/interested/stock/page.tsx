@@ -10,7 +10,7 @@ export default function InterestedStockPage() {
 
   const inputChangeHandler = (e) => {
     if(e.target.value){
-     const newArr =  symbolArr.filter((item)=> item.companyName.includes(e.target.value) || item.symbol.includes(e.target.value))
+      const newArr =  symbolArr.filter((item)=> item.companyName.includes(e.target.value) || item.symbol.includes(e.target.value))
       setArr(newArr)
     } else {
       setArr(symbolArr)
@@ -26,7 +26,7 @@ export default function InterestedStockPage() {
             </h3>
             <p className='text-center text-[14px]'>선택한 종목이 언급된<br/>뉴스 기사를 모아볼 수 있습니다.</p>
           </div>
-          <input type="text" className='min-w-[358px] h-[46px] outline-0 border border-solid border-[#454C52] rounded-lg px-[10px] placeholder:text-[#DBDEE1] m-auto' placeholder='종목 검색' onChange={inputChangeHandler}/>
+          <input type="text" className='w-full h-[46px] outline-0 border border-solid border-[#454C52] rounded-lg px-[10px] placeholder:text-[#DBDEE1] m-auto' placeholder='종목 검색' onChange={inputChangeHandler}/>
         </div>
         <SelectContainer arr={arr} type='stock'/>
         <Button type='button' sizeTheme='large' bgColorTheme='orange' textColorTheme='white' clickHandler={()=>{console.log('ddd')}}>선택 완료</Button>
