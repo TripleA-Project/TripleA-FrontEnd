@@ -1,28 +1,24 @@
 "use client"
-import React, {useState} from 'react'
-import { NewsData } from '@/interfaces/NewsData'
-import {MdOutlineLocalFireDepartment} from 'react-icons/md'
-import {BiNews} from 'react-icons/bi'
-import SectionHeader from './SectionHeader'
-import CardNews from '@/components/CardNews'
+import React, {ReactNode} from 'react'
+import SectionHeader from './SectionHeader';
+import SectionBody from './SectionBody';
+import { newsArr } from '@/constants/newsArr';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
 
-interface SectionContainerProps {
-  newsArr: NewsData[],
-  type: 'hotNews'|'currentNews',
+interface NewsSectionContainerProps {
+  type: string,
+  icon:ReactNode,
+  title: string
 }
 
-export default function SectionContainer({newsArr, type}:SectionContainerProps) {
-  const firstCardDirection = type === 'hotNews' ? 'column' : 'row'
-  const [cardDirection, setCardDirection] = useState(firstCardDirection)
-  
+export default function SectionContainer({type, icon ,title}:NewsSectionContainerProps) {
+    const {cardDirection} = useSelector((state: RootState) => state.card)
+  console.log(cardDirection)
   return (
-    <div className='bg-white px-[16px]'>
-      {type==='hotNews'?<SectionHeader type={'hotNews'} icon={<MdOutlineLocalFireDepartment className='text-[24px]'/>} title={'요즘 뉴스'}/>:<SectionHeader type={'currentNews'} icon={<BiNews className='text-[24px]'/>} title={'최신 뉴스'} setCardDirection={setCardDirection}/>}
-    <div className='flex flex-wrap gap-[10px]'>
-    {newsArr.map((news:NewsData)=>
-      <CardNews cardDirection={cardDirection} key={news.newsId} newsId={news.newsId} symbol={news.symbol} source={news.source} title={news.title}  thumbnail={news.thumbnail} publishedDate={news.publishedDate} sentiment={news.sentiment} bookmark={news.bookmark}/>
-    )}
+    <div className='bg-white px-[16px] min-w-[390px]'>
+      <SectionHeader type={type} icon={icon} title={title}/>
+      <SectionBody cardDirection={type==='hotNews'? 'column' : cardDirection} arr={newsArr}/>
     </div>
-   </div>
   )
 }

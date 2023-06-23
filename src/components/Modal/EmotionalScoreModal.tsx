@@ -1,29 +1,15 @@
-"use client"
 import React from 'react'
-import styled from '@emotion/styled'
-import { MdInfoOutline } from 'react-icons/md'
-
-const ModalTitle = styled.h3`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  font-size: 30px;
-  font-weight: 600;
-  span {
-    font-size: 24px;
-  }
-`
-const ModalSubTitle = styled.h4`
- text-align:center;
-`
+import { InfoIcon } from '@/components/Icons'
 
 export default function EmotionalScoreModal() {
   return (
-    <div className='min-w-[250px] min-h-[163px] rounded-lg p-[20px] m-[20px] bg-white flex flex-col gap-[20px] shadow-[5px_5px_5px_rgba(0,0,0,0.2)] absolute -bottom-[100px] right-0 z-10'>
+    <div className='min-w-[250px] min-h-[163px] rounded-lg p-[20px] m-[20px] bg-white flex flex-col gap-[20px] shadow-[5px_5px_5px_rgba(0,0,0,0.2)]  border border-solid border-[rgba(0,0,0,0.2)] absolute -bottom-[100px] right-0 z-10'>
       <div className="title">
-        <ModalTitle><MdInfoOutline/><span>AI 감성 분석</span></ModalTitle>
-        <ModalSubTitle>(최근 3시간 기준)</ModalSubTitle>
+        <h3 className='flex align-center justify-center gap-[10px] text-[30px] font-semibold'> 
+          <InfoIcon/>
+          <span className='text-[24px]'>AI 감성 분석</span>
+        </h3>
+        <p className='text-center'>(최근 3시간 기준)</p>
       </div>
       <div className="scorePercentages flex align-center justify-between">
         <div className='flex gap-[5px]'>
@@ -56,7 +42,6 @@ export default function EmotionalScoreModal() {
           </div>
         </div>
       </div>
-     
     </div>
   )
 }

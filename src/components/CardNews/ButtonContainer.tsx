@@ -4,8 +4,9 @@ import { useState } from "react"
 import { Bookmark } from "@/interfaces/NewsData"
 //components
 import IconButton from "@/components/Button/IconButton"
-//styles
-import styled from "@emotion/styled"
+
+import { addNewsBookmark, deleteNewsBookmark } from "@/service/bookmark"
+
 
 interface ButtonContainerProps {
   newsId: number;
@@ -17,17 +18,19 @@ export default function ButtonContainer({newsId,bookmark}:ButtonContainerProps){
   const isBookmark = bookmark?.isBookmark
   const [isMarked, setIsMarked] = useState(isBookmark)
   
-  const bookmarkClickHandler = () => {
-  setIsMarked(!isBookmark)
+  const bookmarkClickHandler = async() => {
+  const res = isMarked ? await deleteNewsBookmark(newsId) : await addNewsBookmark(newsId)
+  setIsMarked(!isMarked)
+  console.log(res)
   alert('북마크 버튼이 눌렸습니다')
   }
   const shareClickHandler = () => {
     alert('공유 버튼이 눌렸습니다')
   }
   return (
-    <div className="flex flex-row justify-end align-center p-[4px]">
+    <div className="flex flex-row justify-end items-center gap-[6px]">
       <IconButton icon='export' bgColorTheme='none' textColorTheme='black' clickHandler={shareClickHandler}/>
-      {isBookmark ? 
+      {isMarked ? 
         <IconButton icon='bookmarkfill' bgColorTheme='none' textColorTheme='black' clickHandler={bookmarkClickHandler} isBookmark={isBookmark}>{count && count}</IconButton>
         :
         <IconButton icon='bookmark' bgColorTheme='none' textColorTheme='black'clickHandler={bookmarkClickHandler} isBookmark={isBookmark}>{count && count}</IconButton>

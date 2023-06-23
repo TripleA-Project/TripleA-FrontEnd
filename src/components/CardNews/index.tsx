@@ -20,22 +20,15 @@ interface CardProps {
 }
 
 const Card = styled.li<CardProps>`
-  overflow:hidden;
-  box-sizing: border-box;
-  max-width: ${({cardDirection})=> cardDirection==='tile' ? '106px' : '770px'};
-  min-width:  ${({cardDirection})=> cardDirection ===`column`? `358px`:( cardDirection === `row` ? `357px` : `106px`)};
-  margin: 10px 0;
-  padding: ${({cardDirection})=> cardDirection === `tile` && `12px`};
-  border-radius: 16px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  /* width: ${({cardDirection})=> cardDirection ===`column`? `358px`:( cardDirection === `row` ? `357px` : `106px`)}; */
+  max-width: ${({cardDirection})=> cardDirection===`column` && `358px`};
+  min-width:  ${({cardDirection})=> cardDirection ===`column`? `300px`:( cardDirection === `row` ? `357px` : ``)};
+  width: ${({cardDirection})=> cardDirection ===`column`? ``:( cardDirection === `row` ? `100%` : `106px`)};
   min-height: ${({cardDirection})=> cardDirection === `column`?`344px`:( cardDirection === `row` ? `122px` : `auto`)};
   height : ${({cardDirection})=>cardDirection === `tile` && `106px`};
+  padding: ${({cardDirection})=> cardDirection === `tile` && `12px`};
   background-color:${({cardDirection, sentimentColor})=> cardDirection === `tile` ? `${sentimentColor}` : `#fff`} ;
   .title {
-    max-height: ${({cardDirection})=> cardDirection === `tile` && `40px`};
+    max-height: ${({cardDirection})=> cardDirection === `tile` && `70px`};
     font-size: ${({cardDirection})=> cardDirection === `tile` && `14px`};
     font-weight:${({cardDirection})=>cardDirection === `tile` && `600`};
   }
@@ -62,7 +55,7 @@ function CardNews({ newsId,symbol,logo, source, title, thumbnail,publishedDate, 
     
   return (
     <>
-      <Card className='rounded-2xl bg-white' cardDirection={cardDirection} sentimentColor={sentimentColor}>
+      <Card className='overflow-hidden box-border inline-flex rounded-2xl bg-white flex-col justify-between m-[10px]' cardDirection={cardDirection} sentimentColor={sentimentColor}>
         {cardDirection==='column'?
         <div className='column'>
           <div >
@@ -86,7 +79,7 @@ function CardNews({ newsId,symbol,logo, source, title, thumbnail,publishedDate, 
         </>
         }
       </Card>
-    {cardDirection === 'row' &&   <div className='divider w-[100%] h-[1.5px] bg-[#eee]'></div>}
+    {cardDirection === 'row' &&  <div className='divider w-full h-[1.5px] bg-[#eee]'></div>}
     </>
   )
 }
