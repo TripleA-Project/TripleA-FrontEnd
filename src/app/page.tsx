@@ -3,7 +3,7 @@ import Tabbar from '@/components/Tabbar';
 import NewsSection from '@/components/Section/SectionContainer';
 import NewsSectionHeader from '@/components/Section/SectionHeader';
 import CardNewsContainer from '@/components/CardNews/CardNewsContainer';
-import { FireIcon, NewsIcon } from '@/components/Icons';
+import { FireIcon, NewsIcon } from '@/components/Icon';
 import { Metadata } from 'next';
 
 import { newsArr } from '@/constants/newsArr';
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 function Home() {
 return( 
   <div className='min-h-[844px]'>
-    <Header><Tabbar/></Header>
+    {/* <header><Tabbar/></header> */}
     <div className='flex flex-col gap-[8px] pt-[27px] bg-white'>
       <NewsSection type={'hotNews'} icon={<FireIcon className='text-[24px] m-auto'/>} title={'요즘 뉴스'}/>
       <NewsSection type={'currentNews'} icon={<NewsIcon className='text-[24px] m-auto'/>} title={'최신 뉴스'}/>
