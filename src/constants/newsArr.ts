@@ -16,7 +16,7 @@ export const newsArr:NewsData[]= [{
   },
 },
 {
-  newsId : 1,
+  newsId : 2,
   //NOTE - symbol 데이터 형태 바뀔 예정
   symbol: 'AAPP',
   source: 'kye',
