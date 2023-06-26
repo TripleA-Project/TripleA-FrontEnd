@@ -3,10 +3,11 @@
 import React , {useState} from 'react'
 import EmotionalScoreIcon from './EmotionalScoreIcon'
 import EmotionalScoreModal from '../Modal/EmotionalScoreModal'
-import { HamburgerIcon } from '../Icons'
-import { GridIcon } from '../Icons'
+import { HamburgerIcon } from '@/components/Icon'
+import { GridIcon } from '@/components/Icon'
 import { useDispatch } from 'react-redux'
 import { setDirection } from '@/redux/slice/cardSlice'
+
 export default function SectionHeaderButtonContainer({type}) {
   const [isClicked1, setIsClicked1] = useState(true)
   const [isClicked2, setIsClicked2] = useState(false)
