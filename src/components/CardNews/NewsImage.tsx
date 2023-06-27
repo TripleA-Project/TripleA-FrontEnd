@@ -18,7 +18,7 @@ const ImageContainer = styled.div<ImageContainerProps>`
 `
 
 export default function NewsImage({thumbnail, cardDirection}:NewsImageProps) {
-  console.log(thumbnail)
+  
   return (
     <ImageContainer className='rounded-t-xl overflow-hidden box-border w-full' thumbnail={thumbnail} cardDirection={cardDirection}>
       {thumbnail && <Image src={thumbnail} alt='thumbnail' width={66} height={66}/>}

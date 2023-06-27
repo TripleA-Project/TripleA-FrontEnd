@@ -4,7 +4,7 @@ import { type RootState } from '../store';
 
 type DirectionState = {
   // State 타입
-  cardDirection: string; 
+  cardDirection: 'row'|'column'|'tile'; 
 };
 
 const initialState: DirectionState = {

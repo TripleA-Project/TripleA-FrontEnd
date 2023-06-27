@@ -7,15 +7,20 @@ import { HamburgerIcon } from '@/components/Icon'
 import { GridIcon } from '@/components/Icon'
 import { useDispatch } from 'react-redux'
 import { setDirection } from '@/redux/slice/cardSlice'
+import { ReactJSXElement } from '@emotion/react/types/jsx-namespace'
 
-export default function SectionHeaderButtonContainer({type}) {
+interface SectionHeaderButtonContainerProps {
+  icons: ReactJSXElement[]
+}
+
+export default function SectionHeaderButtonContainer({icons}:SectionHeaderButtonContainerProps) {
   const [isClicked1, setIsClicked1] = useState(true)
   const [isClicked2, setIsClicked2] = useState(false)
   const [isClicked3, setIsClicked3] = useState(false)
   const dispatch = useDispatch()
 
   const hamburgerClickHandler = async () => {
-   
+  
       // await setCardDirection('row')
       dispatch(setDirection('row'))
       if(!isClicked1){
@@ -39,17 +44,7 @@ export default function SectionHeaderButtonContainer({type}) {
   
   return (
     <div className='flex justify-end gap-[10px] font-[24px]'>
-          {
-            type === 'hotNews' ? 
-            <>
-              <EmotionalScoreIcon onClick={EmotionalIconClickHandler}/>
-              {isClicked3 && <EmotionalScoreModal/>}
-            </> :    
-            <>
-              <HamburgerIcon className={'hover:cursor-pointer text-[24px]' + (isClicked1 ?' text-black':' text-gray-400' )} onClick={hamburgerClickHandler}/>
-              <GridIcon className={'hover:cursor-pointer text-[24px]' + (isClicked2 ?` text-black`:' text-gray-400') } onClick={gridClickHandler}/>
-            </>
-          }
+      {icons.map((item) =>  <button key={item.key + Math.random()}>{item}</button> )} 
     </div>
   )
 }
