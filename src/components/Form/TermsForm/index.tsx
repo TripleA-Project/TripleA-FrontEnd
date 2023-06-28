@@ -1,19 +1,16 @@
 'use client';
 
 import Button from '@/components/Button/Button';
-import { SubmitErrorHandler, SubmitHandler, useFormContext } from 'react-hook-form';
+import { FieldErrors, SubmitErrorHandler, SubmitHandler, useFormContext } from 'react-hook-form';
 import { UseStepFormContext } from '../StepForm';
 import IconButton from '@/components/Button/IconButton';
-import { useState } from 'react';
-import { CheckFillIcon, CheckIcon, RightIcon } from '@/components/Button/Icons';
+import { useRef, useState } from 'react';
+import { CheckFillIcon, CheckIcon } from '@/components/Button/Icons';
 import SignupModal from '@/components/Modal/SignupModal';
 import { signup } from '@/service/auth';
+import { FormData } from '@/interfaces/FormData';
 
-export interface TermsFormFormData {
-  email: string;
-  fullName: string;
-  password: string;
-  passwordCheck: string;
+export interface TermsFormData {
   newsLetter: boolean;
 }
 
@@ -26,7 +23,9 @@ function TermsForm() {
     getValues,
     setValue,
     formState: { isValid },
-  } = useFormContext() as UseStepFormContext<TermsFormFormData>;
+  } = useFormContext() as UseStepFormContext<FormData>;
+
+  const checkedAllRef = useRef<HTMLInputElement>(null);
 
   const values = getValues();
 
@@ -39,26 +38,25 @@ function TermsForm() {
     setOpenModal2(!openModal2);
   };
 
-  const onValid: SubmitHandler<TermsFormFormData> = async (data) => {
-    const { newsLetter } = data;
-    console.log(newsLetter);
-    done();
+  const onValid = async (data: FormData) => {
     try {
       const signupResponse = await signup({
-        email: values.email,
-        password: values.password,
-        passwordCheck: values.passwordCheck,
-        fullName: values.fullName,
-        newsLetter: values.newsLetter,
-        emailVerified: false,
+        email: values.email!,
+        password: values.password!,
+        passwordCheck: values.passwordCheck!,
+        fullName: values.fullName!,
+        newsLetter: values.newsLetter!,
+        emailKey: values.emailKey!,
       });
       console.log(signupResponse);
+
+      done();
     } catch (error) {
       console.error(error);
     }
   };
 
-  const onInvalid: SubmitErrorHandler<TermsFormFormData> = (errors) => {
+  const onInvalid = (errors: FieldErrors<FormData>) => {
     console.log({ errors });
   };
 
@@ -68,38 +66,31 @@ function TermsForm() {
   const [togleCheck, setTogleCheck] = useState(getValues().newsLetter);
 
   const handleCheckAll = () => {
-    setCheckedAll(!CheckedAll);
-    setChecked1st(!CheckedAll);
-    setChecked2nd(!CheckedAll);
-    setTogleCheck(!CheckedAll);
+    const targetChecked = checkedAllRef.current?.checked ?? false;
+
+    setCheckedAll(targetChecked);
+
+    setChecked1st(targetChecked);
+    setChecked2nd(targetChecked);
+    setTogleCheck(targetChecked);
+
+    setValue('newsLetter', targetChecked);
   };
-  // const handleCheck1st = () => {
-  //   setChecked1st(!Checked1st);
-  // };
-  // const handleCheck2nd = () => {
-  //   setChecked2nd(!Checked2nd);
-  // };
-  // const handleCheck3rd = () => {
-  //   setChecked3rd(!Checked3rd);
-  // };
 
   return (
     <div>
-      <form className="flex-coulmn " onSubmit={handleSubmit(onValid, onInvalid)}>
-        <div className=" mt-5 flex pl-[18px] text-lg font-semibold">이용약관에 동의해주세요.</div>
+      <form className="flex-coulmn pt-[54px]" onSubmit={handleSubmit(onValid, onInvalid)}>
+        <div className=" mt-5 flex pt-[25px] text-lg font-semibold">이용약관에 동의해주세요.</div>
         <div>
           <div className="border-lightgray mt-10 flex border-b">
-            <input hidden id="all" type="checkbox"></input>
+            <input ref={checkedAllRef} hidden id="all" type="checkbox"></input>
             <label
               onClick={handleCheckAll}
-              // onClick={() => {
-              //   setCheckedAll((prev) => !prev);
-              // }}
-              className="ml-2 flex items-center justify-center gap-2"
+              className="ml-2 flex items-center justify-center gap-2 pb-[21px]"
               htmlFor="all"
             >
-              {CheckedAll ? <CheckIcon /> : <CheckFillIcon />}
-              <span className="font-bold">전체 동의하기</span>
+              {CheckedAll ? <CheckFillIcon /> : <CheckIcon />}
+              <span className=" font-bold">전체 동의하기</span>
             </label>
           </div>
           <div>
@@ -112,7 +103,7 @@ function TermsForm() {
                 className="ml-2 flex items-center justify-center gap-2"
                 htmlFor="first"
               >
-                {Checked1st ? <CheckIcon /> : <CheckFillIcon />}
+                {Checked1st ? <CheckFillIcon /> : <CheckIcon />}
                 <span className="font-bold">[필수]이용약관 동의</span>
               </label>
               <IconButton
@@ -134,7 +125,7 @@ function TermsForm() {
                 className="ml-2 flex items-center justify-center gap-2"
                 htmlFor="personalInfo"
               >
-                {Checked2nd ? <CheckIcon /> : <CheckFillIcon />}
+                {Checked2nd ? <CheckFillIcon /> : <CheckIcon />}
                 <span className="font-bold">[필수]개인정보 처리방침 동의</span>
               </label>
               <IconButton
@@ -162,26 +153,19 @@ function TermsForm() {
             </div>
           </div>
         </div>
-        <Button
-          type="submit"
-          sizeTheme="medium"
-          className=" mx-auto mt-14 box-border font-bold"
-          bgColorTheme={!Checked1st && !Checked2nd ? 'orange' : 'lightgray'}
-          textColorTheme="white"
-          disabled={Checked1st || Checked2nd}
-        >
-          다음
-        </Button>
-        <Button
-          type="button"
-          className="mx-auto mt-2 box-border font-bold "
-          sizeTheme="medium"
-          bgColorTheme="lightgray"
-          textColorTheme="white"
-          onClick={() => prev()}
-        >
-          back
-        </Button>
+        <div className="mt-auto flex flex-col">
+          <Button
+            type="submit"
+            sizeTheme="fullWidth"
+            className="relative top-[300px] mx-auto mt-14 box-border font-bold"
+            bgColorTheme={!Checked1st || !Checked2nd ? 'lightgray' : 'orange'}
+            textColorTheme="white"
+            disabled={!Checked1st || !Checked2nd}
+          >
+            다음
+          </Button>
+        </div>
+
         {openModal1 && (
           <SignupModal
             size="small"
@@ -243,8 +227,9 @@ function TermsForm() {
                 <br />
                 회사는 유료 서비스 및 개별 서비스에 대해서는 별도의 이용약관 및 정책(이하 유료 서비스약관 등)을 둘 수
                 있으며, 해당 내용이 이 약관과 상충할 경우에는 유료 서비스약관 등이 우선하여 적용됩니다. 이 약관에서
-                정하지 아니한 사항이나 해석에 대해서는 유료 서비스약관 등 및 관계법령("정보통신망 이용촉진 및
-                정보보호등에 관한 법률", "약관의 규제에 관한 법률, 전기통신사업법" 등) 또는 상관례에 따릅니다.
+                정하지 아니한 사항이나 해석에 대해서는 유료 서비스약관 등 및 관계법령(&quot;정보통신망 이용촉진 및
+                정보보호등에 관한 법률&quot;, &quot;약관의 규제에 관한 법률, 전기통신사업법&quot; 등) 또는 상관례에
+                따릅니다.
                 <br />
                 <br />
                 <span className="font-semibold">제 5조 이용계약 체결</span>
@@ -267,7 +252,7 @@ function TermsForm() {
                 사용 애플리케이션의 기존 버전을 사용할 수 있는 회원의 권리는 회원의 기기에 설치된 애플리케이션의 가장
                 최신 버전을 받을 수 있거나 보유하게 되는 즉시 소멸합니다 회원 다음과 같은 행위를 할 수 없습니다.
                 애플리케이션의 임대, 재허락, 발행, 수정, 개조, 또는 분해 애플리케이션을 탑재할 권한이 없는, 불법적인,
-                위조 또는 개조된 하드웨어나 소프트웨어의 사용 애플리케이션의 이전 버전 재설치("다운그레이드")
+                위조 또는 개조된 하드웨어나 소프트웨어의 사용 애플리케이션의 이전 버전 재설치(&quot;다운그레이드&quot;)
                 애플리케이션에 접속하거나 애플리케이션을 이용하는 것과 관련한 모든 법률, 규칙 또는 회사나 제3자의 지위
                 또는 권리 위반행위 회사를 통하지 않고 다른 방식으로 애플리케이션을 취득함
                 <br />
@@ -341,7 +326,7 @@ function TermsForm() {
                 <br />
                 관련 법령에 의거한 개인정보처리방침을 정해 이용자 권익 보호에 최선을 다하고 있습니다.
                 <br />
-                회사는 개인정보처리방침을 통해 제공되는 서비스(“서비스")를 이용하는 회원 및 콘텐츠 구독자(이하
+                회사는 개인정보처리방침을 통해 제공되는 서비스(&quot;서비스&quot;)를 이용하는 회원 및 콘텐츠 구독자(이하
                 ‘이용자’)로부터 수집하는
                 <br />
                 개인정보의 항목, 개인정보의 수집 및 이용 목적, 개인정보의 보유 및 이용 기간과 개인정보 보호를 위해
@@ -522,7 +507,7 @@ function TermsForm() {
                 있습니다.
                 <br />
                 회사는 이용자에게 보다 적절하고 유용한 서비스를 제공하기 위해 이용자의 정보를 수시로 저장하고 불러오는
-                '쿠키(cookie)'를 사용합니다.
+                &apos;쿠키(cookie)&apos;를 사용합니다.
                 <br />
                 쿠키란 회사의 웹사이트를 운영하는데 이용되는 서버가 이용자의 컴퓨터로 전송하는 아주 작은 텍스트 파일로서
                 이용자의 기기에 저장됩니다. 이용자는 쿠키의 사용여부를 선택할 수 있습니다.

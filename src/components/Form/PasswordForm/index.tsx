@@ -3,8 +3,7 @@
 import Button from '@/components/Button/Button';
 import { SubmitErrorHandler, SubmitHandler, useFormContext } from 'react-hook-form';
 import { UseStepFormContext } from '../StepForm';
-import { useEffect, useState } from 'react';
-import { validatePassword } from '@/util/validate';
+import { useState } from 'react';
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
 
 export interface PasswordFormData {
@@ -14,14 +13,20 @@ export interface PasswordFormData {
 }
 
 function PasswordForm() {
-  const { register, handleSubmit, done, prev, getValues } = useFormContext() as UseStepFormContext<PasswordFormData>;
+  const {
+    register,
+    handleSubmit,
+    done,
+    prev,
+    getValues,
+    formState: { isValid },
+  } = useFormContext() as UseStepFormContext<PasswordFormData>;
 
   const [showPassword, setShowPassword] = useState(false);
   const handleTogglePassword = () => {
     setShowPassword(!showPassword);
   };
   const values = getValues();
-  // useEffect(() => {}, [getValues('passwordRemind')]);
   const onValid: SubmitHandler<PasswordFormData> = (data) => {
     done();
   };
@@ -29,20 +34,11 @@ function PasswordForm() {
   const onInvalid: SubmitErrorHandler<PasswordFormData> = (errors) => {
     console.log({ errors });
   };
-  const [emailValue, setEmailValue] = useState('');
 
-  // useEffect(() => {
-  //   const value = localStorage.getItem('email');
-  //   if (value) {
-  //     setEmailValue(value);
-  //   }
-  // }, []);
-  console.log('password:', getValues('password'));
-  console.log('passwordCheck:', getValues('passwordCheck'));
   return (
     <div>
-      <form onSubmit={handleSubmit(onValid, onInvalid)}>
-        <div className="flex pl-[18px] text-lg font-semibold">
+      <form onSubmit={handleSubmit(onValid, onInvalid)} className="pt-[54px]">
+        <div className="flex pt-[25px] text-lg font-semibold">
           로그인에 사용할
           <br />
           비밀번호를 입력해주세요.
@@ -51,9 +47,9 @@ function PasswordForm() {
           value={values.email}
           disabled
           id="email"
-          className="mx-auto mt-6 flex h-[46px] w-[358px] rounded-lg border-[1px] border-solid pl-4 placeholder-[#DBDEE1] "
+          className="mx-auto mt-6 flex h-[46px] w-full rounded-lg border-[1px] border-solid pl-4 placeholder-[#DBDEE1] "
         />
-        <div className="relative mx-auto mt-6 flex h-[46px] w-[358px] rounded-lg border-[1px] border-solid placeholder-[#DBDEE1]">
+        <div className="relative mx-auto mt-6 flex h-[46px] w-full rounded-lg border-[1px] border-solid placeholder-[#DBDEE1]">
           <input
             placeholder="비밀번호 입력"
             type={showPassword ? 'text' : 'password'}
@@ -61,16 +57,18 @@ function PasswordForm() {
             {...register('password', {
               required: '패스워드를 입력해주세요',
               validate: (value) => {
-                const { result, type } = validatePassword(value);
+                const passwordLength = /^.{8,16}$/;
+                const notAllowdChar = /[^a-zA-Z0-9\!\@\#\$\%\^\&\*\-\_\=\+\{\}\;\:\,\<\.\>]/g;
+                const isContainAllowdSpec = /[\!@\#\$\%\^\&\*\-\_\=\+\{\}\;\:\,\<\.\>]/g;
 
-                if (result === true) return true;
+                if (!passwordLength.test(value)) return '패스워드는 8자 이상, 16자 이하입니다';
+                if (notAllowdChar.test(value)) return '패스워드는 영문 대소문자, 0-9 숫자로 구성되어야 합니다';
+                if (!isContainAllowdSpec.test(value)) return '특수문자가 포함되어있지 않습니다';
 
-                if (type === 'NotContainSpecial') return '특수문자가 포함되어있지 않습니다';
-
-                return '패스워드 형식이 아닙니다';
+                return true;
               },
             })}
-            className="flex-1 bg-transparent pl-4 focus:border-none focus:outline-none"
+            className="w-full flex-1 bg-transparent pl-4 focus:border-none focus:outline-none"
           />
           <div className="box-border flex items-center p-4">
             <button type="button" onClick={handleTogglePassword}>
@@ -78,7 +76,7 @@ function PasswordForm() {
             </button>
           </div>
         </div>
-        <div className="relative mx-auto mt-6 flex h-[46px] w-[358px] rounded-lg border-[1px] border-solid placeholder-[#DBDEE1]">
+        <div className="relative mx-auto mt-6 flex h-[46px] w-full rounded-lg border-[1px] border-solid placeholder-[#DBDEE1]">
           <input
             placeholder="비밀번호 확인"
             id="passwordCheck"
@@ -91,7 +89,7 @@ function PasswordForm() {
                 },
               },
             })}
-            className="flex-1 bg-transparent pl-4 focus:border-none focus:outline-none"
+            className="w-full flex-1 bg-transparent pl-4 focus:border-none focus:outline-none"
           />
           <div className="box-border flex items-center p-4">
             <button type="button" onClick={handleTogglePassword}>
@@ -101,7 +99,7 @@ function PasswordForm() {
         </div>
         <Button
           type="submit"
-          sizeTheme="medium"
+          sizeTheme="fullWidth"
           className="mx-auto mt-14 box-border font-bold"
           bgColorTheme={
             (getValues('password') === undefined && getValues('passwordCheck') === undefined) ||
@@ -110,18 +108,14 @@ function PasswordForm() {
               : 'orange'
           }
           textColorTheme="white"
-          disabled={
-            !getValues('password') ||
-            !getValues('passwordCheck') ||
-            getValues('password') !== getValues('passwordCheck')
-          }
+          disabled={!isValid}
         >
           다음
         </Button>
         <Button
           type="button"
           className="mx-auto mt-2 box-border font-bold "
-          sizeTheme="medium"
+          sizeTheme="fullWidth"
           bgColorTheme="lightgray"
           textColorTheme="white"
           onClick={() => prev()}
