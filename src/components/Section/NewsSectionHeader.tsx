@@ -16,7 +16,7 @@ export default function NewsSectionHeader({ icon, sectionTitle}:NewsSectionHeade
       <div className='titleIcon'>{icon}</div>
       <div className='title text-[18px] font-semibold'>{sectionTitle}</div>
       <div>
-        <SectionHeaderButtonContainer icons={[<GridIcon key='1'/>,<HamburgerIcon key='2'/>]}/>
+        <SectionHeaderButtonContainer icons={[<HamburgerIcon key='1' />,<GridIcon key='2'/>]}/>
       </div>
     </div>
   )

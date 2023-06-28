@@ -3,9 +3,8 @@
 import React , {useState} from 'react'
 import EmotionalScoreIcon from './EmotionalScoreIcon'
 import EmotionalScoreModal from '../Modal/EmotionalScoreModal'
-import { HamburgerIcon } from '@/components/Icon'
-import { GridIcon } from '@/components/Icon'
-import { useDispatch } from 'react-redux'
+
+import { useCard } from '@/redux/slice/cardSlice'
 import { setDirection } from '@/redux/slice/cardSlice'
 import { ReactJSXElement } from '@emotion/react/types/jsx-namespace'
 
@@ -17,8 +16,7 @@ export default function SectionHeaderButtonContainer({icons}:SectionHeaderButton
   const [isClicked1, setIsClicked1] = useState(true)
   const [isClicked2, setIsClicked2] = useState(false)
   const [isClicked3, setIsClicked3] = useState(false)
-  const dispatch = useDispatch()
-
+  const {dispatch} = useCard()
   const hamburgerClickHandler = async () => {
   
       // await setCardDirection('row')
@@ -41,10 +39,12 @@ export default function SectionHeaderButtonContainer({icons}:SectionHeaderButton
   const EmotionalIconClickHandler = () => {
     setIsClicked3(!isClicked3)
   }
-  
+  const iconClickHandler = () => {
+    dispatch(setDirection('tile'))
+  }
   return (
     <div className='flex justify-end gap-[10px] font-[24px]'>
-      {icons.map((item) =>  <button key={item.key + Math.random()}>{item}</button> )} 
+      {icons.map((item) =>  <button key={item.key + Math.random()} onClick={iconClickHandler}>{item}</button> )} 
     </div>
   )
 }

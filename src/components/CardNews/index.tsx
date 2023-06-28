@@ -1,13 +1,11 @@
 "use client"
+import styled from '@emotion/styled';
 import React, { ReactNode} from 'react';
 import NewsImage from './NewsImage'
 import ChipContainer from './ChipContainer';
 import News from './News'
 import ButtonContainer from './ButtonContainer';
-
-import { NewsData} from '@/interfaces/NewsData';
-
-import styled from '@emotion/styled';
+import { NewsData } from '@/interfaces/NewsData';
 
 interface CardNewsProps {
   cardDirection: 'row'|'column'|'tile',
