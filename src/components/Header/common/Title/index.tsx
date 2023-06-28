@@ -15,7 +15,7 @@ function Title({ title }: TitleProps) {
       className={`${
         pathName === '/chart'? 'absolute left-9 top-[0.8] text-center text-lg font-extrabold text-[#131F3C]':''
       } ${
-        pathName === `/chart/${params.slug}` ?
+        pathName === `/chart/symbol` ?
         'transform-translate-x-1/2 absolute left-[50%] text-center text-lg font-extrabold text-[#131F3C]': ''
       } ${pathName === '/login'? 'ml-[10px]': ''} ${pathName ==='/read'? 'text-center': ''}`}
     >

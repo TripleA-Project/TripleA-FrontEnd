@@ -1,14 +1,14 @@
-
 import React, { FocusEvent, Ref } from 'react';
 import HeaderItem from './HeaderItem';
 import { IconButtonProps } from '../Button/IconButton';
+import SearchBar from './SearchBar';
 
 
 export interface HeaderProps {
   leftIcon?: IconButtonProps['icon'] |'LogoIcon' ;
   rightIcon?: IconButtonProps['icon'];
-  title?: string
-  ref?: Ref<HTMLInputElement> | undefined
+  title?: string;
+  pathName?: string;
 }
 
 /**
@@ -33,16 +33,17 @@ export interface HeaderProps {
  *
  * @returns JSX.Element
  */
-function Header({leftIcon, rightIcon, title, ref}:HeaderProps) {
+
+function Header({ leftIcon, rightIcon, title, pathName }: HeaderProps) {
   return (
-    <header className='bg-[#ffff]'>
-      <HeaderItem leftIcon={leftIcon} rightIcon={rightIcon} title={title} ref={ref}/>
+    <header className="relative z-10">
+      {pathName === '/search' ? (
+        <SearchBar leftIcon={leftIcon} rightIcon={rightIcon} />
+      ) : (
+        <HeaderItem leftIcon={leftIcon} rightIcon={rightIcon} title={title} />
+      )}
     </header>
   );
-
-// function Header({children}) {
-
-//   return <div className="h-full w-[100%] bg-white border-[0.5px] border-b-[#E4E4E4] flex flex-col justify-end">Header{children}</div>;
 
 }
 
