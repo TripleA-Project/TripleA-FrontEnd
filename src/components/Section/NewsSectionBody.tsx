@@ -30,7 +30,7 @@ export default function NewsSectionBody({type}:NewsSectionBodyProps) {
   const hotNews = newslist[0]
   return (
     <div className='w-full'>
-      <div className='flex gap-[10px] flex-wrap flex-shrink-0 m-auto justify-center' >
+      <div className='flex gap-[10px] flex-wrap flex-shrink-0 m-auto' >
         {
         type==='column' ? <CardNews cardDirection='column' news={hotNews}/> : (newslist && newslist.map((item)=><CardNews cardDirection={cardDirection} key={item.newsId + Math.random() } news={item}/>))
         }

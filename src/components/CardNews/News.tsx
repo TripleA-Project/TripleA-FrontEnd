@@ -56,7 +56,7 @@ export default function News({title,source, publishedDate, sentimentColor , hole
       <Bar sentimentColor={sentimentColor}/>
       <Container className='justify-evenly' cardDirection={cardDirection}>
         {hole1 && <Hole1 className='overflow-hidden' cardDirection={cardDirection}>{hole1}</Hole1>}
-        <h3 className='ml-[10px] relative min-h-[40px] title line-clamp-3 text-ellipsis'>
+        <h3 className='ml-[10px] relative min-h-[40px] line-clamp-3 text-ellipsis'>
           {title}
         </h3>
         <p className='subText flex justify-end w-full pr-[15px]'>

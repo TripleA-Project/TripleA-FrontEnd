@@ -16,7 +16,7 @@ export default function SectionHeaderButtonContainer({icons}:SectionHeaderButton
   const [isClicked1, setIsClicked1] = useState(true)
   const [isClicked2, setIsClicked2] = useState(false)
   const [isClicked3, setIsClicked3] = useState(false)
-  const {dispatch} = useCard()
+  const {dispatch, cardDirection} = useCard()
   const hamburgerClickHandler = async () => {
   
       // await setCardDirection('row')
@@ -39,12 +39,10 @@ export default function SectionHeaderButtonContainer({icons}:SectionHeaderButton
   const EmotionalIconClickHandler = () => {
     setIsClicked3(!isClicked3)
   }
-  const iconClickHandler = () => {
-    dispatch(setDirection('tile'))
-  }
   return (
     <div className='flex justify-end gap-[10px] font-[24px]'>
-      {icons.map((item) =>  <button key={item.key + Math.random()} onClick={iconClickHandler}>{item}</button> )} 
+      <button key={icons[0].key + Math.random()} onClick={hamburgerClickHandler}>{icons[0]}</button>
+      <button key={icons[1].key + Math.random()} onClick={gridClickHandler}>{icons[1]}</button>
     </div>
   )
 }
