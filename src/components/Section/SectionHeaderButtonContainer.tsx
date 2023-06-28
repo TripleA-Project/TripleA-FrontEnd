@@ -4,14 +4,23 @@ import React, { useState } from 'react';
 import EmotionalScoreIcon from './EmotionalScoreIcon';
 import EmotionalScoreModal from '../Modal/EmotionalScoreModal';
 
-import { useDispatch } from 'react-redux';
+import React, { useState } from 'react';
+import EmotionalScoreIcon from './EmotionalScoreIcon';
+import EmotionalScoreModal from '../Modal/EmotionalScoreModal';
+
+import { useCard } from '@/redux/slice/cardSlice';
 import { setDirection } from '@/redux/slice/cardSlice';
-export default function SectionHeaderButtonContainer({ type }) {
+import { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
+
+interface SectionHeaderButtonContainerProps {
+  icons: ReactJSXElement[];
+}
+
+export default function SectionHeaderButtonContainer({ icons }: SectionHeaderButtonContainerProps) {
   const [isClicked1, setIsClicked1] = useState(true);
   const [isClicked2, setIsClicked2] = useState(false);
   const [isClicked3, setIsClicked3] = useState(false);
-  const dispatch = useDispatch();
-
+  const { dispatch, cardDirection } = useCard();
   const hamburgerClickHandler = async () => {
     // await setCardDirection('row')
     dispatch(setDirection('row'));
@@ -31,17 +40,14 @@ export default function SectionHeaderButtonContainer({ type }) {
   const EmotionalIconClickHandler = () => {
     setIsClicked3(!isClicked3);
   };
-
   return (
     <div className="flex justify-end gap-[10px] font-[24px]">
-      {type === 'hotNews' ? (
-        <>
-          <EmotionalScoreIcon onClick={EmotionalIconClickHandler} />
-          {isClicked3 && <EmotionalScoreModal />}
-        </>
-      ) : (
-        <></>
-      )}
+      <button key={icons[0].key + Math.random()} onClick={hamburgerClickHandler}>
+        {icons[0]}
+      </button>
+      <button key={icons[1].key + Math.random()} onClick={gridClickHandler}>
+        {icons[1]}
+      </button>
     </div>
   );
 }

@@ -23,6 +23,7 @@ import { GiHamburgerMenu } from 'react-icons/gi';
 import { LuShare } from 'react-icons/lu';
 
 import { IconType } from 'react-icons/lib';
+import { HeartIcon } from './Icons';
 
 export interface IconButtonProps extends ButtonProps {
   icon:
@@ -89,6 +90,7 @@ export default function IconButton({
     small: `h-12 ${fullWidth ? 'w-full' : 'w-28'}`,
     medium: `h-10 ${fullWidth ? 'w-full' : 'w-72'}`,
     large: `h-14 ${fullWidth ? 'w-full' : 'w-40'}`,
+    fullWidth: 'h-[54px] w-full',
     icon: 'h-7 w-7',
   };
 
@@ -109,6 +111,7 @@ export default function IconButton({
   };
 
   const presetIcon = {
+    heart: <HeartIcon />,
     heartfill: <AiFillHeart />,
     bookmark: <BsBookmark className="text-2xl" />,
     bookmarkfill: <BsBookmarkFill className="text-2xl" />,
@@ -128,7 +131,8 @@ export default function IconButton({
     pencil: <RiPencilFill />,
     news: <BiNews />,
     gridmenu: <BsGrid3X3GapFill />,
-
+    // fire: <MdOutlineLocalFireDepartment />,
+    // info: <MdInfoOutline />,
     hamburgermenu: <GiHamburgerMenu />,
   };
 
