@@ -3,18 +3,22 @@
 import React , {useState} from 'react'
 import EmotionalScoreIcon from './EmotionalScoreIcon'
 import EmotionalScoreModal from '../Modal/EmotionalScoreModal'
-import { HamburgerIcon } from '../Icons'
-import { GridIcon } from '../Icons'
-import { useDispatch } from 'react-redux'
+
+import { useCard } from '@/redux/slice/cardSlice'
 import { setDirection } from '@/redux/slice/cardSlice'
-export default function SectionHeaderButtonContainer({type}) {
+import { ReactJSXElement } from '@emotion/react/types/jsx-namespace'
+
+interface SectionHeaderButtonContainerProps {
+  icons: ReactJSXElement[]
+}
+
+export default function SectionHeaderButtonContainer({icons}:SectionHeaderButtonContainerProps) {
   const [isClicked1, setIsClicked1] = useState(true)
   const [isClicked2, setIsClicked2] = useState(false)
   const [isClicked3, setIsClicked3] = useState(false)
-  const dispatch = useDispatch()
-
+  const {dispatch} = useCard()
   const hamburgerClickHandler = async () => {
-   
+  
       // await setCardDirection('row')
       dispatch(setDirection('row'))
       if(!isClicked1){
@@ -35,20 +39,12 @@ export default function SectionHeaderButtonContainer({type}) {
   const EmotionalIconClickHandler = () => {
     setIsClicked3(!isClicked3)
   }
-  
+  const iconClickHandler = () => {
+    dispatch(setDirection('tile'))
+  }
   return (
     <div className='flex justify-end gap-[10px] font-[24px]'>
-          {
-            type === 'hotNews' ? 
-            <>
-              <EmotionalScoreIcon onClick={EmotionalIconClickHandler}/>
-              {isClicked3 && <EmotionalScoreModal/>}
-            </> :    
-            <>
-              <HamburgerIcon className={'hover:cursor-pointer text-[24px]' + (isClicked1 ?' text-black':' text-gray-400' )} onClick={hamburgerClickHandler}/>
-              <GridIcon className={'hover:cursor-pointer text-[24px]' + (isClicked2 ?` text-black`:' text-gray-400') } onClick={gridClickHandler}/>
-            </>
-          }
+      {icons.map((item) =>  <button key={item.key + Math.random()} onClick={iconClickHandler}>{item}</button> )} 
     </div>
   )
 }

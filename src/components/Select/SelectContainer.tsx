@@ -1,12 +1,13 @@
 import React from 'react'
+import Image from 'next/image'
 import Select from './index'
-import { symbolInterface } from '@/constants/symbolArr'
-import { categoryInterface } from '@/constants/newsCategory'
-
+import { Category } from '@/interfaces/Category'
+import { Symbol } from '@/interfaces/Symbol'
 interface SelectContainerProps {
-  arr: symbolInterface[] | categoryInterface[] 
+
+  arr: any
   type: string,
-  selectedArr?: [],
+  selectedArr?: string[],
   setSelectedArr?: Function,
   number? : boolean
 }
@@ -16,10 +17,10 @@ export default function SelectContainer({arr,type, selectedArr, setSelectedArr, 
   return (
     <div className='inline-flex flex-col gap-[6px] justify-start'>
     
-{
+    {
       type === 'category' 
-      ? arr.map((item)=>{return <Select key={item.categoryId} selectedArr={selectedArr} setSelectedArr={setSelectedArr} >{item.label}</Select>})
-      : arr.map((item)=>{return <Select key={item.symbolId} selectedArr={selectedArr} setSelectedArr={setSelectedArr}>{item.logo}{item.symbol}{item.companyName}</Select>})
+      ? arr.map((item)=>{return <Select key={item.categoryId} selectedArr={selectedArr} setSelectedArr={setSelectedArr} >{item.category}</Select>})
+      : arr.map((item)=>{return <Select key={item.symbolId} selectedArr={ selectedArr} setSelectedArr={setSelectedArr}><Image src={item.logo} alt='logo' width={10} height={10}/>{item.symbol}</Select>})
     }
  
     {

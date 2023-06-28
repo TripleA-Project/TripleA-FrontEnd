@@ -4,7 +4,7 @@ import { type RootState } from '../store';
 
 type DirectionState = {
   // State 타입
-  cardDirection: string; 
+  cardDirection: 'row'|'column'|'tile'; 
 };
 
 const initialState: DirectionState = {
@@ -23,15 +23,15 @@ export const cardSlice = createSlice({
 
 export const { setDirection } = cardSlice.actions;
 
-// 커스텀 훅 형태로 만들어주기 (Hooks 폴더로 따로 빼도 됨)
-// export function useCard() {
-//   const dispatch = useDispatch();
-//   const {cardDirection} = useSelector((state: RootState) => state.card);
+//커스텀 훅 형태로 만들어주기 (Hooks 폴더로 따로 빼도 됨)
+export function useCard() {
+  const dispatch = useDispatch();
+  const {cardDirection} = useSelector((state: RootState) => state.card);
 
-//   return {
-//     cardDirection,
-//     dispatch,
-//   };
-// }
+  return {
+    cardDirection,
+    dispatch,
+  };
+}
 
 export default cardSlice.reducer;

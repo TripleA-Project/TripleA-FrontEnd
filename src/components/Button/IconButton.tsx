@@ -109,7 +109,7 @@ export default function IconButton({
   };
 
   const presetIcon = {
-    heart: <HeartIcon/>,
+    // heart: <HeartIcon/>,
     heartfill: <AiFillHeart />,
     bookmark: <BsBookmark className="text-2xl" />,
     bookmarkfill: <BsBookmarkFill className="text-2xl"/>,
@@ -129,8 +129,8 @@ export default function IconButton({
     pencil: <RiPencilFill />,
     news: <BiNews />,
     gridmenu: <BsGrid3X3GapFill />,
-    fire: <MdOutlineLocalFireDepartment />,
-    info: <MdInfoOutline />,
+    // fire: <MdOutlineLocalFireDepartment />,
+    // info: <MdInfoOutline />,
     hamburgermenu: <GiHamburgerMenu />,
   };
 

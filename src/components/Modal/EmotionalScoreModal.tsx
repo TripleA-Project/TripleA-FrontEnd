@@ -1,5 +1,5 @@
 import React from 'react'
-import { InfoIcon } from '@/components/Icons'
+import { InfoIcon } from '@/components/Icon'
 
 export default function EmotionalScoreModal() {
   return (

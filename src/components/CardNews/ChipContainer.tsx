@@ -1,11 +1,12 @@
-import { NewsData } from "@/interfaces/NewsData"
+import Image from "next/image"
 import styled from "@emotion/styled"
+import { NewsData } from "@/interfaces/NewsData"
 
-export default function ChipContainer({symbol, logo='ddd'}:Pick<NewsData, 'symbol'|'logo'>) {
+export default function ChipContainer({symbol, logo}:Pick<NewsData, 'symbol'|'logo'>) {
   return (
     <ChipsWrapper>
       <Chip>
-        <div>{logo}</div>
+        <div></div>
         <div>{symbol}</div>
       </Chip>
       <Chip>
@@ -28,8 +29,7 @@ const ChipsWrapper = styled.div`
 `
 
 const Chip = styled.div`
-box-sizing: border-box;
-height: 28px;
+  height: 28px;
   border-top: 1.5px solid #E5E7EC;
   border-bottom: 1.5px solid #E5E7EC;
   display: inline-flex;
@@ -43,6 +43,7 @@ height: 28px;
     background-color: #fff;
     z-index: 9;
     padding: 3.5px 0;
+    word-break: keep-all;
   }
   &::before {
     content: '';
