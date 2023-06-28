@@ -32,8 +32,14 @@ export function validatePassword(password: string) {
   if (password.length === 0) return { result: false, type: 'RequiredPassword' } as const;
 
   const passwordLengthRegExp = /^.{8,16}$/;
-  const notAllowedCharRegExp = /[^a-zA-Z0-9]/g;
-  const isContainSpecialRegExp = /[\!@#\$%\^&\*-_\=\+\{\};:,\<\.\>]/g;
+  const notAllowedCharRegExp = /[^a-zA-Z0-9\!\@\#\$\%\^\&\*\-\_\=\+\{\}\;\:\,\<\.\>]/g;
+  const isContainSpecialRegExp = /[\!@\#\$\%\^\&\*\-\_\=\+\{\}\;\:\,\<\.\>]/g;
+
+  console.log({
+    passwordLengthRegExp: passwordLengthRegExp.test(password),
+    notAllowedCharRegExp: notAllowedCharRegExp.test(password),
+    isContainSpecialRegExp: isContainSpecialRegExp.test(password),
+  });
 
   if (!passwordLengthRegExp.test(password)) return { result: false, type: 'passwordLength' } as const;
   if (notAllowedCharRegExp.test(password)) return { result: false, type: 'notAllowedChar' } as const;
