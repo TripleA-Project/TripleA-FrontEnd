@@ -21,7 +21,7 @@ import { GiHamburgerMenu } from 'react-icons/gi';
 import { RiPencilFill } from 'react-icons/ri';
 import { FiSearch, FiX } from 'react-icons/fi';
 import { IconType } from 'react-icons/lib';
-import {HeartIcon} from './Icons'
+import { HeartIcon } from './Icons';
 
 export interface IconButtonProps extends ButtonProps {
   icon:
@@ -88,6 +88,7 @@ export default function IconButton({
     small: `h-12 ${fullWidth ? 'w-full' : 'w-28'}`,
     medium: `h-10 ${fullWidth ? 'w-full' : 'w-72'}`,
     large: `h-14 ${fullWidth ? 'w-full' : 'w-40'}`,
+    fullWidth: 'h-[54px] w-full',
     icon: 'h-7 w-7',
   };
 
@@ -108,7 +109,7 @@ export default function IconButton({
   };
 
   const presetIcon = {
-    heart: <HeartIcon/>,
+    heart: <HeartIcon />,
     heartfill: <AiFillHeart />,
     bookmark: <BsBookmark className="text-2xl" />,
     bookmarkfill: <BsBookmarkFill />,
@@ -138,16 +139,21 @@ export default function IconButton({
       className={`flex cursor-pointer items-center justify-center rounded-xl ${textColor[textColorTheme]} ${
         sizeClassNames[sizeTheme]
       } ${backgroundColor[bgColorTheme]} ${className ? ` ${className}` : ''}`}
-      type={type} onClick={onClick}
+      type={type}
+      onClick={onClick}
       {...props}
     >
       <div>
-        <div className={`flex-col items-center justify-center gap-5 relative ${iconPosition === 'right' ? 'flex-row-reverse' : ''}`}>
+        <div
+          className={`relative flex-col items-center justify-center gap-5 ${
+            iconPosition === 'right' ? 'flex-row-reverse' : ''
+          }`}
+        >
           {typeof icon === 'string'
             ? presetIcon[icon as keyof typeof presetIcon]
             : icon({ style: { fontSize: iconSize } })}
         </div>
-        <span className="break-all text-start absolute top-3 right-1">{children}</span>
+        <span className="absolute right-1 top-3 break-all text-start">{children}</span>
       </div>
     </button>
   );
