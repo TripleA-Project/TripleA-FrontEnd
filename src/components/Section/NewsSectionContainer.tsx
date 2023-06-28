@@ -11,11 +11,10 @@ export interface NewsSectionContainerProps {
 }
 
 export default function NewsSectionContainer({type, icon ,sectionTitle}:NewsSectionContainerProps) {
-   
   return (
-    <div className='bg-white px-[16px] min-w-[390px]'>
+    <div className='bg-white px-[16px]'>
       <NewsSectionHeader type={type} icon={icon} sectionTitle={sectionTitle}/>
-      <NewsSectionBody/>
+      <NewsSectionBody type={type}/>
     </div>
   )
 }
