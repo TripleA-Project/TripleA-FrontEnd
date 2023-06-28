@@ -17,10 +17,11 @@ const ImageContainer = styled.div<ImageContainerProps>`
   height: ${({cardDirection})=> cardDirection === 'column' ? '197px':'66px'};
 `
 
-export default function NewsImage({thumbnail='https://giphy.com/gifs/running-muppets-7kn27lnYSAE9O', cardDirection}:NewsImageProps) {
+export default function NewsImage({thumbnail, cardDirection}:NewsImageProps) {
+  
   return (
     <ImageContainer className='rounded-t-xl overflow-hidden box-border w-full' thumbnail={thumbnail} cardDirection={cardDirection}>
-      {/* {thumbnail && <Image loader={'https://giphy.com/gifs/running-muppets-7kn27lnYSAE9O'} src={thumbnail} alt='thumbnail' width={66} height={66}/>} */}
+      {thumbnail && <Image src={thumbnail} alt='thumbnail' width={66} height={66}/>}
     </ImageContainer>
   )
 }

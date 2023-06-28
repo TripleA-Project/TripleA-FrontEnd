@@ -11,9 +11,12 @@ export interface NewsData {
   thumbnail?:string;
   publishedDate: string;
   sentiment:number;
-  bookmark: Bookmark;
+  bookmark: {
+    count: number;
+    isBookmark: boolean;
+  };
 }
-export type CardNewsData = Omit<NewsData,  'description'>
+
 
 export interface Bookmark {
   count: number;

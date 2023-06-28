@@ -15,11 +15,13 @@ import {
   AiFillCheckCircle,
   AiOutlineRight,
 } from 'react-icons/ai';
-import { MdCancel, MdOutlineLocalFireDepartment, MdInfoOutline } from 'react-icons/md';
-import { TfiExport } from 'react-icons/tfi';
-import { GiHamburgerMenu } from 'react-icons/gi';
+import { MdCancel } from 'react-icons/md';
+// import { TfiExport } from 'react-icons/tfi';
 import { RiPencilFill } from 'react-icons/ri';
 import { FiSearch, FiX } from 'react-icons/fi';
+import { GiHamburgerMenu } from 'react-icons/gi';
+import { LuShare } from 'react-icons/lu';
+
 import { IconType } from 'react-icons/lib';
 import { HeartIcon } from './Icons';
 
@@ -112,9 +114,9 @@ export default function IconButton({
     heart: <HeartIcon />,
     heartfill: <AiFillHeart />,
     bookmark: <BsBookmark className="text-2xl" />,
-    bookmarkfill: <BsBookmarkFill />,
+    bookmarkfill: <BsBookmarkFill className="text-2xl" />,
     share: <BsFillShareFill />,
-    export: <TfiExport />,
+    export: <LuShare className="text-2xl" />,
     arrowleft: <AiOutlineArrowLeft />,
     left: <AiOutlineLeft />,
     down: <AiOutlineDown />,
@@ -129,8 +131,8 @@ export default function IconButton({
     pencil: <RiPencilFill />,
     news: <BiNews />,
     gridmenu: <BsGrid3X3GapFill />,
-    fire: <MdOutlineLocalFireDepartment />,
-    info: <MdInfoOutline />,
+    // fire: <MdOutlineLocalFireDepartment />,
+    // info: <MdInfoOutline />,
     hamburgermenu: <GiHamburgerMenu />,
   };
 
