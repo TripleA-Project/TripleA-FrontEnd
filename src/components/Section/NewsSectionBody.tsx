@@ -12,23 +12,19 @@ interface NewsSectionBodyProps {
 
 export default function NewsSectionBody({ type }: NewsSectionBodyProps) {
   const { cardDirection } = useSelector((state: RootState) => state.card);
-  const { isLoading, isError, data, error } = useQuery({
+  const { isLoading, data } = useQuery({
     queryKey: ['newslist'],
     queryFn: () => latestNews(),
   });
-
   if (isLoading) {
     return <span>Loading...</span>;
   }
 
-  if (isError) {
-    return <span>Error: {error.message}</span>;
-  }
   const newslist = data.data.data.news;
   const hotNews = newslist[0];
   return (
     <div className="w-full">
-      <div className="m-auto m-auto flex flex-wrap gap-[10px]">
+      <div className={`m-auto flex flex-wrap gap-[10px] ${cardDirection === 'row' ? 'flex-col' : ''}`}>
         {type === 'column' ? (
           <NewsCard cardDirection="column" news={hotNews} />
         ) : (

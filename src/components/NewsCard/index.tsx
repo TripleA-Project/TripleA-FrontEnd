@@ -14,22 +14,23 @@ interface NewsCardProps {
 export default function NewsCard({ news, cardDirection }: NewsCardProps) {
   const sentimentColor = getSentimentColor(news.sentiment);
   return (
-    <>
+    <div className="m-auto">
       {cardDirection === 'column' ? (
-        <div>
+        <div className="flex flex-col">
           <ImageContainer cardDirection="column" width={358} height={221} thumbnail="ddd" />
           <NewsContainer cardDirection="column" height={120} margin={14} news={news} />
         </div>
       ) : cardDirection === 'row' ? (
-        <div className="row h-[122px] min-w-[357px]">
-          <div>
-            <Select symbol="">
-              <span>logo</span>
-              <span>symbol</span>
-              <span>companyName</span>
-            </Select>
-          </div>
-          <div>
+        <div className=" flex h-[122px] min-w-[357px] flex-col">
+          <Select symbol="dd">
+            <div
+              className="h-[19px] w-[19px] rounded-[50%] bg-cover"
+              style={{ backgroundImage: `url(${news.logo})` }}
+            ></div>
+            <span>{news.symbol}</span>
+            <span>{news.companyName}</span>
+          </Select>
+          <div className="flex items-center">
             <Bar sentiment={news.sentiment} />
             <NewsContainer cardDirection="row" height={72} margin={9} news={news} />
           </div>
@@ -39,6 +40,6 @@ export default function NewsCard({ news, cardDirection }: NewsCardProps) {
           <NewsContainer cardDirection="tile" height={106} width={106} news={news} />
         </div>
       )}
-    </>
+    </div>
   );
 }
