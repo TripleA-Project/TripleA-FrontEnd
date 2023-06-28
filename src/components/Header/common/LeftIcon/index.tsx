@@ -1,6 +1,6 @@
 'use client';
 import IconButton, { IconButtonProps } from '@/components/Button/IconButton';
-import LogoIcon from '@/components/Icon/LogoIcon';
+import LogoIcon from '@/components/Icon';
 import { useParams, usePathname, useRouter } from 'next/navigation';
 import React from 'react';
 
@@ -17,7 +17,7 @@ function LeftIcon({ clickHandle, leftIcon }: leftIconProps) {
     router.push('/chart')
   }
   return (
-    <div className={`${(pathName === '/chart')|| (pathName ==='/login') ? 'text-[#FD954A]' : ''} ${pathName ===`/chart/symbol`? 'text-neutral-400': ''}`}>
+    <div className={`${(pathName === '/chart')|| (pathName ==='/login') ? 'text-[#FD954A]' : ''} ${pathName ===`/chart/symbol`|| pathName ==='/search'? 'text-neutral-400': ''}`}>
       {leftIcon === 'LogoIcon'? <LogoIcon/>:<IconButton icon={leftIcon} textColorTheme='none' bgColorTheme="none" sizeTheme="icon" iconSize="30px" onClick={iconClickHandle}/>}
     </div>
   );

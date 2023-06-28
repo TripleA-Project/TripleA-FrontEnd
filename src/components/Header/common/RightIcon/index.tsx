@@ -29,7 +29,7 @@ function RightIcon({ clickHandle, rightIcon }: RightIconProps) {
       className={`${
         pathName === `/chart/symbol` && isClicked
           ? 'text-[#FD954A]'
-          : pathName === `/chart/symbol` && 'text-neutral-400'
+          : pathName === `/chart/symbol` || pathName ==='/search' && 'text-neutral-400'
       }`}
     >
       <IconButton
