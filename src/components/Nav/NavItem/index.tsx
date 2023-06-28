@@ -18,7 +18,7 @@ function NavItem({ navItem }: NavItemProps) {
 
   const isExactMatch = pathName === navItem.pathName;
   const isSubpathMatch = pathName.startsWith(`${navItem.pathName}/`);
-  const isDynamicMatch = navItem.pathName === `/` && pathName.startsWith(`/${params.slug}`);
+  const isDynamicMatch = navItem.pathName === `/` && pathName.startsWith(`${pathName}`);
 
   const isActive = isExactMatch || isSubpathMatch || isDynamicMatch ? 'text-black' : 'text-neutral-400';
   return (

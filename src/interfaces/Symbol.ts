@@ -21,5 +21,5 @@ export interface Symbol {
   sector?: string;
   logo?: string;
   marketType: string;
-  price: [{ today: SymbolPrice }, { yesterday: SymbolPrice }];
+  price: { today: SymbolPrice , yesterday: SymbolPrice };
 }
