@@ -10,6 +10,7 @@ import { NewsData } from '@/interfaces/NewsData';
 interface CardNewsProps {
   cardDirection: 'row'|'column'|'tile',
   news: NewsData
+  key?: number
 }
 
 interface CardStyleProps {
@@ -21,7 +22,7 @@ interface CardStyleProps {
 const Card = styled.li<CardStyleProps>`
   max-width: ${({cardDirection})=> cardDirection===`column` && `358px`};
   min-width:  ${({cardDirection})=> cardDirection ===`column`? `300px`:( cardDirection === `row` ? `357px` : ``)};
-  width: ${({cardDirection})=> cardDirection ===`column`? ``:( cardDirection === `row` ? `100%` : `106px`)};
+  width: ${({cardDirection})=> cardDirection === `row` ? `100%` :('tile' && `106px`)};
   min-height: ${({cardDirection})=> cardDirection === `column`?`344px`:( cardDirection === `row` ? `122px` : `auto`)};
   height : ${({cardDirection})=>cardDirection === `tile` && `106px`};
   padding: ${({cardDirection})=> cardDirection === `tile` && `12px`};
@@ -54,28 +55,28 @@ function CardNews({ news, cardDirection}:CardNewsProps) {
     
   return (
     <>
-      <Card className='overflow-hidden box-border inline-flex rounded-2xl bg-white flex-col justify-between m-[10px]' cardDirection={cardDirection} sentimentColor={sentimentColor}>
+      <Card className='inline-flex rounded-2xl bg-white justify-between m-[3px]' cardDirection={cardDirection} sentimentColor={sentimentColor}>
         {cardDirection==='column'?
         <div className='column'>
           <div>
             <NewsImage thumbnail={news.thumbnail} cardDirection={cardDirection}/>
           </div>
-          <div style={{padding: '10px'}}>
+          <div className='p-[0 12px 12px]'>
             <ChipContainer symbol={news.symbol} logo={news.logo}/>
             <News title={news.title} source={news.source} publishedDate={news.publishedDate} sentimentColor={sentimentColor} hole1={''} hole2={''} cardDirection={cardDirection}/>
             <ButtonContainer newsId={news.newsId} bookmark={news.bookmark}/>
           </div>
         </div>:
         cardDirection === 'row' ?
-        <div className='row'>
+        <div className='row flex-col justify-between'>
           <ChipContainer symbol={news.symbol} logo={news.logo}/>
           <News title={news.title} source={news.source} publishedDate={news.publishedDate} sentimentColor={sentimentColor} hole1={<NewsImage thumbnail={news.thumbnail} cardDirection={cardDirection}/>} hole2={<ButtonContainer bookmark={news.bookmark} newsId={news.newsId}/>} cardDirection={cardDirection}/>
         </div>
         :
-        <>
-          <div className='title  overflow-hidden text-ellipsis '>{news.title}</div>
-          <div className='time text-right text-[10px] font-semibold text-white'>{news.publishedDate}</div>
-        </>
+        <div>
+          <div className='title text-ellipsis line line-clamp-3'>{news.title}</div>
+          <div className='time text-right text-[10px] font-semibold text-white line-clamp-2'>{news.publishedDate}</div>
+        </div>
         }
       </Card>
     {cardDirection === 'row' &&  <div className='divider w-full h-[1.5px] bg-[#eee]'></div>}
