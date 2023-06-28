@@ -26,14 +26,18 @@ export function validateEmail(email: string) {
  * 2. 영문 대소문자, 0-9 숫자, 허용 특수문자: `.` , `-` 의 조합
  */
 export function validatePassword(password: string) {
+  //password 는 8~16자 이내, 영문(대소문자), 숫자, 특수문자(!@#$%^&*-_=+{};:,<.>) 각 1개 이상 포함하여야 함
+
   if (typeof password !== 'string') return { result: false, type: 'InvalidPasswordType' } as const;
   if (password.length === 0) return { result: false, type: 'RequiredPassword' } as const;
 
-  const passwordLengthRegExp = /^.{6,16}$/;
-  const notAllowedCharRegExp = /[^a-zA-Z0-9.-]/g;
+  const passwordLengthRegExp = /^.{8,16}$/;
+  const notAllowedCharRegExp = /[^a-zA-Z0-9]/g;
+  const isContainSpecialRegExp = /[\!@#\$%\^&\*-_\=\+\{\};:,\<\.\>]/g;
 
   if (!passwordLengthRegExp.test(password)) return { result: false, type: 'passwordLength' } as const;
   if (notAllowedCharRegExp.test(password)) return { result: false, type: 'notAllowedChar' } as const;
+  if (!isContainSpecialRegExp.test(password)) return { result: false, type: 'NotContainSpecial' } as const;
 
   return { result: true };
 }
@@ -50,6 +54,7 @@ export function validatePassword(password: string) {
  * 3. 영어 또는 조합된 한글로만 구성된 문자
  */
 export function validateFullName(fullName: string) {
+  //회원가입 및 개인정보 수정 시 fullName은 영문(대소문자) 혹은 한글로만 작성 가능
   if (typeof fullName !== 'string') return { result: false, type: 'InvalidFullNameType' } as const;
   if (fullName.length === 0) return { result: false, type: 'RequiredFullName' } as const;
 

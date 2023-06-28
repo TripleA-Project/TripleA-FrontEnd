@@ -61,9 +61,11 @@ function PasswordForm() {
             {...register('password', {
               required: '패스워드를 입력해주세요',
               validate: (value) => {
-                const { result } = validatePassword(value);
+                const { result, type } = validatePassword(value);
 
                 if (result === true) return true;
+
+                if (type === 'NotContainSpecial') return '특수문자가 포함되어있지 않습니다';
 
                 return '패스워드 형식이 아닙니다';
               },
