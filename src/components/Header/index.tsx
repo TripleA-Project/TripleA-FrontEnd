@@ -39,6 +39,11 @@ function Header({leftIcon, rightIcon, title, ref}:HeaderProps) {
       <HeaderItem leftIcon={leftIcon} rightIcon={rightIcon} title={title} ref={ref}/>
     </header>
   );
+
+// function Header({children}) {
+
+//   return <div className="h-full w-[100%] bg-white border-[0.5px] border-b-[#E4E4E4] flex flex-col justify-end">Header{children}</div>;
+
 }
 
 export default Header;
