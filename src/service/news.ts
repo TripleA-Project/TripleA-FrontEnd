@@ -23,6 +23,7 @@ import {
   type GetNewsHistorySearchParam,
   type GetNewsHistroyResponse,
 } from '@/interfaces/Dto/History';
+import { headers } from 'next/headers';
 
 /**
  * 최신 뉴스 조회 API (GET) - Pagination
@@ -51,8 +52,12 @@ export async function latestNews({ page = 0, size = 10 }: LatestNewsSearchParam 
  *
  * `id` 뉴스 id [**number**]
  */
-export async function getNewsDetail({ id }: NewsDetailParam) {
-  const getNewsDetailResponse = await axiosInstance.get<NewsDetailResponse>(`/api/news/${id}`);
+export async function getNewsDetail({ id }: NewsDetailParam, accessToken: string) {
+  const getNewsDetailResponse = await axiosInstance.get<NewsDetailResponse>(`/api/auth/news/${id}`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
 
   return getNewsDetailResponse;
 }

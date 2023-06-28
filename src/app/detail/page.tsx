@@ -4,6 +4,7 @@ import React, { useState, ChangeEvent } from 'react';
 import { Metadata } from 'next';
 import { IoIosArrowBack } from 'react-icons/io';
 import { NewsDetail } from '@/components/NewsDetail';
+import { NewsDetailTest } from '@/components/NewsDetailTest';
 
 export const metadata: Metadata = {
   title: '개별 뉴스 상세',
@@ -18,7 +19,7 @@ function Detail() {
           <IoIosArrowBack />
         </button>
       </div>
-      <NewsDetail />
+      <NewsDetailTest />
     </>
   );
 }

@@ -19,8 +19,8 @@ import { MdCancel } from 'react-icons/md';
 // import { TfiExport } from 'react-icons/tfi';
 import { RiPencilFill } from 'react-icons/ri';
 import { FiSearch, FiX } from 'react-icons/fi';
-import {GiHamburgerMenu} from 'react-icons/gi'
-import {LuShare} from 'react-icons/lu'
+import { GiHamburgerMenu } from 'react-icons/gi';
+import { LuShare } from 'react-icons/lu';
 
 import { IconType } from 'react-icons/lib';
 
@@ -109,12 +109,11 @@ export default function IconButton({
   };
 
   const presetIcon = {
-    heart: <HeartIcon/>,
     heartfill: <AiFillHeart />,
     bookmark: <BsBookmark className="text-2xl" />,
-    bookmarkfill: <BsBookmarkFill className="text-2xl"/>,
+    bookmarkfill: <BsBookmarkFill className="text-2xl" />,
     share: <BsFillShareFill />,
-    export: <LuShare className="text-2xl"/>,
+    export: <LuShare className="text-2xl" />,
     arrowleft: <AiOutlineArrowLeft />,
     left: <AiOutlineLeft />,
     down: <AiOutlineDown />,
@@ -129,8 +128,7 @@ export default function IconButton({
     pencil: <RiPencilFill />,
     news: <BiNews />,
     gridmenu: <BsGrid3X3GapFill />,
-    fire: <MdOutlineLocalFireDepartment />,
-    info: <MdInfoOutline />,
+
     hamburgermenu: <GiHamburgerMenu />,
   };
 
@@ -139,16 +137,21 @@ export default function IconButton({
       className={`flex cursor-pointer items-center justify-center rounded-xl ${textColor[textColorTheme]} ${
         sizeClassNames[sizeTheme]
       } ${backgroundColor[bgColorTheme]} ${className ? ` ${className}` : ''}`}
-      type={type} onClick={onClick}
+      type={type}
+      onClick={onClick}
       {...props}
     >
       <div>
-        <div className={`flex-col items-center justify-center gap-5 relative ${iconPosition === 'right' ? 'flex-row-reverse' : ''}`}>
+        <div
+          className={`relative flex-col items-center justify-center gap-5 ${
+            iconPosition === 'right' ? 'flex-row-reverse' : ''
+          }`}
+        >
           {typeof icon === 'string'
             ? presetIcon[icon as keyof typeof presetIcon]
             : icon({ style: { fontSize: iconSize } })}
         </div>
-        <span className="break-all text-start absolute top-3 right-1">{children}</span>
+        <span className="absolute right-1 top-3 break-all text-start">{children}</span>
       </div>
     </button>
   );
