@@ -13,7 +13,6 @@ const ImageContainer = styled.div<ImageContainerProps>`
   border-radius: 12px;
   border-bottom-left-radius: ${({cardDirection})=> cardDirection === 'column' ? 0 : '12px'};
   border-bottom-right-radius: ${({cardDirection})=> cardDirection === 'column' ? 0 : '12px'};
-  border: 1px solid #000;
   height: ${({cardDirection})=> cardDirection === 'column' && '197px'};
 `
 

@@ -1,9 +1,8 @@
-import { NewsData } from '@/interfaces/NewsData'
-
-import { ReactNode } from 'react'
-import Bar from './Bar'
-
 import styled from '@emotion/styled'
+import { ReactNode } from 'react'
+import { NewsData } from '@/interfaces/NewsData'
+import Bar from './Bar'
+import { publishedDateHandler, newsSourceHandler } from '@/util/news'
 
 interface NewsContainerProps {
   cardDirection:'row'|'column'|'tile';
@@ -51,18 +50,22 @@ const Hole2 = styled.div<HoleProps>`
 
 
 export default function News({title,source, publishedDate, sentimentColor , hole1, hole2, cardDirection }:NewsProps) {
+  const publishDate = publishedDateHandler(publishedDate)
+  const newsSource = newsSourceHandler(source)
   return (
     <NewsContainer className='flex relative' cardDirection={cardDirection}>
       <Bar sentimentColor={sentimentColor}/>
       <Container className='justify-evenly' cardDirection={cardDirection}>
         {hole1 && <Hole1 className='overflow-hidden' cardDirection={cardDirection}>{hole1}</Hole1>}
-        <h3 className='ml-[10px] relative min-h-[40px] line-clamp-3 text-ellipsis'>
-          {title}
-        </h3>
-        <p className='subText flex justify-end w-full pr-[15px]'>
-          <span className='text-bold mb-[10px] mr-[10px]'>[{source.replace(/\.com$/,'')}]</span>
-          <span>{publishedDate.substring(0,10)}</span>
-        </p>
+        <div>
+          <h3 className='ml-[10px] relative min-h-[40px] line-clamp-3 text-ellipsis'>
+            {title}
+          </h3>
+          <p className='subText flex justify-end  pr-[15px]'>
+            <span className='text-semibold mb-[10px] mr-[10px]'>{newsSource}</span>
+            <span>{publishDate}</span>
+          </p>
+        </div>
         {hole2 && <Hole2 className='overflow-hidden flex items-center justify-end' cardDirection={cardDirection}>{hole2}</Hole2>}
       </Container>
     </NewsContainer>
