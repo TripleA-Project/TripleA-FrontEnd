@@ -18,12 +18,11 @@ export default function ButtonContainer({newsId,bookmark}:ButtonContainerProps){
   const count = bookmark?.count
   const isBookmark = bookmark?.isBookmark
   const [isMarked, setIsMarked] = useState(isBookmark)
+
   const handleCopyClipBoard = async(text:string) => {
     try {
       await navigator.clipboard.writeText(text)
-      alert(text)
     } catch (error) {
-      console.log(error)
     }
   }
   const shareClickHandler = async() => {
@@ -32,25 +31,22 @@ export default function ButtonContainer({newsId,bookmark}:ButtonContainerProps){
     alert('주소가 복사되었습니다')
   }
   const bookmarkClickHandler = async(newsId:number) => {
+    console.log('cloickefsdjhf')
     if(isMarked){
-      await deleteNewsBookmark({id:newsId}) 
       setIsMarked(!isMarked)
+      await deleteNewsBookmark({id:newsId}) 
       return
     } else {
-      await addNewsBookmark({id:newsId})
       setIsMarked(!isMarked)
+      await addNewsBookmark({id:newsId})
       return
     }
   }
 
   return (
-    <div className="flex flex-row justify-end items-center gap-[6px]">
+    <div className="flex items-center justify-end gap-[6px] relative w-fit pl-[10px] pb-[10px]">
       <IconButton icon='export' bgColorTheme='none' textColorTheme='black' onClick={shareClickHandler}/>
-      {isMarked ? 
-        <IconButton icon='bookmarkfill' bgColorTheme='none' textColorTheme='black' onClick={()=>bookmarkClickHandler(newsId)} isBookmark={isBookmark}>{count && count}</IconButton>
-        :
-        <IconButton icon='bookmark' bgColorTheme='none' textColorTheme='black' onClick={()=>bookmarkClickHandler(newsId)} isBookmark={isBookmark}>{count && count}</IconButton>
-      }
+      <IconButton icon={isMarked ? 'bookmarkfill' :'bookmark'} bgColorTheme='none' textColorTheme='black' onClick={()=>bookmarkClickHandler(newsId)} isBookmark={isBookmark}/>
     </div>
   )
 }
