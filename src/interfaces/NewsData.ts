@@ -2,8 +2,8 @@
 
 export interface NewsData {
   newsId : number;
-  //NOTE - symbol 데이터 형태 바뀔 예정
   symbol: string;
+  companyName: string;
   logo?:string;
   source: string;
   title: string;
