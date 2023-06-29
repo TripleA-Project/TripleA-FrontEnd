@@ -33,7 +33,7 @@ export async function login({ email, password }: LoginRequest) {
  * 로그아웃 API (POST)
  */
 export async function logout() {
-  const logoutResponse = await axiosInstance.post<LogoutResponse>('/api/logout');
+  const logoutResponse = await axiosInstance.post<LogoutResponse>('/api/auth/logout');
 
   return logoutResponse;
 }
@@ -54,14 +54,14 @@ export async function logout() {
  * `emailVerified` 이메일 인증 유무 [**boolean**]
  *
  */
-export async function signup({ email, password, passwordCheck, fullName, newsLetter, emailVerified }: SignupRequest) {
+export async function signup({ email, password, passwordCheck, fullName, newsLetter, emailKey }: SignupRequest) {
   const signupResponse = await axiosInstance.post<any, AxiosResponse<SignupResponse>, SignupRequest>('/api/join', {
     email,
     password,
     passwordCheck,
     fullName,
     newsLetter,
-    emailVerified,
+    emailKey,
   });
 
   return signupResponse;

@@ -1,48 +1,60 @@
 'use client';
 
-import React, {useState, MouseEvent, MouseEventHandler} from 'react';
 import styled from '@emotion/styled';
+import React, { useState, useEffect, MouseEvent, MouseEventHandler, ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
+import { searchSymbol } from '@/service/symbol';
 
 interface SelectComponentProps {
-  children : string;
-  selectedArray : string[] | [];
-  setSelectedArray: any;
+  children: ReactNode;
+  selectedArr?: string[] | [];
+  setSelectedArr?: any;
+  symbol?: string;
 }
-interface NewsCategoryItemProps {
+interface SelectItemProps {
   selected: boolean;
 }
 
-function Select({children, ...props}:SelectComponentProps) {
-  
-  const [selected, setSelected] = useState(false)
-  const selectedArray = props.selectedArray
-  const setSelectedArray= props.setSelectedArray   
-
-  const clickHandler:MouseEventHandler = (e:MouseEvent<HTMLLIElement> & {target:HTMLLIElement}) => {
-    console.log(e.target.innerHTML)
-    setSelected(!selected)
-    if(selected===false){
-      setSelectedArray([...selectedArray, e.target.innerHTML])
-    } else {
-      const filteredArray:string[]|[] = selectedArray.filter((item) => item !== e.target.innerText)
-      setSelectedArray(filteredArray)
-    }
+//style
+const SelectItem = styled.li<SelectItemProps>`
+  display: inline-flex;
+  width: fit-content;
+  height: 36px;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid ${({ selected }) => (selected ? '#FD954A' : '#DBDEE1')};
+  border-radius: 25px;
+  padding: 8px 20px;
+  background-color: ${({ selected }) => (selected ? '#FFF0E4' : '#FFF')};
+  color: #000;
+  &:hover {
+    cursor: pointer;
   }
-  
-  
+`;
+
+function Select({ children, selectedArr, setSelectedArr, symbol }: SelectComponentProps) {
+  const [selected, setSelected] = useState(false);
+
+  const clickHandler: MouseEventHandler = (e: MouseEvent<HTMLLIElement> & { target: HTMLLIElement }) => {
+    if (symbol) {
+      const router = useRouter();
+      router.push(`./api/symbol?symbol=${id}`);
+    } else {
+      setSelected(!selected);
+      if (selected === false) {
+        setSelectedArr([...selectedArr, e.target.innerHTML]);
+      } else {
+        const filteredArray: string[] | [] = selectedArr.filter((item) => item !== e.target.innerText);
+        setSelectedArr(filteredArray);
+      }
+    }
+  };
+  useEffect(() => {}, []);
   return (
-  <NewsCategoryItem className={selected? 'selectItem selected': 'selectItem'} onClick={clickHandler} selected={selected}>{children}</NewsCategoryItem>)
+    <SelectItem className={selected ? 'selectItem selected' : 'selectItem'} onClick={clickHandler} selected={selected}>
+      {children}
+    </SelectItem>
+  );
 }
 
 export default Select;
-
-//style
-const NewsCategoryItem = styled.li<NewsCategoryItemProps>`
-  display: inline-block;
-  border: 1px solid ${({selected})=> selected ? '#6A6A6A': '#000'};
-  border-radius: 25px;
-  margin: 5px;
-  padding: 10px 20px;
-  background-color:${({selected})=>selected? '#6A6A6A' : '#E0E0E0'};
-  color: #fff;
-`

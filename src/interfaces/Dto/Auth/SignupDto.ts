@@ -6,7 +6,7 @@ export interface SignupRequest {
   passwordCheck: string;
   fullName: string;
   newsLetter: boolean;
-  emailVerified: boolean;
+  emailKey: string;
 }
 
 export interface SignupResponse extends APIResponse {}

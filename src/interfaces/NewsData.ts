@@ -2,8 +2,8 @@
 
 export interface NewsData {
   newsId : number;
-  //NOTE - symbol 데이터 형태 바뀔 예정
   symbol: string;
+  companyName: string;
   logo?:string;
   source: string;
   title: string;
@@ -11,9 +11,12 @@ export interface NewsData {
   thumbnail?:string;
   publishedDate: string;
   sentiment:number;
-  bookmark: Bookmark;
+  bookmark: {
+    count: number;
+    isBookmark: boolean;
+  };
 }
-export type CardNewsData = Omit<NewsData,  'description'>
+
 
 export interface Bookmark {
   count: number;

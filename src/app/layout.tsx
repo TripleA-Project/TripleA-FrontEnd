@@ -21,11 +21,13 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
-      <body className={notoSans.className}>
-        <main>
+      <body >
+        <main className={notoSans.className + ' box-border bg-[#F5F7F9] min-w-[390px] max-w-[768px] min-h-[844px] m-auto px-[30px]'}>
           <ReduxProvider>
             <ReactQueryProvider>
-              {children}
+              <div className="mx-auto box-border min-w-[390px] overflow-auto pb-14 pt-[53px] sm:w-full md:max-w-[768px]">
+                {children}
+              </div>
               <Nav />
             </ReactQueryProvider>
           </ReduxProvider>

@@ -1,7 +1,9 @@
-import { Suspense } from 'react';
-import { Metadata, ResolvingMetadata } from 'next';
+import { type Metadata } from 'next';
 import { Chart as AppChart } from '@/components/Chart';
-import { ResampleFrequency } from '@/interfaces/Dto/Stock';
+import { type ResampleFrequency } from '@/interfaces/Dto/Stock';
+import { searchSymbolNews } from '@/service/news';
+
+export const revalidate = 0;
 
 interface PageProps {
   params: {
@@ -20,10 +22,7 @@ const resampleMeta = {
   annually: '년별',
 };
 
-export async function generateMetadata(
-  { params, searchParams }: PageProps,
-  parent: ResolvingMetadata,
-): Promise<Metadata> {
+export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
   const symbolName = searchParams?.name ?? '';
   const resample = searchParams?.resample ?? 'day';
 
@@ -42,14 +41,9 @@ async function SymbolChart({ searchParams }: PageProps) {
       ? (searchParams.resample as any)
       : 'daily';
 
-  return (
-    <div>
-      Chart Symbol Page
-      <Suspense fallback={<>로딩테스트...</>}>
-        <AppChart symbol={symbol} resample={resample} />
-      </Suspense>
-    </div>
-  );
+  const newsResponse = await searchSymbolNews({ symbol, page: 0, size: 3 });
+
+  return <AppChart symbol={symbol} resample={resample} data={{ news: newsResponse.data }} />;
 }
 
 export default SymbolChart;

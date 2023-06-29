@@ -32,7 +32,7 @@ export async function getSymbolStock({
   endDate,
   resampleFreq = 'daily',
 }: GetSymbolStockSearchParam) {
-  const getSymbolStockResponse = await axiosInstance.get<GetSymbolStockResponse>('/api/stocks', {
+  const getSymbolStockResponse = await axiosInstance.get<GetSymbolStockResponse>('/api/auth/stocks', {
     params: {
       symbol,
       startDate,
