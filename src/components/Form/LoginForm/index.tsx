@@ -1,112 +1,138 @@
 'use client';
 
-import { type FieldErrors, useForm } from 'react-hook-form';
-import { useMutation } from '@tanstack/react-query';
 import Button from '@/components/Button/Button';
-import { login } from '@/service/auth';
-import { setCookie } from '@/util/cookies';
-import { type LoginRequest } from '@/interfaces/Dto/Auth';
-import { ExistORNotFoundUserError } from '@/errors/ExistORNotFoundUserError';
-import { useEffect } from 'react';
 import { validateEmail, validatePassword } from '@/util/validate';
+import Image from 'next/image';
+import Logo from '/public/Logo.svg';
+import { FieldErrors, useForm } from 'react-hook-form';
+import { useState } from 'react';
+import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
+import Link from 'next/link';
+import { login } from '@/service/auth';
+import { useRouter } from 'next/navigation';
+import { setCookie } from '@/util/cookies';
+
+export interface LoginForm {
+  email: string;
+  password: string;
+}
 
 function LoginForm() {
+  const [showPassword, setShowPassword] = useState(false);
+  const handleTogglePassword = () => {
+    setShowPassword(!showPassword);
+  };
+
   const {
     register,
     handleSubmit,
-    setError,
-    clearErrors,
-    watch,
-    formState: { errors, isValid },
-  } = useForm<LoginRequest>();
+    formState: { isValid },
+  } = useForm<LoginForm>();
+  const router = useRouter();
 
-  const { mutate: loginRequest, status } = useMutation({
-    mutationFn: login,
-    onSuccess: ({ headers }) => {
-      console.log('[로그인 성공]');
+  const onSubmit = async (data: LoginForm) => {
+    try {
+      const response = await login({ email: data.email, password: data.password });
 
-      const accessToken = headers['authorization'];
+      const accessToken = response.headers['authorization'] as string;
 
       if (accessToken) {
-        setCookie('accessToken', (accessToken as string).replace('Bearer ', ''), { path: '/', maxAge: 60 * 5 });
+        await setCookie('accessToken', accessToken.replace('Bearer ', ''), { path: '/', maxAge: 60 * 60 * 24 });
       }
-    },
-    onError: (error) => {
-      console.log('[로그인 에러]');
+      router.push('/');
+    } catch (error) {
       console.log(error);
-
-      setError('root', { message: ExistORNotFoundUserError.message });
-    },
-  });
-
-  useEffect(() => {
-    const subscription = watch((value, { type }) => {
-      if (type === 'change' && errors.root) {
-        clearErrors('root');
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [watch]); // eslint-disable-line
-
-  const onValid = ({ email, password }: LoginRequest) => {
-    loginRequest({ email, password });
+    }
   };
-
-  const onInvalid = ({ email, password }: FieldErrors<LoginRequest>) => {
-    console.log('이메일 에러: ', { email });
-    console.log('패스워드 에러: ', { password });
+  const onInvalid = (errors: FieldErrors<LoginForm>) => {
+    console.log('error:', errors);
   };
 
   return (
-    <form onSubmit={handleSubmit(onValid, onInvalid)}>
-      <div>
-        <label htmlFor="email">이메일</label>
-        <input
-          id="email"
-          type="email"
-          {...register('email', {
-            required: '이메일은 필수 입력 항목 입니다',
-            validate: (value) => {
-              const validation = validateEmail(value);
+    <form onSubmit={handleSubmit(onSubmit, onInvalid)}>
+      <div className="mx-auto ">
+        <div className="mx-auto w-full">
+          <div className="flex items-center justify-center  py-11 font-semibold">
+            <Link href={'/login'} className="flex gap-3">
+              <Image src={Logo} alt="Logo" />
+              Triple A
+            </Link>
+          </div>
+          <div className="flex flex-col">
+            <label className="ml-4 text-xs font-semibold text-[#454C52]" htmlFor="email">
+              이메일
+            </label>
+            <input
+              placeholder="이메일 입력"
+              id="email"
+              {...register('email', {
+                required: '이메일을 입력해주세요',
+                validate: (value) => {
+                  const { result } = validateEmail(value);
 
-              if (validation.result === true) return true;
+                  if (result === true) return true;
 
-              return '유효한 email 형식이 아닙니다';
-            },
-          })}
-        />
+                  return '이메일 형식이 아닙니다';
+                },
+              })}
+              className="mx-auto mt-1 flex h-[46px] w-full rounded-lg border-[1px] border-solid pl-4 placeholder-[#DBDEE1] "
+            />
+          </div>
+
+          <div className="flex-coulmn mt-3">
+            <label className="ml-4 text-xs font-semibold text-[#454C52]" htmlFor="password">
+              비밀번호
+            </label>
+            <div className="relative mx-auto mt-1 flex h-[46px] w-full rounded-lg border-[1px] border-solid placeholder-[#DBDEE1]">
+              <input
+                placeholder="비밀번호 입력"
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                className="flex-1 bg-transparent pl-4 focus:border-none focus:outline-none"
+                {...register('password', {
+                  required: '비밀번호를 입력해주세요',
+                  validate: (value) => {
+                    const { result, type } = validatePassword(value);
+
+                    if (result === true) return true;
+
+                    switch (type) {
+                      case 'passwordLength':
+                        return '8자에서 16자 이내로 작성해주세요';
+                      case 'notAllowedChar':
+                        return '영문 대소문자,0-9숫자와 `.`,`-`가 허용됩니다';
+                    }
+                  },
+                })}
+              />
+              <div className="box-border flex items-center p-4">
+                <button onClick={handleTogglePassword}>{showPassword ? <AiFillEyeInvisible /> : <AiFillEye />}</button>
+              </div>
+            </div>
+          </div>
+
+          <div className="align-center mt-6">
+            <input className="ml-4 shadow-none" type="checkbox" id="checkbox" value={'자동로그인'} />
+            <label className="ml-2 text-sm text-[#5B6267]" htmlFor="checkbox">
+              자동 로그인
+            </label>
+          </div>
+          <Button
+            disabled={!isValid}
+            className="mx-auto mt-2 box-border font-bold "
+            sizeTheme="fullWidth"
+            bgColorTheme={isValid ? 'orange' : 'lightgray'}
+            textColorTheme="white"
+          >
+            로그인
+          </Button>
+        </div>
+        <div className="mx-auto ml-3 mt-3 flex">
+          <Link className="text-xs text-[#454C52]" href="/signup">
+            회원가입
+          </Link>
+        </div>
       </div>
-      <div>
-        <label htmlFor="password">패스워드</label>
-        <input
-          id="password"
-          type="password"
-          {...register('password', {
-            required: '비밀번호는 필수 입력 항목 입니다',
-            validate: (value) => {
-              const validation = validatePassword(value);
-
-              if (validation.result === true) return true;
-
-              return validation.type;
-            },
-          })}
-        />
-      </div>
-      {errors?.root ? <span className="text-red-600">{errors.root.message}</span> : null}
-      <Button
-        disabled={!isValid}
-        className="disabled:cursor-not-allowed disabled:bg-violet-200 disabled:hover:bg-violet-200"
-        type="submit"
-        bgColorTheme="violet"
-        textColorTheme="white"
-        clickHandler={() => {}}
-      >
-        로그인
-      </Button>
     </form>
   );
 }

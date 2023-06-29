@@ -1,0 +1,68 @@
+'use client';
+
+import React from 'react';
+import SymbolCard from '../SymbolCard';
+import { useSearch } from '@/redux/slice/searchSlice';
+import { useQuery } from '@tanstack/react-query';
+import SymbolCardBar from '../SymbolCard/SymbolCardBar';
+import { searchSymbol } from '@/service/symbol';
+import { Symbol } from '@/interfaces/Symbol';
+import { searchCategoryNews, searchSymbolNews } from '@/service/news';
+// import { NewsData } from '@/interfaces/NewsData';
+
+function SearchPageContainer() {
+  const { searchValue } = useSearch();
+
+  const englishRegex = /[a-zA-Z{1,5}]/;
+  const matchSymbol = englishRegex.test(searchValue);
+
+  const { data: symbol } = useQuery(['symbol', searchValue], () => searchSymbol({ symbol: searchValue }), {
+    enabled: matchSymbol && !Number(searchValue),
+    retry: 0,
+  });
+  const { data: symbolNews } = useQuery(['news', searchValue], () => searchSymbolNews({ symbol: searchValue }), {
+    enabled: matchSymbol && !Number(searchValue),
+    retry: 0,
+  });
+  const { data: categoryNews } = useQuery(
+    [Number(searchValue)],
+    () => searchCategoryNews({ categoryId: Number(searchValue) }),
+    {
+      enabled: Number(searchValue) !== 0 && !isNaN(Number(searchValue)),
+      select: (response) => {
+        return response.data.data?.news;
+      },
+      retry: 0,
+    },
+  );
+
+  const getSymbolValue = categoryNews && categoryNews.map((newsItem) => newsItem.symbol);
+  console.log(getSymbolValue && getSymbolValue);
+  if (getSymbolValue) {
+    for (let i = 0; i < getSymbolValue.length; i++) {
+      getSymbolValue[i];
+    }
+  }
+  // const clickHandle = () => {
+  //   console.log('dododo');
+  // };
+
+  if (!symbol) return null;
+  if (!symbolNews) return null;
+
+  const symbolSearchData = symbol && symbol.data && symbol.data.data;
+  // const symbolNewsData = symbolNews && symbolNews.data && symbolNews.data.data && symbolNews.data.data.news;
+  // console.log(symbolSearchData);
+  return (
+    <div>
+      <div>
+        <SymbolCardBar />
+        {symbolSearchData &&
+          symbolSearchData.map((symbolItem: Symbol) => (
+            <SymbolCard key={symbolItem.symbolId} symbolData={symbolItem} />
+          ))}
+      </div>
+    </div>
+  );
+}
+export default SearchPageContainer;

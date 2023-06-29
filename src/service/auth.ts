@@ -54,14 +54,14 @@ export async function logout() {
  * `emailVerified` 이메일 인증 유무 [**boolean**]
  *
  */
-export async function signup({ email, password, passwordCheck, fullName, newsLetter, emailVerified }: SignupRequest) {
+export async function signup({ email, password, passwordCheck, fullName, newsLetter, emailKey }: SignupRequest) {
   const signupResponse = await axiosInstance.post<any, AxiosResponse<SignupResponse>, SignupRequest>('/api/join', {
     email,
     password,
     passwordCheck,
     fullName,
     newsLetter,
-    emailVerified,
+    emailKey,
   });
 
   return signupResponse;
