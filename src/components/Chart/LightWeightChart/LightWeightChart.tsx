@@ -1,15 +1,28 @@
 'use client';
 
-import { useRef, useState, useLayoutEffect } from 'react';
-import { ChartOptions, IChartApi } from 'lightweight-charts';
+import { useRef, useState, useLayoutEffect, forwardRef, useImperativeHandle, type ForwardedRef } from 'react';
 import LightWeightChartContainer from './LightWeightChartContainer';
+import { type ChartOptions, type DeepPartial, type IChartApi } from 'lightweight-charts';
+import { type ChartTooltipSource } from '../ChartTooltip';
+import { type ResampleFrequency } from '@/interfaces/Dto/Stock';
 
 export interface ChartProps {
-  options?: Partial<ChartOptions>;
+  resample: ResampleFrequency;
+  charts: {
+    payload: IChartApi[];
+    triggerSize: number;
+  };
+  source?: ChartTooltipSource;
+  tooltipVisible?: boolean;
+  timeMarkerVisible?: boolean;
+  options?: DeepPartial<ChartOptions>;
   children: React.ReactNode;
 }
 
-function LightWeightChart({ options, children }: ChartProps) {
+function LightWeightChart(
+  { resample, charts, options, source, timeMarkerVisible, tooltipVisible, children }: ChartProps,
+  ref: ForwardedRef<IChartApi>,
+) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartAPIRef = useRef<IChartApi>(null);
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
@@ -26,20 +39,28 @@ function LightWeightChart({ options, children }: ChartProps) {
     };
   }, []); /* eslint-disable-line */
 
+  useImperativeHandle(ref, () => chartAPIRef.current!);
+
   return (
-    <div ref={chartContainerRef}>
+    <div ref={chartContainerRef} className="relative">
       {container ? (
-        <LightWeightChartContainer ref={chartAPIRef} container={container} options={{ height: 300 }}>
-          {children}
-        </LightWeightChartContainer>
-      ) : (
         <>
-          {/* 나중에 스켈레톤과 같은 UI적용할 예정 */}
-          <div className="animate-pulse bg-orange-400">차트를 로딩중...</div>
+          <LightWeightChartContainer
+            ref={chartAPIRef}
+            resample={resample}
+            container={container}
+            charts={charts}
+            source={source}
+            timeMarkerVisible={timeMarkerVisible}
+            tooltipVisible={tooltipVisible}
+            options={{ height: 322 / 2, ...options } as ChartOptions}
+          >
+            {children}
+          </LightWeightChartContainer>
         </>
-      )}
+      ) : null}
     </div>
   );
 }
 
-export default LightWeightChart;
+export default forwardRef(LightWeightChart);

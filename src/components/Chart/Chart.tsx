@@ -1,68 +1,266 @@
 'use client';
 
-import { useState, useRef, useContext } from 'react';
-import { type ISeriesApi } from 'lightweight-charts';
-import { ChartContext } from '@/context/ChartContext';
-import { LightWeightChart, LightWeightChartLineSeries } from './LightWeightChart';
-import Button from '../Button/Button';
+import { useState, useRef, useLayoutEffect } from 'react';
+import Link from 'next/link';
+import dayjs from 'dayjs';
+import { useQuery } from '@tanstack/react-query';
+import { type ISeriesApi, type IChartApi, type LineData, type HistogramData } from 'lightweight-charts';
+import { BsArrowRightShort } from 'react-icons/bs';
+import { LightWeightChart, LightWeightChartLineSeries, LightWeightHistogramSeries } from './LightWeightChart';
+import { ChartWrapper, ChartResampleGroup, ChartNotify, ChartLoading } from '@/components/Chart';
+import { type SentimentData, getSymbolChartData } from '@/service/chart';
+import { getSymbolLineChartContainerOptions, getSymbolLineChartSeriesOptions } from './constants/symbolLineChartConfig';
+import {
+  getSymbolHistogramChartContainerOptions,
+  getSymbolHistogramSeriesOptions,
+} from './constants/symbolHistogramConfig';
 import { type ResampleFrequency } from '@/interfaces/Dto/Stock';
+import { DeltaPriceColor, getPriceInfo } from '@/util/chart';
+import ChartHeader, { ChartHeaderLoading } from './ChartHeader';
+import { type SearchSymbolNewsResponse } from '@/interfaces/Dto/News';
+import { AxiosError } from 'axios';
+import { APIResponse } from '@/interfaces/Dto/Core';
 
 interface ChartProps {
   symbol: string;
+  data?: {
+    news: SearchSymbolNewsResponse;
+  };
   resample: ResampleFrequency;
 }
 
-function Chart({ symbol, resample }: ChartProps) {
-  const { api } = useContext(ChartContext);
+function Chart({ symbol, resample, data }: ChartProps) {
+  const [authState, setAuthState] = useState<'pending' | 'notAllowed' | 'loginRequired' | 'AuthUser'>('pending');
+  const [source, setSource] = useState<{
+    lineData?: LineData[];
+    buzzData?: HistogramData[];
+    sentimentData?: SentimentData[];
+  }>({ lineData: undefined, buzzData: undefined, sentimentData: undefined });
 
-  const today = new Date();
-  const oneYearBefore = new Date();
-  oneYearBefore.setTime(oneYearBefore.setFullYear(today.getFullYear() - 1));
-
-  console.log({
-    today: today.toISOString().substring(0, 10),
-    oneYearBefore: oneYearBefore.toISOString().substring(0, 10),
-  });
-
-  const [resampleFrequency, setResampleFrequency] = useState<ResampleFrequency>(resample);
+  const lineChartApiRef = useRef<IChartApi>(null);
+  const histogramChartApiRef = useRef<IChartApi>(null);
 
   const symbolLineChartRef = useRef<ISeriesApi<'Line'>>(null);
+  const symbolHistogramChartRef = useRef<ISeriesApi<'Histogram'>>(null);
 
-  // 이후 심볼을 활용하여 api 통신을 하고 데이터를 설정하여 렌더링
+  const startDate = dayjs(`${dayjs().get('year')}-01-01`);
+  const endDate = dayjs();
+
+  const charts = {
+    payload: [] as IChartApi[],
+    triggerSize: 2,
+  };
+
+  const {
+    data: response,
+    status: chartDataStatus,
+    error: chartDataError,
+  } = useQuery(
+    ['symbolChart', symbol, resample],
+    () =>
+      getSymbolChartData({
+        symbol,
+        startDate: startDate.format('YYYY-MM-DD'),
+        endDate: endDate.format('YYYY-MM-DD'),
+        resampleFreq: resample,
+      }),
+    {
+      refetchOnWindowFocus: false,
+      retry: false,
+      cacheTime: 0,
+    },
+  );
+
+  const {
+    data: priceInfo,
+    status,
+    error,
+  } = useQuery(
+    ['symbolChart', symbol, 'priceInfo'],
+    () => getPriceInfo({ symbol, startDate: startDate.format('YYYY-MM-DD'), endDate: endDate.format('YYYY-MM-DD') }),
+    {
+      refetchOnWindowFocus: false,
+      retry: false,
+      cacheTime: 0,
+      enabled: chartDataStatus === 'success',
+    },
+  );
+
+  useLayoutEffect(() => {
+    if (chartDataStatus === 'error') {
+      if ((chartDataError as AxiosError<APIResponse>).response?.data.data!.includes('구독 확인 실패')) {
+        setAuthState('notAllowed');
+        return;
+      }
+      setAuthState('loginRequired');
+      return;
+    }
+    if (response && response.membership === 'BASIC' && authState !== 'notAllowed') {
+      setAuthState('notAllowed');
+      return;
+    }
+
+    setSource((prev) => ({ ...prev, ...response?.payload }));
+  }, [chartDataStatus, response]); /* eslint-disable-line */
+
+  useLayoutEffect(() => {
+    if (authState === 'pending' || authState === 'AuthUser') return;
+
+    document.body.style.overflow = 'hidden';
+
+    const handleScroll = (e: Event) => {
+      if (window.scrollY !== 0 || window.scrollY !== 0) {
+        window.scrollTo(0, 0);
+      }
+      const overflow = document.body.style.overflow;
+      if (overflow !== 'hidden') document.body.style.overflow = 'hidden';
+
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    };
+
+    window.addEventListener('scroll', handleScroll, { capture: true });
+
+    return () => {
+      document.body.removeEventListener('scroll', handleScroll, { capture: true });
+    };
+  }, [authState]);
 
   return (
-    <>
-      <Button
-        className="!w-40"
-        bgColorTheme="orange"
-        textColorTheme="white"
-        clickHandler={(e) => {
-          // 현재는 데이터가 클릭시 데이터가 바뀌는지 테스트 해보기 위해 작성한 코드
-          // 이후 일, 주, 월, 년 으로 단위가 바뀐 경우 해당 데이터를 가공해서 다시 설정
-          //  => 렌더링
-          api?.remove();
-
-          symbolLineChartRef.current?.setData([
-            { value: 1, time: '2018-12-12' },
-            { value: 2, time: '2018-12-13' },
-          ]);
-        }}
-      >
-        일
-      </Button>
-      <LightWeightChart>
-        <LightWeightChartLineSeries
-          ref={symbolLineChartRef}
-          lineSeriesOptions={{
-            color: 'red',
-          }}
-          lineChartData={[
-            { value: 10, time: '2022-12-01' },
-            { value: 6, time: '2022-12-02' },
-          ]}
+    <div
+      className={`${
+        authState !== 'pending' && authState !== 'AuthUser' ? 'overflow-hidden' : 'overflow-auto'
+      } box-border px-4 pt-4`}
+    >
+      {chartDataStatus === 'loading' ? (
+        <ChartHeaderLoading />
+      ) : (
+        <ChartHeader
+          symbol={symbol}
+          companyName={response?.companyName}
+          priceInfo={priceInfo ?? { delta: { type: 'NO_CHANGE', value: 0, percent: 0 }, close: 0 }}
+          sentimentData={response?.payload?.sentimentData ?? []}
         />
-      </LightWeightChart>
-    </>
+      )}
+      <ChartWrapper blur={authState !== 'pending' && authState !== 'AuthUser'}>
+        {chartDataStatus === 'loading' || authState === 'loginRequired' ? <ChartLoading /> : null}
+        {chartDataStatus !== 'loading' && authState !== 'loginRequired' ? (
+          <div className="space-y-4 divide-y-2 divide-dashed">
+            <LightWeightChart
+              ref={lineChartApiRef}
+              charts={charts}
+              resample={resample}
+              timeMarkerVisible={false}
+              tooltipVisible={false}
+              options={getSymbolLineChartContainerOptions(resample)}
+            >
+              <LightWeightChartLineSeries
+                ref={symbolLineChartRef}
+                lineSeriesOptions={{
+                  ...getSymbolLineChartSeriesOptions(),
+                  color: priceInfo ? DeltaPriceColor[priceInfo.delta.type] : DeltaPriceColor.NO_CHANGE,
+                }}
+                lineChartData={response?.payload?.lineData ?? []}
+              />
+            </LightWeightChart>
+            <div className="pt-4">
+              <LightWeightChart
+                ref={histogramChartApiRef}
+                charts={charts}
+                resample={resample}
+                options={getSymbolHistogramChartContainerOptions(resample)}
+                source={source}
+                timeMarkerVisible={true}
+                tooltipVisible={true}
+              >
+                <LightWeightHistogramSeries
+                  ref={symbolHistogramChartRef}
+                  histogramChartData={response?.payload?.buzzData ?? []}
+                  histogramSeriesOptions={getSymbolHistogramSeriesOptions()}
+                />
+              </LightWeightChart>
+            </div>
+          </div>
+        ) : null}
+        <ChartResampleGroup symbol={symbol} />
+        <div>
+          {chartDataStatus === 'success' ? (
+            <div className="mb-11 mt-5">
+              <p className="font-bold text-black">{response.symbol.toUpperCase()} 관련 뉴스</p>
+              {data?.news.data?.news?.map((news) => {
+                return <div key={news.title}>{news.title}</div>;
+              })}
+              <Link href={`/chart/symbol/${symbol}/news`} className="mt-5 flex items-center justify-center">
+                <button className="box-border flex h-10 w-[311px] items-center justify-center rounded-3xl border-2 border-[#E2E6ED] px-4 py-3">
+                  <p className="mr-5 font-bold">뉴스 전체보기</p>
+                  <BsArrowRightShort className="shrink-0 text-2xl" />
+                </button>
+              </Link>
+            </div>
+          ) : (
+            <div className="mb-11 mt-5">
+              <div
+                role="status"
+                className="animate-pulse space-y-4 divide-y divide-gray-200 rounded border border-gray-200 p-4 shadow dark:divide-gray-700 dark:border-gray-700 md:p-6"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="mb-2.5 h-2.5 w-24 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+                    <div className="h-2 w-32 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                  </div>
+                  <div className="h-2.5 w-12 rounded-full bg-gray-300 dark:bg-gray-700"></div>
+                </div>
+                <div className="flex items-center justify-between pt-4">
+                  <div>
+                    <div className="mb-2.5 h-2.5 w-24 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+                    <div className="h-2 w-32 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                  </div>
+                  <div className="h-2.5 w-12 rounded-full bg-gray-300 dark:bg-gray-700"></div>
+                </div>
+                <div className="flex items-center justify-between pt-4">
+                  <div>
+                    <div className="mb-2.5 h-2.5 w-24 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+                    <div className="h-2 w-32 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                  </div>
+                  <div className="h-2.5 w-12 rounded-full bg-gray-300 dark:bg-gray-700"></div>
+                </div>
+                <div className="flex items-center justify-between pt-4">
+                  <div>
+                    <div className="mb-2.5 h-2.5 w-24 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+                    <div className="h-2 w-32 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                  </div>
+                  <div className="h-2.5 w-12 rounded-full bg-gray-300 dark:bg-gray-700"></div>
+                </div>
+                <div className="flex items-center justify-between pt-4">
+                  <div>
+                    <div className="mb-2.5 h-2.5 w-24 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+                    <div className="h-2 w-32 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                  </div>
+                  <div className="h-2.5 w-12 rounded-full bg-gray-300 dark:bg-gray-700"></div>
+                </div>
+                <span className="sr-only"></span>
+              </div>
+            </div>
+          )}
+        </div>
+      </ChartWrapper>
+      {authState === 'notAllowed' ? (
+        <ChartNotify
+          title="구독제 회원만 열람 가능"
+          content="멤버십 회원이 되어 무제한 이용해보세요!"
+          buttonText="지금 바로 구독하기"
+          linkTarget="/"
+        />
+      ) : null}
+      {authState === 'loginRequired' ? (
+        <ChartNotify
+          title="로그인이 필요합니다"
+          content="로그인 후 이용해주세요"
+          buttonText="로그인하러 가기"
+          linkTarget="/login"
+        />
+      ) : null}
+    </div>
   );
 }
 

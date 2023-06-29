@@ -26,7 +26,7 @@ export async function getRecommandSymbol() {
  * 관심 심볼 조회 API (GET)
  */
 export async function getLikeSymbol() {
-  const getLikeSymbolResponse = await axiosInstance.get<GetLikeSymbolResponse>('/api/symbol/like');
+  const getLikeSymbolResponse = await axiosInstance.get<GetLikeSymbolResponse>('/api/auth/symbol/like');
 
   return getLikeSymbolResponse;
 }

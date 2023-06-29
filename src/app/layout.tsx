@@ -25,7 +25,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main>
           <ReduxProvider>
             <ReactQueryProvider>
-              {children}
+              <div className="mx-auto box-border min-w-[390px] overflow-auto pb-14 pt-[53px] sm:w-full md:max-w-[768px]">
+                {children}
+              </div>
               <Nav />
             </ReactQueryProvider>
           </ReduxProvider>

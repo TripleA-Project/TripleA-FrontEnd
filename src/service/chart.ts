@@ -1,15 +1,30 @@
+import dayjs from 'dayjs';
 import { type HistogramData, type LineData, type Time } from 'lightweight-charts';
 import { getSymbolStock } from './stock';
 import { getSentimentGrade } from '@/util/getSentimentGrade';
 import { SentimentGrade, type SentimentGradeLabel } from '@/constants/sentimentGrade';
-import { type GetSymbolStockSearchParam } from '@/interfaces/Dto/Stock';
+import { GetSymbolStockPayload, type GetSymbolStockSearchParam } from '@/interfaces/Dto/Stock';
+import { MEMBERSHIP } from '@/interfaces/User';
 
-interface GetChartDataRequest extends GetSymbolStockSearchParam {}
+export interface GetChartDataRequest extends GetSymbolStockSearchParam {}
 
-interface SentimentData {
+export interface SentimentData {
   time: Time;
   value: SentimentGradeLabel;
   color: string;
+}
+
+interface GetChartDataPayload {
+  lineData: LineData[];
+  buzzData: HistogramData[];
+  sentimentData: SentimentData[];
+}
+
+export interface GetChartDataResponse {
+  membership: keyof typeof MEMBERSHIP;
+  symbol: string;
+  companyName: string;
+  payload: GetChartDataPayload | null;
 }
 
 /**
@@ -23,27 +38,47 @@ interface SentimentData {
  *
  * `resampleFreq` 데이터 단위 - `daily` | `weekly` | `monthly` | `annually`
  */
-export async function getSymbolChartData({ symbol, startDate, endDate, resampleFreq }: GetChartDataRequest) {
+export async function getSymbolChartData({
+  symbol,
+  startDate,
+  endDate,
+  resampleFreq,
+}: GetChartDataRequest): Promise<GetChartDataResponse> {
   const { data: symbolStockPayload } = await getSymbolStock({ symbol, startDate, endDate, resampleFreq });
 
-  if (!symbolStockPayload.data?.charts || symbolStockPayload.data?.charts?.length === 0) return { payload: null };
+  if (symbolStockPayload.status === 401) throw symbolStockPayload;
 
+  const chartData = createChartData(symbolStockPayload.data);
+
+  return {
+    membership: symbolStockPayload.data?.membership as keyof typeof MEMBERSHIP,
+    symbol: symbolStockPayload.data?.symbol ?? 'symbol',
+    companyName: symbolStockPayload.data?.companyName ?? symbolStockPayload.data?.symbol ?? 'company',
+    payload: chartData,
+  };
+}
+
+function createChartData(payload?: GetSymbolStockPayload): Omit<GetChartDataPayload, 'membership'> | null {
   const lineData: LineData[] = [];
   const buzzData: HistogramData[] = [];
   const sentimentData: SentimentData[] = [];
 
-  symbolStockPayload.data?.charts?.forEach(({ date, close, buzz, sentiment }) => {
+  if (!payload?.charts || payload.charts.length === 0) return null;
+
+  payload.charts.forEach(({ date, close, buzz, sentiment }) => {
     const { label, color } = SentimentGrade[getSentimentGrade(sentiment)!];
 
+    const parsedDate = dayjs(date).format('YYYY-MM-DD');
+
     lineData.push({
-      time: date,
+      time: parsedDate,
       value: close,
     });
 
-    buzzData.push({ time: date, value: buzz, color });
+    buzzData.push({ time: parsedDate, value: buzz, color });
 
-    sentimentData.push({ time: date, value: label, color });
+    sentimentData.push({ time: parsedDate, value: label, color });
   });
 
-  return { payload: { lineData, buzzData, sentimentData } };
+  return { lineData, buzzData, sentimentData };
 }

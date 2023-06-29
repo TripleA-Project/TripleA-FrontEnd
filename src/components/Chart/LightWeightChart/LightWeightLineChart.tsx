@@ -1,8 +1,8 @@
 'use client';
 
 import { useContext, forwardRef } from 'react';
-import { type ISeriesApi, type LineData, type LineSeriesOptions } from 'lightweight-charts';
 import { ChartContext } from '@/context/ChartContext';
+import { type ISeriesApi, type LineData, type LineSeriesOptions } from 'lightweight-charts';
 
 interface LineChartProps {
   lineSeriesOptions?: Partial<LineSeriesOptions>;
@@ -16,7 +16,15 @@ const LightWeightLineSeries = forwardRef<ISeriesApi<'Line'>, LineChartProps>(
     const lineSeries = api?.addLineSeries({ ...lineSeriesOptions }) ?? null;
 
     if (lineSeries !== null) {
-      lineChartData && lineSeries.setData(lineChartData);
+      if (lineChartData) {
+        try {
+          lineSeries?.setData(lineChartData);
+          api?.timeScale().fitContent();
+        } catch (e) {
+          lineSeries?.setData(lineChartData);
+          api?.timeScale().fitContent();
+        }
+      }
 
       (ref as React.MutableRefObject<ISeriesApi<'Line'>>).current = lineSeries;
     }

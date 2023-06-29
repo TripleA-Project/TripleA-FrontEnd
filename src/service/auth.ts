@@ -33,7 +33,7 @@ export async function login({ email, password }: LoginRequest) {
  * 로그아웃 API (POST)
  */
 export async function logout() {
-  const logoutResponse = await axiosInstance.post<LogoutResponse>('/api/logout');
+  const logoutResponse = await axiosInstance.post<LogoutResponse>('/api/auth/logout');
 
   return logoutResponse;
 }

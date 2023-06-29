@@ -22,7 +22,7 @@ export interface ChartData extends SymbolPrice {
   buzz: number;
 }
 
-interface GetSymbolStockPayload {
+export interface GetSymbolStockPayload {
   membership: keyof typeof MEMBERSHIP;
   symbol: string;
   companyName?: string;
