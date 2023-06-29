@@ -43,6 +43,7 @@ function SymbolCard({ symbolData }: SearchSymbolData) {
           <Image
             src={symbolData.logo ?? ''}
             alt={symbolData.symbol}
+            width={42}
             className="w-full object-cover"
             onError={imgErrorHandle}
           />
