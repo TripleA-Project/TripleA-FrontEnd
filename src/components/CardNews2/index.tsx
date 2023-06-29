@@ -1,15 +1,15 @@
 'use client';
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode } from 'react';
 import NewsImage from './NewsImage';
 import ChipContainer from './ChipContainer';
 import News from './News';
 import ButtonContainer from './ButtonContainer';
 
-import { CardNewsData, NewsData } from '@/interfaces/NewsData';
+import { NewsData } from '@/interfaces/NewsData';
 
 import styled from '@emotion/styled';
 
-interface CardNewsProps extends CardNewsData {
+interface CardNewsProps extends NewsData {
   cardDirection: string;
 }
 

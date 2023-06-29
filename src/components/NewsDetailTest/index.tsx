@@ -2,17 +2,18 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { BiBookmark, BiUpload, BiBot, BiSmile, BiBarChartSquare } from 'react-icons/bi';
-import { BsPiggyBank } from 'react-icons/bs';
+// import { BsPiggyBank } from 'react-icons/bs';
 import { MdLink } from 'react-icons/md';
 import Switch from 'react-switch';
 import { Categories } from '../Categories';
 import { IoIosArrowUp } from 'react-icons/io';
 import { ImSad } from 'react-icons/im';
 import { latestNews, getNewsDetail } from '../../service/news';
-import { login } from '../../service/auth';
-import Modal2 from '@/components/Modal';
+// import { login } from '../../service/auth';
+// import Modal2 from '@/components/Modal';
 import NewsCard from '@/components/NewsCard';
 import Select2 from '@/components/Select2';
+import Image from 'next/image';
 
 export function NewsDetailTest() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -26,9 +27,9 @@ export function NewsDetailTest() {
     const fetchNewsDetail = async () => {
       try {
         const id = 55841332; // Replace 'your-news-id' with the actual news ID
-        const accessToken =
-          'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0cmlwbGUtYSIsImlkIjoyOTcsImV4cCI6MTY4Nzk2MDA1MH0.m-ZjlSHXHOvO50gtq-QBAekZapgt5V_KHW8iPG9llNzHOIFDiomcvKqV7OW5eDOe2LeTiXnzK7m6SAdzsCAONw';
-        const response = await getNewsDetail({ id }, accessToken);
+        // const accessToken =
+        //   'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0cmlwbGUtYSIsImlkIjoyOTcsImV4cCI6MTY4Nzk2MDA1MH0.m-ZjlSHXHOvO50gtq-QBAekZapgt5V_KHW8iPG9llNzHOIFDiomcvKqV7OW5eDOe2LeTiXnzK7m6SAdzsCAONw';
+        const response = await getNewsDetail({ id });
         setNewsDetail(response.data);
         console.log(response.data);
       } catch (error) {
@@ -58,11 +59,11 @@ export function NewsDetailTest() {
     setChecked(checked);
   };
 
-  const handleRenderSwitchIcon = () => null;
+  // const handleRenderSwitchIcon = () => null;
 
-  const handleRenderHandle = () => (
-    <div className={`react-switch-handle ${checked ? 'on' : 'off'}`}>{checked ? 'On' : 'Off'}</div>
-  );
+  // const handleRenderHandle = () => (
+  //   <div className={`react-switch-handle ${checked ? 'on' : 'off'}`}>{checked ? 'On' : 'Off'}</div>
+  // );
 
   const getPercentage = () => {
     const priceDiff = newsDetail.data?.symbol?.price?.today?.close - newsDetail.data?.symbol?.price?.yesterday?.close;
@@ -95,7 +96,7 @@ export function NewsDetailTest() {
       color: null,
     },
     {
-      icon: <img className="mr-[5px] h-[16px] w-[16px]" src={newsDetail.data?.symbol?.logo || ''} />,
+      icon: <Image className="mr-[5px] h-[16px] w-[16px]" src={newsDetail.data?.symbol?.logo || ''} alt="icon" />,
       label: newsDetail.data?.symbol?.companyName || '',
       percentage: getPercentage() + '%',
       color: percentageColor,
@@ -178,6 +179,7 @@ export function NewsDetailTest() {
         <div className="absolute right-5 flex items-center justify-center text-[#4e525d]">
           <BiBot className="text-[20px]" />
           <span className="ml-[5px] text-[12px] font-semibold">한글 번역</span>
+          {/* @ts-ignore */}
           <Switch
             onChange={handleChange}
             checked={checked}

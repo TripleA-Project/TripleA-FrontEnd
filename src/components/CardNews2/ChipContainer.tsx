@@ -1,11 +1,12 @@
 import { NewsData } from '@/interfaces/NewsData';
 import styled from '@emotion/styled';
+import Image from 'next/image';
 
 export default function ChipContainer({ symbol, logo = 'ddd' }: Pick<NewsData, 'symbol' | 'logo'>) {
   return (
     <ChipsWrapper>
       <Chip>
-        <img src={logo} alt="" className="h-[16px] w-[16px]" />
+        <Image src={logo} alt="logo" className="h-[16px] w-[16px]" />
         <div>{symbol}</div>
       </Chip>
     </ChipsWrapper>

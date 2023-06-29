@@ -42,7 +42,7 @@ function Modal2({ size, title, content, mainBtn, subBtn }: ModalProps) {
           sizeTheme="large"
           bgColorTheme="orange"
           textColorTheme="white"
-          clickHandler={() => {
+          onClick={() => {
             alert('메인버튼이 눌렸습니다');
           }}
         >
