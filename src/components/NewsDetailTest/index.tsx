@@ -9,15 +9,12 @@ import { Categories } from '../Categories';
 import { IoIosArrowUp } from 'react-icons/io';
 import { ImSad } from 'react-icons/im';
 import { latestNews, getNewsDetail } from '../../service/news';
+import { login } from '../../service/auth';
 import Modal2 from '@/components/Modal';
 import NewsCard from '@/components/NewsCard';
 import Select2 from '@/components/Select2';
 
-interface NewsDetailProps {
-  newsId: string;
-}
-
-export function NewsDetail({ newsId }: NewsDetailProps) {
+export function NewsDetailTest() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [checked, setChecked] = useState(true);
   const [newsDetail, setNewsDetail] = useState<any>({});
@@ -28,9 +25,10 @@ export function NewsDetail({ newsId }: NewsDetailProps) {
     // Fetch news detail when the component mounts
     const fetchNewsDetail = async () => {
       try {
-        const getId = newsId; // Replace 'your-news-id' with the actual news ID
-        const id = Number(getId);
-        const response = await getNewsDetail({ id });
+        const id = 55841332; // Replace 'your-news-id' with the actual news ID
+        const accessToken =
+          'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0cmlwbGUtYSIsImlkIjoyOTcsImV4cCI6MTY4Nzk2MDA1MH0.m-ZjlSHXHOvO50gtq-QBAekZapgt5V_KHW8iPG9llNzHOIFDiomcvKqV7OW5eDOe2LeTiXnzK7m6SAdzsCAONw';
+        const response = await getNewsDetail({ id }, accessToken);
         setNewsDetail(response.data);
         console.log(response.data);
       } catch (error) {
@@ -119,10 +117,6 @@ export function NewsDetail({ newsId }: NewsDetailProps) {
     };
 
     scrollToTop();
-  }
-
-  function goLink() {
-    window.location.href = newsDetail.data?.url;
   }
 
   return (
@@ -228,10 +222,7 @@ export function NewsDetail({ newsId }: NewsDetailProps) {
         ))}
       </div>
       <div className="align-center mt-[20px] flex justify-center border-b-8 border-solid border-b-[#F5F7F9]">
-        <button
-          className="align-center mb-[20px] flex h-[54px] w-[358px] items-center justify-center rounded-lg bg-[#FD954A] text-[16px] font-bold text-[#ffffff]"
-          onClick={goLink}
-        >
+        <button className="align-center mb-[20px] flex h-[54px] w-[358px] items-center justify-center rounded-lg bg-[#FD954A] text-[16px] font-bold text-[#ffffff]">
           <MdLink className="mr-[10px] text-[22px]" />
           <span>기사 원문 보러가기</span>
         </button>
@@ -274,18 +265,21 @@ export function NewsDetail({ newsId }: NewsDetailProps) {
         <Select2 selectedArr={selectedArr} setSelectedArr={setSelectedArr}>
           엔터테이먼트
         </Select2>
+        <Select2 selectedArr={selectedArr} setSelectedArr={setSelectedArr}>
+          교육테크
+        </Select2>
       </div>
 
       <div className="pl-[16px] pt-[20px] text-[20px] font-semibold">관심 종목에 추가하기</div>
       <div className="ml-[16px] flex">
         <Select2 selectedArr={selectedArr} setSelectedArr={setSelectedArr}>
-          AAIC
+          게임
         </Select2>
         <Select2 selectedArr={selectedArr} setSelectedArr={setSelectedArr}>
-          AI
+          음악
         </Select2>
         <Select2 selectedArr={selectedArr} setSelectedArr={setSelectedArr}>
-          ML
+          엔터테이먼트
         </Select2>
       </div>
       <div className="align-center flex items-center justify-center py-[20px]">
@@ -303,4 +297,4 @@ export function NewsDetail({ newsId }: NewsDetailProps) {
   );
 }
 
-export default NewsDetail;
+export default NewsDetailTest;
