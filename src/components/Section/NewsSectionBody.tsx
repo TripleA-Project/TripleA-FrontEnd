@@ -5,7 +5,9 @@ import NewsCard from '../NewsCard';
 import { latestNews } from '@/service/news';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
-import { response } from 'msw';
+import { AxiosError } from 'axios';
+import { LatestNewsResponse } from '@/interfaces/Dto/News';
+
 
 interface NewsSectionBodyProps {
   type: 'row' | 'column' | 'tile';

@@ -1,6 +1,6 @@
 'use client';
 
-import { FieldErrors, FieldValues, SubmitErrorHandler, SubmitHandler, useFormContext } from 'react-hook-form';
+import { FieldErrors, FieldValues, useFormContext } from 'react-hook-form';
 import { UseStepFormContext } from '../StepForm';
 import Button from '@/components/Button/Button';
 
@@ -25,7 +25,7 @@ export default function SignupCompleteForm() {
         <Button
           type="button"
           className="mx-auto mt-2 box-border font-bold "
-          sizeTheme="medium"
+          sizeTheme="fullWidth"
           bgColorTheme="lightgray"
           textColorTheme="white"
           onClick={() => prev()}
@@ -35,7 +35,7 @@ export default function SignupCompleteForm() {
         <Button
           type="submit"
           className="mx-auto mt-2 box-border font-bold "
-          sizeTheme="medium"
+          sizeTheme="fullWidth"
           bgColorTheme="lightgray"
           textColorTheme="white"
         >
