@@ -6,7 +6,7 @@ import SignupCompleteForm from '@/components/Form/SignupCompleteForm';
 import PasswordForm from '@/components/Form/PasswordForm';
 import TermsForm from '@/components/Form/TermsForm';
 import Header from '@/components/Header';
-import FullNameForm from '@/components/Form/funnNameForm';
+import FullNameForm from '@/components/Form/fullNameForm';
 
 export const metadata: Metadata = {
   title: '회원가입',
