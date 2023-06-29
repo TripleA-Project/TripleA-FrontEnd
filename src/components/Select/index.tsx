@@ -34,17 +34,17 @@ const SelectItem = styled.li<SelectItemProps>`
 
 function Select({ children, selectedArr, setSelectedArr, symbol }: SelectComponentProps) {
   const [selected, setSelected] = useState(false);
+  const router = useRouter();
 
   const clickHandler: MouseEventHandler = (e: MouseEvent<HTMLLIElement> & { target: HTMLLIElement }) => {
     if (symbol) {
-      const router = useRouter();
-      router.push(`./api/symbol?symbol=${id}`);
+      router.push(`./api/symbol?symbol=${symbol}`);
     } else {
       setSelected(!selected);
       if (selected === false) {
-        setSelectedArr([...selectedArr, e.target.innerHTML]);
+        setSelectedArr([...(selectedArr as string[]), e.target.innerHTML]);
       } else {
-        const filteredArray: string[] | [] = selectedArr.filter((item) => item !== e.target.innerText);
+        const filteredArray: string[] | [] = (selectedArr as string[]).filter((item) => item !== e.target.innerText);
         setSelectedArr(filteredArray);
       }
     }

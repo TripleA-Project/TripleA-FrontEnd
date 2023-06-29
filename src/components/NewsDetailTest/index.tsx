@@ -210,7 +210,7 @@ export function NewsDetailTest() {
             <span className="text-[20px] font-semibold">기사입니다.</span>{' '}
           </div>
         ) : (
-          <img src={newsDetail.data?.thumbnail} />
+          <Image src={newsDetail.data?.thumbnail} alt="thumbnail" />
         )}
       </div>
       <div className="p-[16px] text-[15px] font-medium leading-[23px]">
@@ -229,25 +229,6 @@ export function NewsDetailTest() {
           <span>기사 원문 보러가기</span>
         </button>
       </div>
-
-      {/* <div className="mt-[10px] flex h-[150px] w-[280px] flex-col self-center rounded-[10px] bg-[#d9d9d9]">
-        <div className="mt-5 self-center text-[13px] font-semibold">이 기사가 도움이 되었나요?</div>
-        <div className="relative flex w-[280px] px-[60px]">
-          <div className="absolute left-[70px] top-5 flex flex-col items-center justify-center">
-            <div className="text-[30px]">
-              <RiThumbUpLine />
-            </div>
-            <div className="mt-[10px] text-[10px] font-semibold">네</div>
-          </div>
-          <div className="absolute right-[70px] top-5 flex flex-col items-center justify-center">
-            <div className="text-[30px]">
-              <RiThumbDownLine />
-            </div>
-            <div className="mt-[10px] text-[10px] font-semibold">아니오</div>
-          </div>
-        </div>
-      </div> */}
-
       <div className="border-b-8 border-solid border-b-[#F5F7F9] pl-[16px] pt-[20px] text-[20px] font-semibold">
         <span>다른 기사 더보기</span>
       </div>

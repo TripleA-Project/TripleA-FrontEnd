@@ -2,20 +2,20 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { BiBookmark, BiUpload, BiBot, BiSmile, BiBarChartSquare } from 'react-icons/bi';
-import { BsPiggyBank } from 'react-icons/bs';
 import { MdLink } from 'react-icons/md';
-import Switch from 'react-switch';
+import SwitchComponent from 'react-switch';
 import { Categories } from '../Categories';
 import { IoIosArrowUp } from 'react-icons/io';
 import { ImSad } from 'react-icons/im';
 import { latestNews, getNewsDetail } from '../../service/news';
-import Modal2 from '@/components/Modal';
 import NewsCard from '@/components/NewsCard';
 import Select2 from '@/components/Select2';
-
+import Image from 'next/image';
 interface NewsDetailProps {
   newsId: string;
 }
+
+const Switch = SwitchComponent as any;
 
 export function NewsDetail({ newsId }: NewsDetailProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -39,7 +39,7 @@ export function NewsDetail({ newsId }: NewsDetailProps) {
     };
 
     fetchNewsDetail();
-  }, []);
+  }, []); /* eslint-disable-line */
 
   useEffect(() => {
     // Fetch news detail when the component mounts
@@ -60,11 +60,11 @@ export function NewsDetail({ newsId }: NewsDetailProps) {
     setChecked(checked);
   };
 
-  const handleRenderSwitchIcon = () => null;
+  // const handleRenderSwitchIcon = () => null;
 
-  const handleRenderHandle = () => (
-    <div className={`react-switch-handle ${checked ? 'on' : 'off'}`}>{checked ? 'On' : 'Off'}</div>
-  );
+  // const handleRenderHandle = () => (
+  //   <div className={`react-switch-handle ${checked ? 'on' : 'off'}`}>{checked ? 'On' : 'Off'}</div>
+  // );
 
   const getPercentage = () => {
     const priceDiff = newsDetail.data?.symbol?.price?.today?.close - newsDetail.data?.symbol?.price?.yesterday?.close;
@@ -97,7 +97,7 @@ export function NewsDetail({ newsId }: NewsDetailProps) {
       color: null,
     },
     {
-      icon: <img className="mr-[5px] h-[16px] w-[16px]" src={newsDetail.data?.symbol?.logo || ''} />,
+      icon: <Image className="mr-[5px] h-[16px] w-[16px]" src={newsDetail.data?.symbol?.logo || ''} alt="icon" />,
       label: newsDetail.data?.symbol?.companyName || '',
       percentage: getPercentage() + '%',
       color: percentageColor,
@@ -184,6 +184,7 @@ export function NewsDetail({ newsId }: NewsDetailProps) {
         <div className="absolute right-5 flex items-center justify-center text-[#4e525d]">
           <BiBot className="text-[20px]" />
           <span className="ml-[5px] text-[12px] font-semibold">한글 번역</span>
+
           <Switch
             onChange={handleChange}
             checked={checked}
@@ -214,7 +215,7 @@ export function NewsDetail({ newsId }: NewsDetailProps) {
             <span className="text-[20px] font-semibold">기사입니다.</span>{' '}
           </div>
         ) : (
-          <img src={newsDetail.data?.thumbnail} />
+          <Image src={newsDetail.data?.thumbnail} alt="thumbnail" />
         )}
       </div>
       <div className="p-[16px] text-[15px] font-medium leading-[23px]">
@@ -236,25 +237,6 @@ export function NewsDetail({ newsId }: NewsDetailProps) {
           <span>기사 원문 보러가기</span>
         </button>
       </div>
-
-      {/* <div className="mt-[10px] flex h-[150px] w-[280px] flex-col self-center rounded-[10px] bg-[#d9d9d9]">
-        <div className="mt-5 self-center text-[13px] font-semibold">이 기사가 도움이 되었나요?</div>
-        <div className="relative flex w-[280px] px-[60px]">
-          <div className="absolute left-[70px] top-5 flex flex-col items-center justify-center">
-            <div className="text-[30px]">
-              <RiThumbUpLine />
-            </div>
-            <div className="mt-[10px] text-[10px] font-semibold">네</div>
-          </div>
-          <div className="absolute right-[70px] top-5 flex flex-col items-center justify-center">
-            <div className="text-[30px]">
-              <RiThumbDownLine />
-            </div>
-            <div className="mt-[10px] text-[10px] font-semibold">아니오</div>
-          </div>
-        </div>
-      </div> */}
-
       <div className="border-b-8 border-solid border-b-[#F5F7F9] pl-[16px] pt-[20px] text-[20px] font-semibold">
         <span>다른 기사 더보기</span>
       </div>
