@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-//
-=======
 'use client';
 
 import { usePathname } from 'next/navigation';
@@ -43,4 +40,3 @@ function HeaderItem({ leftIcon, rightIcon, title }: HeaderProps) {
 }
 
 export default HeaderItem;
->>>>>>> 4d3ade8d4532286a09dbb4d59e2a8b6d93fb8419

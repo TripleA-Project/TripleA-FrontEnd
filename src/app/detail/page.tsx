@@ -1,6 +1,4 @@
-'use client';
-
-import React, { useState, ChangeEvent } from 'react';
+import React from 'react';
 import { Metadata } from 'next';
 import { IoIosArrowBack } from 'react-icons/io';
 import { NewsDetail } from '@/components/NewsDetail';

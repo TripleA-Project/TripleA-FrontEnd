@@ -37,22 +37,8 @@ function Chart({ symbol, resample, data }: ChartProps) {
     sentimentData?: SentimentData[];
   }>({ lineData: undefined, buzzData: undefined, sentimentData: undefined });
 
-<<<<<<< HEAD
-  const today = new Date();
-  const oneYearBefore = new Date();
-  oneYearBefore.setTime(oneYearBefore.setFullYear(today.getFullYear() - 1));
-
-  console.log({
-    symbol,
-    today: today.toISOString().substring(0, 10),
-    oneYearBefore: oneYearBefore.toISOString().substring(0, 10),
-  });
-
-  const [resampleFrequency, setResampleFrequency] = useState<ResampleFrequency>(resample);
-=======
   const lineChartApiRef = useRef<IChartApi>(null);
   const histogramChartApiRef = useRef<IChartApi>(null);
->>>>>>> 4d3ade8d4532286a09dbb4d59e2a8b6d93fb8419
 
   const symbolLineChartRef = useRef<ISeriesApi<'Line'>>(null);
   const symbolHistogramChartRef = useRef<ISeriesApi<'Histogram'>>(null);
