@@ -83,10 +83,10 @@ function Subscribe() {
                 textColorTheme="white"
                 className="disabled:!bg-[#898A8D]"
                 disabled={membership === 'PREMIUM'}
-                clickHandler={async () => {
+                onClick={async () => {
                   if (membership === 'PREMIUM') return;
 
-                  const res = await subscribe({ url: 'http://localhost:3000/payment' });
+                  const res = await subscribe({ url: 'https://stock.moya.ai/payment' });
 
                   router.push(res.data.data?.payment!);
                 }}
