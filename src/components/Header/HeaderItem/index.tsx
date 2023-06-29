@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import LeftIcon from '../common/LeftIcon';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import RightIcon from '../common/RightIcon';
 import Title from '../common/Title';
 import { HeaderProps } from '..';

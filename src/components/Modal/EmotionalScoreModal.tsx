@@ -1,10 +1,12 @@
 import React from 'react';
+import { InfoIcon } from '@/components/Button/Icons';
 
 export default function EmotionalScoreModal() {
   return (
     <div className="absolute -bottom-[100px] right-0 z-10 m-[20px] flex min-h-[163px] min-w-[250px] flex-col gap-[20px]  rounded-lg border border-solid border-[rgba(0,0,0,0.2)] bg-white p-[20px] shadow-[5px_5px_5px_rgba(0,0,0,0.2)]">
       <div className="title">
         <h3 className="align-center flex justify-center gap-[10px] text-[30px] font-semibold">
+          <InfoIcon />
           <span className="text-[24px]">AI 감성 분석</span>
         </h3>
         <p className="text-center">(최근 3시간 기준)</p>

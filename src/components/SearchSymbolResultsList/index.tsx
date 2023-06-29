@@ -1,12 +1,11 @@
 'use client';
-import { SearchSymbolResponse } from '@/interfaces/Dto/Symbol';
-;
+// import { SearchSymbolResponse } from '@/interfaces/Dto/Symbol';
 import React, { useEffect } from 'react';
 
-interface SearchResultsListProps {
-  symbolData: SearchSymbolResponse;
-  onSelect: (value:string) => void
-}
+// interface SearchResultsListProps {
+//   symbolData: SearchSymbolResponse;
+//   onSelect: (value: string) => void;
+// }
 
 function SearchSymbolResultsList({ symbolData, onSelect }: any) {
   useEffect(() => {}, [symbolData.symbol]);
@@ -20,7 +19,6 @@ function SearchSymbolResultsList({ symbolData, onSelect }: any) {
   return (
     <li key={symbolData.symbolId} className="p-4" onClick={selectHandle}>
       {symbolData.symbol}
-      
     </li>
   );
 }

@@ -1,10 +1,10 @@
 'use client';
 import Image from 'next/image';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import IconButton from '../Button/IconButton';
-import LogoIcon from '../Icon/LogoIcon';
 import { Symbol } from '@/interfaces/Symbol';
 import Link from 'next/link';
+import LogoIcon from '../../../public/Logo.svg';
 
 interface SearchSymbolData {
   symbolData: Symbol;
@@ -36,7 +36,7 @@ function SymbolCard({ symbolData }: SearchSymbolData) {
     <Link
       href={`/chart/symbol?name=${symbolData.symbol}`}
       key={symbolData.symbolId}
-      className="flex  items-center  justify-between  py-[5px] pl-4 pr-2"
+      className="flex  items-center justify-between  py-[5px] pl-4 pr-2"
     >
       <div className="h-[42px] w-[42px] overflow-hidden rounded-[50%] text-center align-middle">
         {!imgError ? (
@@ -44,11 +44,16 @@ function SymbolCard({ symbolData }: SearchSymbolData) {
             src={symbolData.logo ?? ''}
             alt={symbolData.symbol}
             width={42}
+            height={42}
             className="w-full object-cover"
             onError={imgErrorHandle}
           />
         ) : (
-          <LogoIcon className="mx-auto flex h-[50%] w-[50%] items-center object-cover text-center" />
+          <Image
+            src={LogoIcon}
+            alt="logo icon"
+            className="mx-auto flex h-[50%] w-[50%] items-center object-cover text-center"
+          />
         )}
       </div>
       <div className="ml-4 mr-[10.5px] w-[121px]">
