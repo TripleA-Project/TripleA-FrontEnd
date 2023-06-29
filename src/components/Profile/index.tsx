@@ -146,7 +146,6 @@ function Profile({ mode = 'info', userProfile }: ProfileProps) {
                 bgColorTheme="orange"
                 className="!h-[54px] !rounded-md"
                 textColorTheme="white"
-                clickHandler={() => {}}
               >
                 변경완료
               </Button>

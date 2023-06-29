@@ -61,7 +61,7 @@ export default function ButtonContainer({ news }: ButtonContainerProps) {
         bgColorTheme="none"
         sizeTheme="icon"
         iconSize="30px"
-        onClick={bookmarkIconHandler}
+        onClick={() => bookmarkIconHandler(newsId)}
       >
         {count}
       </IconButton>
