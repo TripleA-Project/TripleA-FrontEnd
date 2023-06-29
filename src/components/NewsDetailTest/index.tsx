@@ -11,7 +11,7 @@ import { ImSad } from 'react-icons/im';
 import { latestNews, getNewsDetail } from '../../service/news';
 import { login } from '../../service/auth';
 import Modal2 from '@/components/Modal';
-import CardNews2 from '@/components/CardNews2';
+import NewsCard from '@/components/NewsCard';
 import Select2 from '@/components/Select2';
 
 export function NewsDetailTest() {
@@ -250,19 +250,7 @@ export function NewsDetailTest() {
         <span>다른 기사 더보기</span>
       </div>
       {cardNews.map((news: any) => (
-        <CardNews2
-          key={news.newsId}
-          newsId={news.newsId}
-          symbol={news.symbol}
-          logo={news.logo}
-          source={news.source}
-          title={news.title}
-          thumbnail={news.thumbnail}
-          publishedDate={fixDate(news.publishedDate)}
-          sentiment={news.sentiment}
-          bookmark={news.bookmark.isBookmark}
-          cardDirection="row"
-        />
+        <NewsCard key={news} news={news} cardDirection="row" />
       ))}
       <div className="border-b-8 border-solid border-b-[#F5F7F9] pl-[16px] pt-[20px] text-[20px] font-semibold">
         관심 카테고리에 추가하기

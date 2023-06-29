@@ -121,6 +121,10 @@ export function NewsDetail({ newsId }: NewsDetailProps) {
     scrollToTop();
   }
 
+  function goLink() {
+    window.location.href = newsDetail.data?.url;
+  }
+
   return (
     <div className="flex flex-col overflow-x-hidden">
       <div className="p-4 text-xl font-semibold">{newsDetail.data?.kor?.title}</div>
@@ -224,7 +228,10 @@ export function NewsDetail({ newsId }: NewsDetailProps) {
         ))}
       </div>
       <div className="align-center mt-[20px] flex justify-center border-b-8 border-solid border-b-[#F5F7F9]">
-        <button className="align-center mb-[20px] flex h-[54px] w-[358px] items-center justify-center rounded-lg bg-[#FD954A] text-[16px] font-bold text-[#ffffff]">
+        <button
+          className="align-center mb-[20px] flex h-[54px] w-[358px] items-center justify-center rounded-lg bg-[#FD954A] text-[16px] font-bold text-[#ffffff]"
+          onClick={goLink}
+        >
           <MdLink className="mr-[10px] text-[22px]" />
           <span>기사 원문 보러가기</span>
         </button>
