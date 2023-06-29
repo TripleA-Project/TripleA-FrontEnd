@@ -19,7 +19,6 @@ function ChartResampleGroup({ symbol }: ChartResampleGroupProps) {
           }`}
           bgColorTheme="gray"
           textColorTheme="black"
-          clickHandler={() => {}}
         >
           월
         </Button>
@@ -31,7 +30,6 @@ function ChartResampleGroup({ symbol }: ChartResampleGroupProps) {
           }`}
           bgColorTheme="gray"
           textColorTheme="black"
-          clickHandler={() => {}}
         >
           주
         </Button>
@@ -43,7 +41,6 @@ function ChartResampleGroup({ symbol }: ChartResampleGroupProps) {
           }`}
           bgColorTheme="gray"
           textColorTheme="black"
-          clickHandler={() => {}}
         >
           일
         </Button>

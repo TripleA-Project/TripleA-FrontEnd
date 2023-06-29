@@ -1,9 +1,8 @@
-// import Header from '@/components/Header';
-// import Tabbar from '@/components/Tabbar';
 import Header from '@/components/Header';
 import NewsHomeWrapper from '@/components/Section/NewsHomeWrapper';
 import { Metadata } from 'next';
-
+// import Header from '@/components/Header';
+// import Tabbar from '@/components/Tabbar';
 // import InterestSection from '@/components/Section/InterestSection';
 // import cardSlice from '@/redux/slice/cardSlice';
 // import { useRouter } from 'next/router';

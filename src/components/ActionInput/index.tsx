@@ -3,7 +3,6 @@
 import React, { useState, useEffect, forwardRef, LegacyRef } from 'react';
 import { ActionInputProps } from '@/interfaces/InputProps';
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
-import { MdCancel } from 'react-icons/md';
 import { FiSearch } from 'react-icons/fi';
 
 const ActionInput = forwardRef(

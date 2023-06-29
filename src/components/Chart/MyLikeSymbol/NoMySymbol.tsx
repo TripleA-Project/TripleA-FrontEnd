@@ -20,7 +20,7 @@ function NoMySymbol() {
             className="box-border !h-[54px] !w-[202px] !px-4 !py-[15px]"
             bgColorTheme="orange"
             textColorTheme="white"
-            clickHandler={() => {}}
+            onClick={() => {}}
           >
             관심 추가하기
           </Button>

@@ -26,7 +26,9 @@ export default function NewsContainer({ width = 358, height, margin, cardDirecti
           <div>
             <div className="flex flex-col">
               <p className="line-clamp-2 text-[16px] font-semibold">{news.title}</p>
-              <p className="text-[12px] font-semibold text-[#777]">{(source, date)}</p>
+              <p className="text-[12px] font-semibold text-[#777]">
+                {source},{date}
+              </p>
             </div>
             <div className="flex justify-between">
               <Select symbol={'AAPL'}>
@@ -46,7 +48,9 @@ export default function NewsContainer({ width = 358, height, margin, cardDirecti
           <ImageContainer width={66} height={72} thumbnail={news.thumbnail} />
           <div className="flex flex-col">
             <p className="line-clamp-2 text-[14px] font-semibold">{news.title}</p>
-            <p className="text-[12px] font-semibold text-[#777]">{(source, date)}</p>
+            <p className="text-[12px] font-semibold text-[#777]">
+              {source},{date}
+            </p>
           </div>
           <ButtonContainer news={news} />
         </>

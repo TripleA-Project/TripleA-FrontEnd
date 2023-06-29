@@ -9,7 +9,6 @@ import SearchResultsList from '@/components/SearchSymbolResultsList';
 import { useQuery } from '@tanstack/react-query';
 import { searchSymbol } from '@/service/symbol';
 import { setSearchKeywordData, useSearch } from '@/redux/slice/searchSlice';
-import { stringify } from 'querystring';
 import { searchCategory } from '@/service/category';
 import SearchCategoryResultsList from '@/components/SearchCategoryResultList';
 
@@ -20,10 +19,13 @@ interface SearchBarProps {
 
 function SearchBar({ leftIcon, rightIcon }: SearchBarProps) {
   const [searchValue, setSearchValue] = useState<string>('');
+  // @ts-ignore
   const [getCategoryId, setGetCategoryId] = useState<number | null>(null);
   const [tmpQuery, setTmpQuery] = useState<string>(searchValue);
   const [isClicked, setIsClicked] = useState<boolean>(true);
+  // @ts-ignore
   const [selectedSymbol, setSelectedSymbol] = useState<any | null>(null);
+  // @ts-ignore
   const [selectedCategory, setSelectedCategory] = useState<any | null>(null);
   const { dispatch } = useSearch();
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -33,11 +35,7 @@ function SearchBar({ leftIcon, rightIcon }: SearchBarProps) {
   const koreanRegex = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
   const matchCategory = koreanRegex.test(searchValue);
 
-  const {
-    data: symbol,
-    isLoading,
-    error,
-  } = useQuery(
+  const { data: symbol } = useQuery(
     ['symbol', searchValue],
     () => searchSymbol({ symbol: searchValue }),
 
@@ -50,11 +48,7 @@ function SearchBar({ leftIcon, rightIcon }: SearchBarProps) {
     },
   );
 
-  const {
-    data: categoryData,
-    isLoading: categoryLoading,
-    error: categoryError,
-  } = useQuery(['category', searchValue], () => searchCategory({ search: searchValue }), {
+  const { data: categoryData } = useQuery(['category', searchValue], () => searchCategory({ search: searchValue }), {
     select: (response) => {
       return response.data.data;
     },

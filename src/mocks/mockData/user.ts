@@ -25,7 +25,7 @@ export const userList: MockUser[] = [
 
 export const mockUserManage = {
   userList,
-  create({ email, password, fullName, newsLetter, emailVerified }: Omit<SignupRequest, 'passwordCheck'>) {
+  create({ email, password, fullName, newsLetter }: Omit<SignupRequest, 'passwordCheck'>) {
     const existUser = this.get({ email });
 
     if (existUser) {
@@ -41,7 +41,6 @@ export const mockUserManage = {
       membership: 'BASIC',
       profile,
       newsLetter,
-      emailVerified,
       isActive: true,
     };
 

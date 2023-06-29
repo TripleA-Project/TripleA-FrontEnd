@@ -21,39 +21,39 @@ import {
 export const authHandler = [
   rest.post<SignupRequest, PathParams<string>, SignupResponse>(getURL('/api/join'), async (req, res, ctx) => {
     try {
-      const { email, password, passwordCheck, fullName, newsLetter, emailVerified } = await req.json<SignupRequest>();
+      const { email, password, passwordCheck, fullName, newsLetter } = await req.json<SignupRequest>();
 
-      const { result, type } = validateSignup({ email, password, passwordCheck, fullName });
+      // const { result, type } = validateSignup({ email, password, passwordCheck, fullName });
 
-      if (!result) {
-        switch (type) {
-          case 'InvalidEmailFormat':
-            throw new RegisterdAppError('InvalidField', '유효하지 않은 email 형식입니다');
-          case 'RequiredPassword':
-            throw new RegisterdAppError('InvalidField', 'password는 필수 입력 항목입니다');
-          case 'InvalidPasswordType':
-          case 'passwordLength':
-          case 'notAllowedChar':
-            throw new RegisterdAppError('InvalidField', '올바른 형식의 비밀번호여야 합니다');
-          case 'NotEqualPasswordCheck':
-            throw new RegisterdAppError('InvalidField', 'password must be equals passwordCheck');
-          case 'InvalidFullNameType':
-            throw new RegisterdAppError('InvalidField', '유효한 fullName 타입이 아닙니다');
-          case 'RequiredFullName':
-            throw new RegisterdAppError('InvalidField', 'fullName은 필수 입력 항목입니다');
-          case 'InvalidSpaceFormat':
-            throw new RegisterdAppError('InvalidField', 'fullName은 공백문자를 포함하지 않아야 합니다');
-          case 'NotCombinationAllEngOrAllKor':
-            throw new RegisterdAppError(
-              'InvalidField',
-              'fullName은 영어로만 입력하거나 조합된 한글로만 입력해야 합니다',
-            );
-          default:
-            break;
-        }
-      }
+      // if (!result) {
+      //   switch (type) {
+      //     case 'InvalidEmailFormat':
+      //       throw new RegisterdAppError('InvalidField', '유효하지 않은 email 형식입니다');
+      //     case 'RequiredPassword':
+      //       throw new RegisterdAppError('InvalidField', 'password는 필수 입력 항목입니다');
+      //     case 'InvalidPasswordType':
+      //     case 'passwordLength':
+      //     case 'notAllowedChar':
+      //       throw new RegisterdAppError('InvalidField', '올바른 형식의 비밀번호여야 합니다');
+      //     case 'NotEqualPasswordCheck':
+      //       throw new RegisterdAppError('InvalidField', 'password must be equals passwordCheck');
+      //     case 'InvalidFullNameType':
+      //       throw new RegisterdAppError('InvalidField', '유효한 fullName 타입이 아닙니다');
+      //     case 'RequiredFullName':
+      //       throw new RegisterdAppError('InvalidField', 'fullName은 필수 입력 항목입니다');
+      //     case 'InvalidSpaceFormat':
+      //       throw new RegisterdAppError('InvalidField', 'fullName은 공백문자를 포함하지 않아야 합니다');
+      //     case 'NotCombinationAllEngOrAllKor':
+      //       throw new RegisterdAppError(
+      //         'InvalidField',
+      //         'fullName은 영어로만 입력하거나 조합된 한글로만 입력해야 합니다',
+      //       );
+      //     default:
+      //       break;
+      //   }
+      // }
 
-      mockUserManage.create({ email, password, fullName, newsLetter, emailVerified });
+      // mockUserManage.create({ email, password, fullName, newsLetter, emailVerified });
 
       return res(
         ctx.status(HttpStatusCode.Ok),

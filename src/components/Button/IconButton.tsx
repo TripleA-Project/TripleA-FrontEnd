@@ -16,7 +16,6 @@ import {
   AiOutlineRight,
 } from 'react-icons/ai';
 import { MdCancel } from 'react-icons/md';
-// import { TfiExport } from 'react-icons/tfi';
 import { RiPencilFill } from 'react-icons/ri';
 import { FiSearch, FiX } from 'react-icons/fi';
 import { GiHamburgerMenu } from 'react-icons/gi';
@@ -131,8 +130,6 @@ export default function IconButton({
     pencil: <RiPencilFill />,
     news: <BiNews />,
     gridmenu: <BsGrid3X3GapFill />,
-    // fire: <MdOutlineLocalFireDepartment />,
-    // info: <MdInfoOutline />,
     hamburgermenu: <GiHamburgerMenu />,
   };
 
