@@ -17,11 +17,11 @@ export default function NewsCard({ news, cardDirection }: NewsCardProps) {
     <div className="m-auto">
       {cardDirection === 'column' ? (
         <div className="flex flex-col">
-          <ImageContainer cardDirection="column" width={358} height={221} thumbnail="ddd" />
+          <ImageContainer cardDirection="column" width={358} height={221} thumbnail={news.thumbnail} />
           <NewsContainer cardDirection="column" height={120} margin={14} news={news} />
         </div>
       ) : cardDirection === 'row' ? (
-        <div className=" flex h-[122px] min-w-[357px] flex-col">
+        <div className="flex h-[122px] min-w-[357px] flex-col">
           <Select symbol="dd">
             <div
               className="h-[19px] w-[19px] rounded-[50%] bg-cover"

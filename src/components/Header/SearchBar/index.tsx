@@ -20,7 +20,7 @@ interface SearchBarProps {
 
 function SearchBar({ leftIcon, rightIcon }: SearchBarProps) {
   const [searchValue, setSearchValue] = useState<string>('');
-  const [getCategoryId, setGetCategoryId] = useState<number|null>(null);
+  const [getCategoryId, setGetCategoryId] = useState<number | null>(null);
   const [tmpQuery, setTmpQuery] = useState<string>(searchValue);
   const [isClicked, setIsClicked] = useState<boolean>(true);
   const [selectedSymbol, setSelectedSymbol] = useState<any | null>(null);
@@ -45,8 +45,8 @@ function SearchBar({ leftIcon, rightIcon }: SearchBarProps) {
       enabled: matchSymbol,
       staleTime: 0,
       cacheTime: 50000,
-      refetchOnWindowFocus:false,
-      retry: 0
+      refetchOnWindowFocus: false,
+      retry: 0,
     },
   );
 
@@ -59,7 +59,7 @@ function SearchBar({ leftIcon, rightIcon }: SearchBarProps) {
       return response.data.data;
     },
     enabled: matchCategory,
-    retry: 0
+    retry: 0,
   });
 
   const symbolData = symbol && symbol.data && symbol.data.data;
@@ -75,25 +75,24 @@ function SearchBar({ leftIcon, rightIcon }: SearchBarProps) {
   };
 
   const selectSymbolHandle = (searchSymbolKeyword: string) => {
-      setSelectedSymbol(searchSymbolKeyword);
-      dispatch(setSearchKeywordData(searchSymbolKeyword));
-      if (searchInputRef.current) {
-        searchInputRef.current.value = searchSymbolKeyword.toLocaleLowerCase();
-        setSearchValue(searchInputRef.current.value);
-        setIsClicked(false);
-      }
+    setSelectedSymbol(searchSymbolKeyword);
+    dispatch(setSearchKeywordData(searchSymbolKeyword));
+    if (searchInputRef.current) {
+      searchInputRef.current.value = searchSymbolKeyword.toLocaleLowerCase();
+      setSearchValue(searchInputRef.current.value);
+      setIsClicked(false);
+    }
   };
 
-  const selectCategoryHandle = (searchCategoryKeywordData:{categoryId:number, category: string}) => {
-   setSelectedCategory(searchCategoryKeywordData)
-   dispatch(setSearchKeywordData(searchCategoryKeywordData.categoryId.toString()))
-   if(searchInputRef.current) {
-    searchInputRef.current.value = searchCategoryKeywordData.category
-    setGetCategoryId(searchCategoryKeywordData.categoryId)
-    setIsClicked(false);
-   }
-  }
-
+  const selectCategoryHandle = (searchCategoryKeywordData: { categoryId: number; category: string }) => {
+    setSelectedCategory(searchCategoryKeywordData);
+    dispatch(setSearchKeywordData(searchCategoryKeywordData.categoryId.toString()));
+    if (searchInputRef.current) {
+      searchInputRef.current.value = searchCategoryKeywordData.category;
+      setGetCategoryId(searchCategoryKeywordData.categoryId);
+      setIsClicked(false);
+    }
+  };
 
   const iconClickHandle = () => {
     if (searchInputRef.current) {
@@ -117,7 +116,7 @@ function SearchBar({ leftIcon, rightIcon }: SearchBarProps) {
         <ActionInput type="mainSearch" onChange={changeHandle} ref={searchInputRef} />
         {rightIcon && <RightIcon rightIcon={rightIcon} clickHandle={iconClickHandle} />}
       </div>
-      <ul onClick={clickHandle} className="absolute border-b  bg-[#fff] shadow-md">
+      <ul onClick={clickHandle} className="absolute w-full  border-b bg-[#fff] shadow-md">
         {isClicked &&
           symbolData &&
           symbolData.map((symbolData: any) => (
@@ -126,7 +125,11 @@ function SearchBar({ leftIcon, rightIcon }: SearchBarProps) {
         {isClicked &&
           categoryData &&
           categoryData.map((categoryDataItem: any) => (
-            <SearchCategoryResultsList key={categoryDataItem.categoryId} categoryData={categoryDataItem} onSelect={selectCategoryHandle} />
+            <SearchCategoryResultsList
+              key={categoryDataItem.categoryId}
+              categoryData={categoryDataItem}
+              onSelect={selectCategoryHandle}
+            />
           ))}
       </ul>
     </div>

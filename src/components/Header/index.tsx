@@ -35,12 +35,14 @@ export interface HeaderProps {
 
 function Header({ leftIcon, rightIcon, title, pathName }: HeaderProps) {
   return (
-    <header className="relative z-10">
-      {pathName === '/search' ? (
-        <SearchBar leftIcon={leftIcon} rightIcon={rightIcon} />
-      ) : (
-        <HeaderItem leftIcon={leftIcon} rightIcon={rightIcon} title={title} />
-      )}
+    <header className="fixed left-0 top-0 z-10 w-full bg-white">
+      <div className="mx-auto w-full min-w-[390px] max-w-[768px]">
+        {pathName === '/search' ? (
+          <SearchBar leftIcon={leftIcon} rightIcon={rightIcon} />
+        ) : (
+          <HeaderItem leftIcon={leftIcon} rightIcon={rightIcon} title={title} />
+        )}
+      </div>
     </header>
   );
 }

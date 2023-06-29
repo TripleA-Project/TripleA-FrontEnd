@@ -9,6 +9,7 @@ import { searchSymbol } from '@/service/symbol';
 import { Symbol } from '@/interfaces/Symbol';
 import { searchCategoryNews, searchSymbolNews } from '@/service/news';
 import NewsCard from '../NewsCard';
+import NewsSectionHeader from '../Section/NewsSectionHeader';
 
 function SearchPageContainer() {
   const { searchValue, dispatch } = useSearch();
@@ -52,16 +53,19 @@ function SearchPageContainer() {
 
   const symbolSearchData = symbol && symbol.data && symbol.data.data;
   const symbolNewsData = symbolNews && symbolNews.data && symbolNews.data.data && symbolNews.data.data.news;
-  // console.log(symbolSearchData);
+
   return (
     <div>
-      <div>
-        <SymbolCardBar />
+      <div className="mb-[10px]">
+        {symbolSearchData && symbolSearchData && <SymbolCardBar />}
         {symbolSearchData &&
           symbolSearchData.map((symbolItem: Symbol) => (
             <SymbolCard key={symbolItem.symbolId} symbolData={symbolItem} />
           ))}
       </div>
+      {symbolNewsData && symbolNewsData && (
+        <div className="mt-[10px] px-4 py-5 text-base font-extrabold">관련 뉴스</div>
+      )}
       {symbolNewsData &&
         symbolNewsData.map((symbolNewsItem) => (
           <NewsCard cardDirection="row" key={symbolNewsItem.newsId} news={symbolNewsItem} />

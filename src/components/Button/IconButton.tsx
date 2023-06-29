@@ -155,7 +155,7 @@ export default function IconButton({
             ? presetIcon[icon as keyof typeof presetIcon]
             : icon({ style: { fontSize: iconSize } })}
         </div>
-        <span className="absolute right-1 top-3 break-all text-start">{children}</span>
+        {children ? <span className="absolute right-1 top-3 break-all text-start">{children}</span> : null}
       </div>
     </button>
   );

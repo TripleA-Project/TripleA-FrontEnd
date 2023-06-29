@@ -1,5 +1,6 @@
 // import Header from '@/components/Header';
 // import Tabbar from '@/components/Tabbar';
+import Header from '@/components/Header';
 import NewsHomeWrapper from '@/components/Section/NewsHomeWrapper';
 import { Metadata } from 'next';
 
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
 function Home() {
   return (
     <div className="min-h-[844px]">
-      {/* <header><Tabbar/></header> */}
+      <Header leftIcon="LogoIcon" rightIcon="searchshort" />
       <div className="flex flex-col gap-[8px] bg-white pt-[27px]">
         <NewsHomeWrapper />
       </div>
