@@ -6,9 +6,12 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol:'https',
-        hostname: 'storage.googleapis.com',
-        pathname:'/iex/api/logos/**'
+        protocol: 'http',
+        hostname: '**',
+      },
+      {
+        protocol: 'https',
+        hostname: '**',
       },
     ],
   },

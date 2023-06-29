@@ -8,7 +8,7 @@ import SymbolCardBar from '../SymbolCard/SymbolCardBar';
 import { searchSymbol } from '@/service/symbol';
 import { Symbol } from '@/interfaces/Symbol';
 import { searchCategoryNews, searchSymbolNews } from '@/service/news';
-import { NewsData } from '@/interfaces/NewsData';
+import NewsCard from '../NewsCard';
 
 function SearchPageContainer() {
   const { searchValue, dispatch } = useSearch();
@@ -17,11 +17,11 @@ function SearchPageContainer() {
   const matchSymbol = englishRegex.test(searchValue);
 
   const { data: symbol } = useQuery(['symbol', searchValue], () => searchSymbol({ symbol: searchValue }), {
-    enabled: matchSymbol&& !Number(searchValue),
+    enabled: matchSymbol && !Number(searchValue),
     retry: 0,
   });
   const { data: symbolNews } = useQuery(['news', searchValue], () => searchSymbolNews({ symbol: searchValue }), {
-    enabled: matchSymbol&& !Number(searchValue),
+    enabled: matchSymbol && !Number(searchValue),
     retry: 0,
   });
   const { data: categoryNews } = useQuery(
@@ -39,8 +39,8 @@ function SearchPageContainer() {
   const getSymbolValue = categoryNews && categoryNews.map((newsItem) => newsItem.symbol);
   console.log(getSymbolValue && getSymbolValue);
   if (getSymbolValue) {
-    for(let i = 0; i < getSymbolValue.length; i++) {
-      getSymbolValue[i]
+    for (let i = 0; i < getSymbolValue.length; i++) {
+      dispatch(setSearchKeywordData(getSymbolValue[i]));
     }
   }
   const clickHandle = () => {
@@ -62,6 +62,10 @@ function SearchPageContainer() {
             <SymbolCard key={symbolItem.symbolId} symbolData={symbolItem} />
           ))}
       </div>
+      {symbolNewsData &&
+        symbolNewsData.map((symbolNewsItem) => (
+          <NewsCard cardDirection="row" key={symbolNewsItem.newsId} news={symbolNewsItem} />
+        ))}
     </div>
   );
 }

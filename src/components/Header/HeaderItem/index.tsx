@@ -23,7 +23,7 @@ function HeaderItem({ leftIcon, rightIcon, title }: HeaderProps) {
   }, [pathName]);
 
   return (
-    <div className={`w-screen p-3 ${pathName === '/search'? 'border-b-[1px] border-b-[#FD954A]': ''}`}>
+    <div className={`p-3 ${pathName === '/search'? 'border-b-[1px] border-b-[#FD954A]': ''}`}>
       <div
         className={`flex ${
           pathName === '/login' || pathName === '/read'

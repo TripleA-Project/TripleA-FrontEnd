@@ -1,6 +1,6 @@
 'use client';
 import IconButton, { IconButtonProps } from '@/components/Button/IconButton';
-import LogoIcon from '@/components/Icon';
+import LogoIcon from '@/components/Icon/LogoIcon';
 import { useParams, usePathname, useRouter } from 'next/navigation';
 import React from 'react';
 
