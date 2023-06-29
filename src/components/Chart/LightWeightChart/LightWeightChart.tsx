@@ -44,13 +44,6 @@ function LightWeightChart(
   return (
     <div ref={chartContainerRef} className="relative">
       {container ? (
-<<<<<<< HEAD
-        <LightWeightChartContainer ref={chartAPIRef} container={container} options={{ height: 300, ...options }}>
-          {children}
-        </LightWeightChartContainer>
-      ) : (
-=======
->>>>>>> 4d3ade8d4532286a09dbb4d59e2a8b6d93fb8419
         <>
           <LightWeightChartContainer
             ref={chartAPIRef}
