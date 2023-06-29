@@ -29,7 +29,7 @@ function Progress({ value, min, max, className, ...props }: ProgressProps) {
 
   return (
     <StyeldProgress
-      className={`relative h-2 w-full rounded-lg bg-[#D5DDE9] before:h-full before:rounded-lg before:bg-[#5645F6] ${className}`}
+      className={`relative h-[2px] w-full rounded-lg bg-[#D5DDE9] before:h-full before:rounded-lg before:bg-black ${className}`}
       value={normalize(value, { min, max })}
       min={min}
       max={max}

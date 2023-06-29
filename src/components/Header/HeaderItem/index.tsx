@@ -2,15 +2,15 @@
 
 import { usePathname } from 'next/navigation';
 import LeftIcon from '../common/LeftIcon';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import RightIcon from '../common/RightIcon';
 import Title from '../common/Title';
-import ActionInput from '@/components/ActionInput';
 import { HeaderProps } from '..';
 
 function HeaderItem({ leftIcon, rightIcon, title }: HeaderProps) {
   const pathName = usePathname();
   const [isClicked, setIsClicked] = useState(false);
+
   const clickHandle = () => {
     setIsClicked(!isClicked);
     if (pathName === '/') {
@@ -22,7 +22,7 @@ function HeaderItem({ leftIcon, rightIcon, title }: HeaderProps) {
   }, [pathName]);
 
   return (
-    <div className="my-3 w-screen px-6 ">
+    <div className={`p-3 ${pathName === '/search' ? 'border-b-[1px] border-b-[#FD954A]' : ''}`}>
       <div
         className={`flex ${
           pathName === '/login' || pathName === '/read'
@@ -31,11 +31,8 @@ function HeaderItem({ leftIcon, rightIcon, title }: HeaderProps) {
         } `}
       >
         {leftIcon && <LeftIcon leftIcon={leftIcon} clickHandle={clickHandle} />}
-        {pathName === '/search' ? (
-          <ActionInput type="mainSearch" onClick={clickHandle} />
-        ) : (
-          title && <Title title={title} />
-        )}
+
+        {title && <Title title={title} />}
         {rightIcon && <RightIcon rightIcon={rightIcon} clickHandle={clickHandle} />}
       </div>
     </div>

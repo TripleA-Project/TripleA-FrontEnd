@@ -4,10 +4,6 @@ import React, { useState } from 'react';
 import EmotionalScoreIcon from './EmotionalScoreIcon';
 import EmotionalScoreModal from '../Modal/EmotionalScoreModal';
 
-import React, { useState } from 'react';
-import EmotionalScoreIcon from './EmotionalScoreIcon';
-import EmotionalScoreModal from '../Modal/EmotionalScoreModal';
-
 import { useCard } from '@/redux/slice/cardSlice';
 import { setDirection } from '@/redux/slice/cardSlice';
 import { ReactJSXElement } from '@emotion/react/types/jsx-namespace';
@@ -42,10 +38,10 @@ export default function SectionHeaderButtonContainer({ icons }: SectionHeaderBut
   };
   return (
     <div className="flex justify-end gap-[10px] font-[24px]">
-      <button key={icons[0].key + Math.random()} onClick={hamburgerClickHandler}>
+      <button key={(icons[0].key as string) + Math.random()} onClick={hamburgerClickHandler}>
         {icons[0]}
       </button>
-      <button key={icons[1].key + Math.random()} onClick={gridClickHandler}>
+      <button key={(icons[1].key as string) + Math.random()} onClick={gridClickHandler}>
         {icons[1]}
       </button>
     </div>

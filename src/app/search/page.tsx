@@ -1,4 +1,7 @@
+import Header from '@/components/Header';
+import SearchPageContainer from '@/components/SearchPageContainer';
 import { Metadata } from 'next';
+
 
 export const metadata: Metadata = {
   title: '검색',
@@ -6,7 +9,11 @@ export const metadata: Metadata = {
 };
 
 function Search() {
-  return <div>Search Page</div>;
+  return <div className='bg-[#FFFFFF]'>
+    <Header leftIcon='arrowleft' rightIcon='x' pathName='/search'/>
+    <SearchPageContainer/>
+    </div>;
+
 }
 
 export default Search;

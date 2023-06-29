@@ -8,6 +8,9 @@ import { FieldErrors, useForm } from 'react-hook-form';
 import { useState } from 'react';
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
 import Link from 'next/link';
+import { login } from '@/service/auth';
+import { useRouter } from 'next/navigation';
+import { setCookie } from '@/util/cookies';
 
 export interface LoginForm {
   email: string;
@@ -25,38 +28,30 @@ function LoginForm() {
     handleSubmit,
     formState: { errors, isValid },
   } = useForm<LoginForm>();
+  const router = useRouter();
 
   const onSubmit = async (data: LoginForm) => {
-    //
-    console.log(data);
+    try {
+      const response = await login({ email: data.email, password: data.password });
+
+      const accessToken = response.headers['authorization'] as string;
+
+      if (accessToken) {
+        await setCookie('accessToken', accessToken.replace('Bearer ', ''), { path: '/', maxAge: 60 * 60 * 24 });
+      }
+      router.push('/');
+    } catch (error) {
+      console.log(error);
+    }
   };
   const onInvalid = (errors: FieldErrors<LoginForm>) => {
     console.log('error:', errors);
   };
 
-  // const [isValid, setIsValid] = useState(false)
-  // const handleClick = async () => {
-
-  //   console.log('얍얍!!');
-  // };
-
-  // const checkEmail = () =>{
-  //   console.log(emailRef.current.value)
-  //   validateEmail(emailRef.current.value)
-  // }
-  // const checkPassword = () =>{
-  //   console.log(passwordRef.current.value)
-  //   validatePassword(passwordRef.current.value)
-  // }
-
-  // const emailRef = useRef()
-  // console.log(emailRef.current)
-  // const passwordRef = useRef()
-  // console.log(passwordRef.current)
   return (
     <form onSubmit={handleSubmit(onSubmit, onInvalid)}>
-      <div className="mx-auto min-w-[390px] max-w-[768px]">
-        <div className="mx-auto w-[358px]">
+      <div className="mx-auto ">
+        <div className="mx-auto w-full">
           <div className="flex items-center justify-center  py-11 font-semibold">
             <Link href={'/login'} className="flex gap-3">
               <Image src={Logo} alt="Logo" />
@@ -80,7 +75,7 @@ function LoginForm() {
                   return '이메일 형식이 아닙니다';
                 },
               })}
-              className="mx-auto mt-1 flex h-[46px] w-[358px] rounded-lg border-[1px] border-solid pl-4 placeholder-[#DBDEE1] "
+              className="mx-auto mt-1 flex h-[46px] w-full rounded-lg border-[1px] border-solid pl-4 placeholder-[#DBDEE1] "
             />
           </div>
 
@@ -88,7 +83,7 @@ function LoginForm() {
             <label className="ml-4 text-xs font-semibold text-[#454C52]" htmlFor="password">
               비밀번호
             </label>
-            <div className="relative mx-auto mt-1 flex h-[46px] w-[358px] rounded-lg border-[1px] border-solid placeholder-[#DBDEE1]">
+            <div className="relative mx-auto mt-1 flex h-[46px] w-full rounded-lg border-[1px] border-solid placeholder-[#DBDEE1]">
               <input
                 placeholder="비밀번호 입력"
                 type={showPassword ? 'text' : 'password'}
@@ -103,7 +98,7 @@ function LoginForm() {
 
                     switch (type) {
                       case 'passwordLength':
-                        return '6자에서 16자 이내로 작성해주세요';
+                        return '8자에서 16자 이내로 작성해주세요';
                       case 'notAllowedChar':
                         return '영문 대소문자,0-9숫자와 `.`,`-`가 허용됩니다';
                     }
@@ -125,14 +120,14 @@ function LoginForm() {
           <Button
             disabled={!isValid}
             className="mx-auto mt-2 box-border font-bold "
-            sizeTheme="medium"
+            sizeTheme="fullWidth"
             bgColorTheme={isValid ? 'orange' : 'lightgray'}
             textColorTheme="white"
           >
             로그인
           </Button>
         </div>
-        <div className="mx-auto flex justify-center">
+        <div className="mx-auto ml-3 mt-3 flex">
           <Link className="text-xs text-[#454C52]" href="/signup">
             회원가입
           </Link>

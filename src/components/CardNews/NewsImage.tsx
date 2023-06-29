@@ -20,7 +20,7 @@ export default function NewsImage({thumbnail, cardDirection}:NewsImageProps) {
   
   return (
     <ImageContainer className='rounded-t-xl overflow-hidden box-border' thumbnail={thumbnail} cardDirection={cardDirection}>
-      {/* {thumbnail && <Image src={thumbnail} alt='thumbnail' width={66} height={66}/>} */}
+      {thumbnail && <Image src={thumbnail} alt='thumbnail' width={66} height={66}/>}
     </ImageContainer>
   )
 }

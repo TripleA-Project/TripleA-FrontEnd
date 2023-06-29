@@ -11,4 +11,4 @@ export interface SearchSymbolRequestConfig extends AxiosRequestConfig {
   params: SearchSymbolSearchParam;
 }
 
-export interface SearchSymbolResponse extends APIResponse<Omit<Symbol, 'price'>[]> {}
+export interface SearchSymbolResponse extends APIResponse<Symbol[]> {}

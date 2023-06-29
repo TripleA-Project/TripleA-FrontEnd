@@ -52,12 +52,8 @@ export async function latestNews({ page = 0, size = 10 }: LatestNewsSearchParam 
  *
  * `id` 뉴스 id [**number**]
  */
-export async function getNewsDetail({ id }: NewsDetailParam, accessToken: string) {
-  const getNewsDetailResponse = await axiosInstance.get<NewsDetailResponse>(`/api/auth/news/${id}`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
+export async function getNewsDetail({ id }: NewsDetailParam) {
+  const getNewsDetailResponse = await axiosInstance.get<NewsDetailResponse>(`/api/auth/news/${id}`);
 
   return getNewsDetailResponse;
 }
