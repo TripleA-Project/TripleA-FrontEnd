@@ -5,9 +5,7 @@ import NewsCard from '../NewsCard';
 import { latestNews } from '@/service/news';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
-import { AxiosError } from 'axios';
-import { LatestNewsResponse } from '@/interfaces/Dto/News';
-
+import { NewsData } from '@/interfaces/NewsData';
 
 interface NewsSectionBodyProps {
   type: 'row' | 'column' | 'tile';
@@ -15,15 +13,15 @@ interface NewsSectionBodyProps {
 
 export default function NewsSectionBody({ type }: NewsSectionBodyProps) {
   const { cardDirection } = useSelector((state: RootState) => state.card);
-  const { isLoading, data:newsList } = useQuery(['newslist'],()=>latestNews(),{
-    select: (response) => response.data.data?.news
+  const { isLoading, data: newsList } = useQuery(['newslist'], () => latestNews(), {
+    select: (response) => response.data.data?.news,
   });
   if (isLoading) {
     return <span>Loading...</span>;
   }
 
-  
-  const hotNews = newsList[0];
+  const hotNews = newsList ? newsList[0] : ({} as NewsData);
+
   return (
     <div className="w-full">
       <div className={`m-auto flex flex-wrap gap-[10px] ${cardDirection === 'row' ? 'flex-col' : ''}`}>

@@ -11,7 +11,7 @@ import {
  * 유저프로필 조회 API (GET)
  */
 export async function getProfile() {
-  const getProfileResponse = await axiosInstance.get<ProfileResponse>('/api/user/me');
+  const getProfileResponse = await axiosInstance.get<ProfileResponse>('/api/auth/user/me');
 
   return getProfileResponse;
 }
@@ -70,8 +70,8 @@ export async function updateUserInfo({
     ...(typeof newsLetter === 'boolean' && { newsLetter }),
   } as UpdateUserInfoRequest;
 
-  const updateUserInfoResponse = await axiosInstance.put<any, UpdateUserInfoResponse, UpdateUserInfoRequest>(
-    '/api/user',
+  const updateUserInfoResponse = await axiosInstance.post<any, UpdateUserInfoResponse, UpdateUserInfoRequest>(
+    '/api/auth/user',
     {
       ...postPayload,
     },

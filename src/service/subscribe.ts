@@ -8,13 +8,13 @@ import {
   type UnSubscribeResponse,
 } from '@/interfaces/Dto/Subscribe';
 
-const subscribeBaseURL = '/api/subscribe';
+const subscribeBaseURL = '/api/auth/subscribe';
 
 /**
  * 구독 API (GET)
  */
-export async function subscribe() {
-  const subscribeResponse = await axiosInstance.get<SubscribeResponse>(subscribeBaseURL);
+export async function subscribe({ url }: { url: string }) {
+  const subscribeResponse = await axiosInstance.get<SubscribeResponse>(`${subscribeBaseURL}?url=${url}`);
 
   return subscribeResponse;
 }

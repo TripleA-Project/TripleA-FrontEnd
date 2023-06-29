@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import DefaultImg from '../../../public/Logo.svg';
 
 interface ImageContainerProps {
   cardDirection?: 'column';
@@ -9,18 +10,22 @@ interface ImageContainerProps {
 }
 
 export default function ImageContainer({ cardDirection, width, height, thumbnail }: ImageContainerProps) {
+  console.log({ thumbnail });
   return (
     <>
       {cardDirection === 'column' ? (
         <div
-          className=" inline-flex rounded-[8px]"
+          className="inline-flex rounded-[8px] object-cover"
           style={{ minWidth: `${width}px`, height: `${height}px`, border: '1px solid #000' }}
         >
-          <Image src='/#' alt='thumbnail' width={100} height={100}/>
+          <Image src={thumbnail || DefaultImg} alt="thumbnail" className="w-full" width={width} height={height} />
         </div>
       ) : (
-        <div className="rounded-[10px]" style={{ width: `${width}px`, height: `${height}px` }}>
-          {' '}
+        <div
+          className="flex h-full items-center rounded-[10px] object-cover"
+          style={{ width: `${width}px`, height: `${height}px` }}
+        >
+          <Image src={thumbnail || DefaultImg} alt="thumbnail" className="h-full" width={width} height={height} />
         </div>
       )}
     </>

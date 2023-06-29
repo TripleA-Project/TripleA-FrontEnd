@@ -26,7 +26,7 @@ function LoginForm() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { isValid },
   } = useForm<LoginForm>();
   const router = useRouter();
 

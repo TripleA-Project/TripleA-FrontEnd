@@ -1,5 +1,5 @@
 import { HttpStatusCode } from 'axios';
-import { APP_ERROR_LIST, AppErrorKey } from './APIErrorList';
+import { APP_ERROR_LIST, type AppErrorKey } from './APIErrorList';
 
 export interface AppError {
   type: 'RegisteredAppError';

@@ -1,3 +1,4 @@
+import SymbolTabs from '@/components/Chart/SymbolTabs';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -6,7 +7,11 @@ export const metadata: Metadata = {
 };
 
 function Chart() {
-  return <div>Chart Page</div>;
+  return (
+    <div className="bg-[#F5F7F9]" style={{ minHeight: 'calc(100vh - 3.5rem)' }}>
+      <SymbolTabs />
+    </div>
+  );
 }
 
 export default Chart;
