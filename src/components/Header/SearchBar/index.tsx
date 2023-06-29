@@ -112,12 +112,12 @@ function SearchBar({ leftIcon, rightIcon }: SearchBarProps) {
 
   return (
     <div>
-      <div className="flex w-screen justify-between border-b-[1px] border-b-[#FD954A] px-4 py-3">
+      <div className="flex justify-between border-b-[1px] border-b-[#FD954A] px-4 py-3">
         {leftIcon && <LeftIcon leftIcon={leftIcon} clickHandle={clickHandle} />}
         <ActionInput type="mainSearch" onChange={changeHandle} ref={searchInputRef} />
         {rightIcon && <RightIcon rightIcon={rightIcon} clickHandle={iconClickHandle} />}
       </div>
-      <ul onClick={clickHandle} className="absolute w-screen border-b  bg-[#fff] shadow-md">
+      <ul onClick={clickHandle} className="absolute border-b  bg-[#fff] shadow-md">
         {isClicked &&
           symbolData &&
           symbolData.map((symbolData: any) => (

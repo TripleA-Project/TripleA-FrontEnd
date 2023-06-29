@@ -23,6 +23,9 @@ function RightIcon({ clickHandle, rightIcon }: RightIconProps) {
     if (pathName === `/chart/symbol`) {
       setIsClicked(!isClicked);
     }
+    if(pathName==='/search') {
+      clickHandle()
+    }
   };
   return (
     <div

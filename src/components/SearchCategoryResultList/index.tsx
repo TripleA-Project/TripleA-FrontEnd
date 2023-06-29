@@ -1,6 +1,5 @@
 'use client';
 import { SearchSymbolResponse } from '@/interfaces/Dto/Symbol';
-;
 import React, { useEffect } from 'react';
 
 interface SearchResultsListProps {
@@ -14,8 +13,8 @@ function SearchCategoryResultsList({ categoryData, onSelect }: any) {
   }
 
   const selectHandle = () => {
-    onSelect({categoryId:categoryData.categoryId, category: categoryData.category });
-    console.log({categoryId:categoryData.categoryId, category: categoryData.category })
+    onSelect({ categoryId: categoryData.categoryId, category: categoryData.category });
+    console.log({ categoryId: categoryData.categoryId, category: categoryData.category });
   };
 
   return (
