@@ -1,6 +1,6 @@
 import React from 'react'
 import NewsSectionContainer from './NewsSectionContainer'
-import { FireIcon, NewsIcon } from '@/components/Icon'
+import { FireIcon, NewsIcon } from '@/components/Icon/LogoIcon'
 export default function NewsHomeWrapper() {
   return (
     <div>

@@ -1,4 +1,4 @@
-import React, { FocusEvent, Ref } from 'react';
+import React from 'react';
 import HeaderItem from './HeaderItem';
 import { IconButtonProps } from '../Button/IconButton';
 import SearchBar from './SearchBar';

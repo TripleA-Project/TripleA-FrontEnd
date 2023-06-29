@@ -36,16 +36,14 @@ function SymbolCard({ symbolData }: SearchSymbolData) {
     <Link
       href={`/chart/symbol?name=${symbolData.symbol}`}
       key={symbolData.symbolId}
-      className="flex w-screen items-center  justify-between  py-[5px] pl-4 pr-2"
+      className="flex  items-center  justify-between  py-[5px] pl-4 pr-2"
     >
       <div className="h-[42px] w-[42px] overflow-hidden rounded-[50%] text-center align-middle">
         {!imgError ? (
           <Image
             src={symbolData.logo ?? ''}
-            width={42}
-            height={42}
             alt={symbolData.symbol}
-            className="flex h-[100%] w-[100%] items-center object-cover"
+            className="w-full object-cover"
             onError={imgErrorHandle}
           />
         ) : (
@@ -62,7 +60,7 @@ function SymbolCard({ symbolData }: SearchSymbolData) {
           {symbolChangePrice.toFixed(1)} ({symbolSharePrice}%)
         </div>
       </div>
-      <div className="ml-[74px] text-[#E5E7EC]">
+      <div className="ml-[72px] text-[#E5E7EC]">
         <IconButton
           icon="heartfill"
           textColorTheme="none"
