@@ -95,7 +95,7 @@ function Chart({ symbol, resample, data }: ChartProps) {
       setAuthState('loginRequired');
       return;
     }
-    if (response && response.membership === 'BASIC' && authState !== 'notAllowed') {
+    if (response && response.membership === 'BASIC') {
       setAuthState('notAllowed');
       return;
     }

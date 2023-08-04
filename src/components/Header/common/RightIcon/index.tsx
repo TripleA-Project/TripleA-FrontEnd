@@ -23,8 +23,8 @@ function RightIcon({ clickHandle, rightIcon }: RightIconProps) {
     if (pathName === `/chart/symbol`) {
       setIsClicked(!isClicked);
     }
-    if(pathName==='/search') {
-      clickHandle()
+    if (pathName === '/search') {
+      clickHandle();
     }
   };
   return (
@@ -32,7 +32,7 @@ function RightIcon({ clickHandle, rightIcon }: RightIconProps) {
       className={`${
         pathName === `/chart/symbol` && isClicked
           ? 'text-[#FD954A]'
-          : pathName === `/chart/symbol` || pathName ==='/search' && 'text-neutral-400'
+          : pathName === `/chart/symbol?${params.name}` || (pathName === '/search' && 'text-neutral-400')
       }`}
     >
       <IconButton

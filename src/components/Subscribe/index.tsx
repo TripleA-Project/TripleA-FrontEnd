@@ -81,12 +81,12 @@ function Subscribe() {
               <Button
                 bgColorTheme="orange"
                 textColorTheme="white"
-                className="disabled:!bg-[#898A8D]"
+                className="!w-full disabled:!bg-[#898A8D]"
                 disabled={membership === 'PREMIUM'}
                 onClick={async () => {
                   if (membership === 'PREMIUM') return;
 
-                  const res = await subscribe({ url: 'https://stock.moya.ai/payment' });
+                  const res = await subscribe({ url: 'http://localhost:3000/payment' });
 
                   router.push(res.data.data?.payment!);
                 }}

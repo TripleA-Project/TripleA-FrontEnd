@@ -2,6 +2,7 @@ import { type Metadata } from 'next';
 import { Chart as AppChart } from '@/components/Chart';
 import { type ResampleFrequency } from '@/interfaces/Dto/Stock';
 import { searchSymbolNews } from '@/service/news';
+import Header from '@/components/Header';
 
 export const revalidate = 0;
 
@@ -43,7 +44,12 @@ async function SymbolChart({ searchParams }: PageProps) {
 
   const newsResponse = await searchSymbolNews({ symbol, page: 0, size: 3 });
 
-  return <AppChart symbol={symbol} resample={resample} data={{ news: newsResponse.data }} />;
+  return (
+    <>
+      <Header leftIcon={'left'} title={searchParams?.name} rightIcon={'searchshort'} />
+      <AppChart symbol={symbol} resample={resample} data={{ news: newsResponse.data }} />;
+    </>
+  );
 }
 
 export default SymbolChart;

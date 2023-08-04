@@ -21,6 +21,8 @@ async function MyPage() {
 
   const payload = profileResponse?.data.data;
 
+  console.log({ payload });
+
   const profile = {
     email: typeof payload !== 'string' ? payload?.email : '',
     fullName: typeof payload !== 'string' ? payload?.fullName : '',
