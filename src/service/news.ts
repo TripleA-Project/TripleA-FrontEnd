@@ -1,5 +1,8 @@
+import axios, { AxiosResponse, HttpStatusCode } from 'axios';
 import { axiosInstance } from './axios';
+import { cloneDeep } from 'lodash';
 import {
+  type GetNewsByIdSearchParam,
   type LatestNewsRequestConfig,
   type LatestNewsSearchParam,
   type LatestNewsResponse,
@@ -11,19 +14,21 @@ import {
   type SearchCategoryNewsParam,
   type SearchCategoryNewsSearchParam,
   type SearchCategoryNewsResponse,
-  type SearchCategoryNewsRequestConfig,
   type SearchKeywordNewsSearchParam,
   type SearchKeywordNewsRequestConfig,
   type SearchKeywordNewsResponse,
   type AINewsAnalysisParam,
   type AINewsAnalysisResponse,
+  type GetNewsByIdResponse,
+  type CollapseNews,
+  type CollapseNewsPayload,
 } from '@/interfaces/Dto/News';
 import {
   type GetNewsHistoryRequestConfig,
   type GetNewsHistorySearchParam,
   type GetNewsHistroyResponse,
 } from '@/interfaces/Dto/History';
-import { headers } from 'next/headers';
+import { type Pagination } from '@/interfaces/Dto/Core';
 
 /**
  * 최신 뉴스 조회 API (GET) - Pagination
@@ -45,6 +50,89 @@ export async function latestNews({ page = 0, size = 10 }: LatestNewsSearchParam 
   } as LatestNewsRequestConfig);
 
   return latestNewsResponse;
+}
+
+/**
+ * 최신 뉴스 조회 API - 심볼 병합 (GET) - Pagination
+ *
+ * 뉴스 아이디가 같은 경우 심볼을 합쳐서 심볼리스트로 반환
+ *
+ * moya API 에서의 뉴스 조회 응답데이터가 변경되지 않는 이상,
+ *
+ * 메인 화면에서만 유의미하게 적용할 수 있어 적용하지는 않음
+ *
+ * (추후 확장을 고려하여 삭제하지 않고 남겨둠)
+ *
+ * `page` 페이지 번호 [**number**] - optional
+ *
+ * 기본 **0**
+ *
+ * `size` 뉴스 개수 [**number**] - optional
+ *
+ * 기본 **10**
+ */
+export async function collapseLatestNews({ page = 10, size = 10 }: LatestNewsSearchParam = {}) {
+  try {
+    const latestNewsResponse = await latestNews({ page, size });
+
+    if (latestNewsResponse.data.status === HttpStatusCode.Unauthorized || !latestNewsResponse.data.data?.news?.length) {
+      return {
+        ...latestNewsResponse,
+        data: {
+          status: latestNewsResponse.data.status,
+          msg: latestNewsResponse.data.msg,
+          data: {
+            news: [] as CollapseNews[],
+            nextPage: latestNewsResponse.data.data?.nextPage,
+          },
+        },
+      } as AxiosResponse<Pagination<CollapseNewsPayload>>;
+    }
+
+    const originNewsList = cloneDeep(latestNewsResponse.data.data.news);
+
+    const collapseNewsList = originNewsList.reduce((result, currentNewsItem) => {
+      const {
+        symbol: currentNewsSymbol,
+        companyName: currentNewsCompanyName,
+        logo: currentNewsLogo,
+        ...currentNews
+      } = currentNewsItem;
+
+      const sameIdNews = result.find((resultNews) => resultNews.newsId === currentNewsItem.newsId);
+
+      if (!sameIdNews) {
+        result.push({
+          ...currentNews,
+          symbolList: [{ symbol: currentNewsSymbol, companyName: currentNewsCompanyName, logo: currentNewsLogo }],
+        });
+
+        return result;
+      }
+
+      sameIdNews.symbolList.push({
+        symbol: currentNewsSymbol,
+        companyName: currentNewsCompanyName,
+        logo: currentNewsLogo,
+      });
+
+      return result;
+    }, [] as CollapseNews[]);
+
+    return {
+      ...latestNewsResponse,
+      data: {
+        status: latestNewsResponse.data.status,
+        msg: latestNewsResponse.data.msg,
+        data: {
+          nextPage: latestNewsResponse.data.data.nextPage,
+          news: collapseNewsList,
+        },
+      },
+    } as AxiosResponse<Pagination<CollapseNewsPayload>>;
+  } catch (err) {
+    throw err;
+  }
 }
 
 /**
@@ -93,13 +181,7 @@ export async function searchCategoryNews({
   size = 10,
 }: SearchCategoryNewsParam & SearchCategoryNewsSearchParam) {
   const searchCategoryNewsResponse = await axiosInstance.get<SearchCategoryNewsResponse>(
-    `/api/news/category/${categoryId}`,
-    {
-      params: {
-        page,
-        size,
-      },
-    } as SearchCategoryNewsRequestConfig,
+    `/api/news/category/${categoryId}?page=${page}&size=${size}`,
   );
 
   return searchCategoryNewsResponse;
@@ -131,10 +213,10 @@ export async function searchKeywordNews({ keyword, page = 0, size = 10 }: Search
  *
  * `year` 년도 [**number**] - YYYY
  *
- * `month` 월 [**number**] - D
+ * `month` 월 [**number**] - M
  */
 export async function getNewsHistory({ year, month }: GetNewsHistorySearchParam) {
-  const getNewsHistoryResponse = await axiosInstance.get<GetNewsHistroyResponse>('/api/history', {
+  const getNewsHistoryResponse = await axiosInstance.get<GetNewsHistroyResponse>('/api/auth/history', {
     params: {
       year,
       month,
@@ -142,6 +224,19 @@ export async function getNewsHistory({ year, month }: GetNewsHistorySearchParam)
   } as GetNewsHistoryRequestConfig);
 
   return getNewsHistoryResponse;
+}
+
+/**
+ * 뉴스아이디로 뉴스 데이터 조회 API (GET) - Moya
+ *
+ * `id` 뉴스 아이디 [**number**]
+ */
+export async function getNewsById({ id }: GetNewsByIdSearchParam) {
+  const getNewsByIdResponse = await axios.get<GetNewsByIdResponse>(
+    `https://api.moya.ai/globalnews?id=${id}&token=${process.env.NEXT_PUBLIC_TOKEN}`,
+  );
+
+  return getNewsByIdResponse;
 }
 
 /**

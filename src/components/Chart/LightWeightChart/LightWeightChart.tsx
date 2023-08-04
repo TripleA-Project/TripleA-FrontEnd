@@ -42,7 +42,7 @@ function LightWeightChart(
   useImperativeHandle(ref, () => chartAPIRef.current!);
 
   return (
-    <div ref={chartContainerRef} className="relative">
+    <div ref={chartContainerRef} className="chart_container relative">
       {container ? (
         <>
           <LightWeightChartContainer

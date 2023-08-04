@@ -10,7 +10,7 @@ interface Bookmark {
 
 interface History {
   count: number;
-  news: Omit<News, 'deleted'>[];
+  news: Pick<News, 'id'>[];
 }
 
 export interface NewsHistory {

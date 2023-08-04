@@ -1,9 +1,7 @@
 import { type Metadata } from 'next';
-import { Chart as AppChart } from '@/components/Chart';
-import { type ResampleFrequency } from '@/interfaces/Dto/Stock';
-import { searchSymbolNews } from '@/service/news';
-import Header from '@/components/Header';
+import ChartSymbolPage from '@/components/Chart/ChartSymbolPage';
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 interface PageProps {
@@ -17,7 +15,7 @@ interface PageProps {
 }
 
 const resampleMeta = {
-  day: '일별',
+  daily: '일별',
   weekly: '주별',
   monthly: '월별',
   annually: '년별',
@@ -25,31 +23,18 @@ const resampleMeta = {
 
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
   const symbolName = searchParams?.name ?? '';
-  const resample = searchParams?.resample ?? 'day';
+  const resample = searchParams?.resample ?? 'daily';
 
-  const resampleTitle = resampleMeta[resample as keyof typeof resampleMeta] ?? resampleMeta['day'];
+  const resampleTitle = resampleMeta[resample as keyof typeof resampleMeta] ?? resampleMeta['daily'];
 
   return {
-    title: `${symbolName} 심볼 차트 (${resampleTitle})`,
+    title: `Triple A | ${symbolName} 심볼 차트 (${resampleTitle})`,
     description: `Triple A ${symbolName} 심볼 차트`,
   };
 }
 
 async function SymbolChart({ searchParams }: PageProps) {
-  const symbol = searchParams?.name ?? '';
-  const resample: ResampleFrequency =
-    searchParams?.resample && Object.keys(resampleMeta).includes(searchParams.resample)
-      ? (searchParams.resample as any)
-      : 'daily';
-
-  const newsResponse = await searchSymbolNews({ symbol, page: 0, size: 3 });
-
-  return (
-    <>
-      <Header leftIcon={'left'} title={searchParams?.name} rightIcon={'searchshort'} />
-      <AppChart symbol={symbol} resample={resample} data={{ news: newsResponse.data }} />;
-    </>
-  );
+  return <ChartSymbolPage />;
 }
 
 export default SymbolChart;

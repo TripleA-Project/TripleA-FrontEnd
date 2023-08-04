@@ -9,16 +9,15 @@ export interface NewsDetailParam {
   id: number;
 }
 
-interface NewsDetailSymbol extends Omit<Symbol, 'symbolId' | 'symbol'> {
+export interface NewsDetailSymbol extends Omit<Symbol, 'symbolId' | 'symbol'> {
   name: string;
 }
 
 interface NewsDetailTranlateResult {
   title: string;
-  description: string;
+  description: string | null;
   summary: string;
   content: string;
-  keyword: [string, string, string];
 }
 
 interface UserPayload {
@@ -29,12 +28,13 @@ interface UserPayload {
   };
 }
 
-interface NewsDetailPayload extends Omit<NewsData, 'symbol' | 'logo' | 'description' | 'title'> {
+export interface NewsDetailPayload extends Omit<NewsData, 'symbol' | 'logo' | 'description' | 'title'> {
   symbol: NewsDetailSymbol;
   category: Category;
   url: string;
   eng: NewsDetailTranlateResult;
   kor: NewsDetailTranlateResult;
+  keyword: string[];
 }
 
 export interface NewsDetailResponse extends APIResponse<UserPayload & NewsDetailPayload> {}

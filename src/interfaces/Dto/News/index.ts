@@ -1,4 +1,5 @@
 export * from './Common';
+export * from './GetNewsByIdDto';
 export * from './LatestNewsDto';
 export * from './NewsDetailDto';
 export * from './SearchSymbolNewsDto';

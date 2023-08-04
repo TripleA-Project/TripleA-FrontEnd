@@ -58,7 +58,7 @@ export async function getSymbolChartData({
   };
 }
 
-function createChartData(payload?: GetSymbolStockPayload): Omit<GetChartDataPayload, 'membership'> | null {
+export function createChartData(payload?: GetSymbolStockPayload): Omit<GetChartDataPayload, 'membership'> | null {
   const lineData: LineData[] = [];
   const buzzData: HistogramData[] = [];
   const sentimentData: SentimentData[] = [];

@@ -18,8 +18,10 @@ export interface Symbol {
   symbolId: number;
   symbol: string;
   companyName?: string;
-  sector?: string;
+  sector: string | null;
   logo?: string;
   marketType: string;
-  price: { today: SymbolPrice , yesterday: SymbolPrice };
+  price: { today: SymbolPrice; yesterday: SymbolPrice };
 }
+
+export interface SearchedSymbol extends Omit<Symbol, 'price'> {}

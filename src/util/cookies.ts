@@ -30,7 +30,7 @@ export async function setCookie(
     value,
     ...(options?.maxAge !== undefined && { maxAge: options?.maxAge }),
     ...(options?.expires !== undefined && { expires: options?.expires }),
-    ...(options?.domain !== undefined && { path: options?.domain }),
+    ...(options?.domain !== undefined && { domain: options?.domain }),
     ...(options?.path !== undefined && { path: options?.path }),
     ...(options?.httpOnly !== undefined && { httpOnly: options?.httpOnly }),
   } as SetCookieOption);

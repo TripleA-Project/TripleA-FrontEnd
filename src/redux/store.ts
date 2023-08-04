@@ -1,11 +1,14 @@
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
-import counterReducer from './slice/rootSlice';
-import cardReducer from './slice/cardSlice'
-import searchReducer from './slice/searchSlice'; 
+import searchReducer from './slice/searchSlice';
+import symbolReducer from './slice/symbolSlice';
+import categoryReducer from './slice/categorySlice';
+import newsListFilterReducer from './slice/newsListFilterSlice';
+
 const rootReducer = combineReducers({
-  counter: counterReducer,
-  card: cardReducer,
   search: searchReducer,
+  symbol: symbolReducer,
+  category: categoryReducer,
+  newsListFilter: newsListFilterReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

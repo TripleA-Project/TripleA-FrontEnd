@@ -14,4 +14,6 @@ export function getSentimentGrade(sentiment: number) {
   if (Neutral.more <= sentiment) return 'Neutral';
   if (Negative.more <= sentiment) return 'Negative';
   if (ExtremeNegative.more <= sentiment) return 'ExtremeNegative';
+
+  return 'Neutral';
 }

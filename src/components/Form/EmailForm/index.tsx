@@ -1,61 +1,56 @@
 'use client';
 
-import { SubmitErrorHandler, SubmitHandler, useFormContext } from 'react-hook-form';
-
-import { UseStepFormContext } from '../StepForm';
 import Button from '@/components/Button/Button';
-
-import { FormData } from '@/interfaces/FormData';
-import { verifyEmail } from '@/service/auth';
+import { useFormContext } from 'react-hook-form';
 import { validateEmail } from '@/util/validate';
+import { UseStepFormContext } from '../StepForm';
+import { verifyEmailSend } from '@/service/auth';
+import FormTitle from '../FormTitle';
+import ResetValueInput from '@/components/Input/StepFormInput/ResetValueInput';
+import { AxiosError } from 'axios';
+import { APIResponse } from '@/interfaces/Dto/Core';
 
-export interface EmailFormData {
+export interface EmailForm {
   email: string;
-  code: string;
-  emailKey: string;
 }
 
-export function EmailForm() {
-  const { register, handleSubmit, done, prev, getValues, setValue } =
-    useFormContext() as UseStepFormContext<EmailFormData>;
+function SignupForm() {
+  const {
+    register,
+    handleSubmit,
+    setError,
+    done,
+    formState: { errors, isValid, isSubmitting },
+  } = useFormContext<EmailForm>() as UseStepFormContext<EmailForm>;
 
-  const values = getValues() as FormData;
-  console.log('초기emailform: ', { values });
+  const title = `
+    로그인에 사용할
+    이메일을 입력해주세요 
+  `;
 
-  const onValid: SubmitHandler<EmailFormData> = async (data) => {
-    // if(!values.email) return
+  const onSubmit = async ({ email }: EmailForm) => {
     try {
-      const { email, code } = data;
-      const response = await verifyEmail({ email: data.email as string, code: data.code });
-
-      setValue('emailKey', response.data.data!);
+      await verifyEmailSend({ email });
 
       done();
     } catch (error) {
-      console.log(error);
+      const { response } = error as AxiosError<APIResponse<{ key: string; value: string }>>;
+
+      const { data: errorPayload, msg } = response!.data;
+
+      setError('email', { type: 'validate', message: errorPayload ? errorPayload.value : msg });
     }
   };
 
-  const onInvalid: SubmitErrorHandler<EmailFormData> = (errors) => {
-    console.log({ errors });
-  };
-
   return (
-    <div>
-      <form className="pt-[54px]" onSubmit={handleSubmit(onValid, onInvalid)}>
-        <div className="flex pt-[25px] text-lg font-semibold">
-          인증코드를
-          <br />
-          입력해주세요.
-        </div>
-        <input
-          defaultValue={values.email}
-          placeholder="입력된 이메일"
-          disabled
-          id="email"
-          className="mx-auto mt-6 flex h-[46px] w-full rounded-lg border-[1px] border-solid pl-4 placeholder-[#DBDEE1] "
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <FormTitle title={title} />
+      <div className="mb-11">
+        <ResetValueInput
+          type="email"
+          placeholder="이메일 입력"
           {...register('email', {
-            required: true,
+            required: '이메일을 입력해주세요',
             validate: (value) => {
               const { result } = validateEmail(value);
 
@@ -65,35 +60,19 @@ export function EmailForm() {
             },
           })}
         />
-        <div>
-          <input
-            placeholder="인증코드"
-            id="code"
-            {...register('code')}
-            className="mx-auto mt-[25px] flex h-[46px] w-full rounded-lg border-[1px] border-solid pl-4 placeholder-[#DBDEE1] "
-          />
-          <input hidden {...register('emailKey')} />
-
-          <Button
-            type="submit"
-            className="mx-auto mt-[45px] box-border font-bold "
-            sizeTheme="fullWidth"
-            bgColorTheme="lightgray"
-            textColorTheme="white"
-          >
-            이메일 인증하기
-          </Button>
-          <div className="flex justify-end">
-            <button
-              className="mt-[11px] flex h-[20px] w-[80px] justify-end border-b border-black text-base"
-              type="button"
-              onClick={() => {}}
-            >
-              <span className="ml-auto">코드재발송</span>
-            </button>
-          </div>
-        </div>
-      </form>
-    </div>
+        {errors.email ? <span className="mt-2 block text-sm text-error">{errors.email.message}</span> : null}
+      </div>
+      <Button
+        type="submit"
+        disabled={!isValid || (isValid && isSubmitting)}
+        className={`font-bold disabled:!cursor-default disabled:!bg-[#DBDEE1]`}
+        sizeTheme="fullWidth"
+        bgColorTheme={'orange'}
+        textColorTheme="white"
+      >
+        {isSubmitting ? '인증코드 전송 요청 중' : '인증코드 전송하기'}
+      </Button>
+    </form>
   );
 }
+export default SignupForm;

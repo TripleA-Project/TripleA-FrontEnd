@@ -1,18 +1,24 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { FieldValues, FormProvider, FormProviderProps, useForm } from 'react-hook-form';
+import { FieldValues, FormProvider, FormProviderProps, useForm, DefaultValues } from 'react-hook-form';
 import Progress from './StepFormProgress';
+import StepFormHeader from './StepFormHeader';
 
 export interface UseStepFormContext<T extends FieldValues = FieldValues> extends FormProviderProps<T> {
   isLastStep: boolean;
+  step: number;
   skip: () => void;
   done: () => void;
   prev: () => void;
 }
 
 interface StepFormProps {
+  headerType?: 'Arrow' | 'NoBarArrow';
+  headerTitle?: string;
+  headerClassName?: string;
   renderStepProgressBar?: boolean;
+  defaultValues?: any;
   children: React.ReactNode;
 }
 
@@ -81,9 +87,20 @@ interface StepFormProps {
  ```
  * @returns JSX.Element | null
  */
-const StepForm = ({ renderStepProgressBar = true, children }: StepFormProps) => {
+const StepForm = ({
+  headerType = 'Arrow',
+  headerTitle,
+  headerClassName,
+  renderStepProgressBar = true,
+  defaultValues,
+  children,
+}: StepFormProps) => {
   if (!Array.isArray(children)) throw new Error('최소 2개 이상의 폼요소가 필요합니다');
-  const methods = useForm();
+  const methods = useForm({
+    ...(defaultValues && {
+      defaultValues: { ...defaultValues } as DefaultValues<Record<keyof typeof defaultValues, string>>,
+    }),
+  });
 
   const [step, setStep] = useState(1);
   const [isComplete, setIsComplete] = useState(false);
@@ -104,7 +121,6 @@ const StepForm = ({ renderStepProgressBar = true, children }: StepFormProps) => 
 
   const prev = () => {
     setStep((prev) => {
-      console.log({ prev });
       const prevStep = prev - 1;
       return prevStep < 1 ? 1 : prevStep;
     });
@@ -123,7 +139,10 @@ const StepForm = ({ renderStepProgressBar = true, children }: StepFormProps) => 
 
   const CurrentForm = FormList[step - 1] ?? null;
 
-  const providerProps = { ...methods, isLastStep, skip, done, prev };
+  const skipable = CurrentForm ? CurrentForm.props['skipable'] : false;
+  const hide = CurrentForm ? CurrentForm.props['hideHeader'] : false;
+
+  const providerProps = { ...methods, step, isLastStep, skip, done, prev };
 
   useEffect(() => {
     if (!methods.formState.isSubmitSuccessful) return;
@@ -133,10 +152,16 @@ const StepForm = ({ renderStepProgressBar = true, children }: StepFormProps) => 
 
   return !isComplete ? (
     <FormProvider {...providerProps}>
-      <div className="relative box-border h-full">
-        {renderStepProgressBar ? <Progress value={step} min={1} max={lastStep} /> : null}
-        {CurrentForm}
-      </div>
+      <StepFormHeader
+        type={headerType}
+        title={headerTitle}
+        headerClassName={headerClassName}
+        skipable={skipable}
+        hide={hide}
+      >
+        {renderStepProgressBar ? <Progress value={step} min={1} max={lastStep} className="mt-[18px]" /> : null}
+      </StepFormHeader>
+      <div className="relative box-border h-full px-4">{CurrentForm}</div>
     </FormProvider>
   ) : null;
 };

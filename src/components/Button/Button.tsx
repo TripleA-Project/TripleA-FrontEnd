@@ -9,7 +9,6 @@ export interface ButtonProps extends Omit<React.HTMLProps<HTMLButtonElement>, 's
   bgColorTheme: 'blue' | 'gray' | 'violet' | 'orange' | 'none' | 'lightgray';
   textColorTheme: 'white' | 'black' | 'gray' | 'orange' | 'none';
   bg?: string;
-  onClick?: () => void;
 }
 
 export default function Button({

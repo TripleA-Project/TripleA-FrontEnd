@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { type HistogramData, type LineData, type Time } from 'lightweight-charts';
 import { type ResampleFrequency } from '@/interfaces/Dto/Stock';
-import { GetChartDataRequest, getSymbolChartData } from '@/service/chart';
+import { SymbolPrice } from '@/interfaces/Symbol';
 
 export const DeltaPriceType = {
   NO_CHANGE: '--',
@@ -57,15 +57,7 @@ export const getDataMinMax: <T extends LineData | HistogramData>(
   return { min: { target: minTarget, value: minValue }, max: { target: maxTarget, value: maxValue } };
 };
 
-export async function getPriceInfo({
-  symbol,
-  startDate,
-  endDate,
-}: Omit<GetChartDataRequest, 'resampleFreq'>): Promise<PriceInfo> {
-  const res = await getSymbolChartData({ symbol, startDate, endDate, resampleFreq: 'daily' });
-
-  if (!res.payload?.lineData) return { delta: { type: 'NO_CHANGE', value: 0, percent: 0 }, close: 0 };
-
+export function getPriceInfo({ today, yesterday }: { today: SymbolPrice; yesterday: SymbolPrice }): PriceInfo {
   function getDeltaType(delta: number): keyof typeof DeltaPriceType {
     if (delta === 0) return 'NO_CHANGE';
     if (delta > 0) return 'PLUS';
@@ -74,10 +66,8 @@ export async function getPriceInfo({
     return 'NO_CHANGE';
   }
 
-  const dataLength = res.payload.lineData.length;
-
-  const todayPrice = res.payload.lineData[dataLength - 1].value;
-  const yesterdayPrice = res.payload.lineData[dataLength - 2].value;
+  const todayPrice = today.close;
+  const yesterdayPrice = yesterday.close;
 
   const deltaPrice = Number((todayPrice - yesterdayPrice).toFixed(2));
 
