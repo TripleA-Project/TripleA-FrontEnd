@@ -2,6 +2,9 @@ import { axiosInstance } from './axios';
 import {
   type GetRecommandSymbolResponse,
   type GetLikeSymbolResponse,
+  type GetSymbolRequestConfig,
+  type GetSymbolResponse,
+  type GetSymbolSearchParam,
   type SearchSymbolSearchParam,
   type SearchSymbolResponse,
   type SearchSymbolRequestConfig,
@@ -31,13 +34,23 @@ export async function getLikeSymbol() {
   return getLikeSymbolResponse;
 }
 
+export async function getSymbol({ symbol }: GetSymbolSearchParam) {
+  const getSymbolResponse = await axiosInstance.get<GetSymbolResponse>('/api/symbol', {
+    params: {
+      symbol,
+    },
+  } as GetSymbolRequestConfig);
+
+  return getSymbolResponse;
+}
+
 /**
  * 심볼 검색 API (GET)
  *
  * `symbol` 검색할 심볼 문자열 [**string**]
  */
 export async function searchSymbol({ symbol }: SearchSymbolSearchParam) {
-  const searchSymbolResponse = await axiosInstance.get<SearchSymbolResponse>('/api/symbol', {
+  const searchSymbolResponse = await axiosInstance.get<SearchSymbolResponse>('/api/symbol/search', {
     params: {
       symbol,
     },
@@ -47,12 +60,12 @@ export async function searchSymbol({ symbol }: SearchSymbolSearchParam) {
 }
 
 /**
- * 관심 심볼 생성 API (POST)
+ * 관심 심볼 생성 API (GET)
  *
  * `id` 심볼 id [**number**]
  */
-export async function likeSymbol({ id }: LikeSymbolParam) {
-  const likeSymbolResponse = await axiosInstance.post<LikeSymbolResponse>(`/api/symbol/${id}`);
+export async function likeSymbol({ symbol }: LikeSymbolParam) {
+  const likeSymbolResponse = await axiosInstance.get<LikeSymbolResponse>(`/api/auth/symbol?symbol=${symbol}`);
 
   return likeSymbolResponse;
 }
@@ -63,7 +76,7 @@ export async function likeSymbol({ id }: LikeSymbolParam) {
  * `id` 심볼 id [**number**]
  */
 export async function disLikeSymbol({ id }: DisLikeSymbolParam) {
-  const disLikeSymbolResponse = await axiosInstance.delete<DisLikeSymbolResponse>(`/api/symbol/${id}`);
+  const disLikeSymbolResponse = await axiosInstance.delete<DisLikeSymbolResponse>(`/api/auth/symbol/${id}`);
 
   return disLikeSymbolResponse;
 }

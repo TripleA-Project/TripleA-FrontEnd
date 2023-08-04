@@ -1,7 +1,6 @@
 import { axiosInstance } from './axios';
 import {
   type ProfileResponse,
-  type GetUserInfoResponse,
   type MembershipWithDrawalResponse,
   type UpdateUserInfoRequest,
   type UpdateUserInfoResponse,
@@ -20,20 +19,9 @@ export async function getProfile() {
  * 회원 탈퇴 API (DELETE)
  */
 export async function membershipWithDrawal() {
-  const membershipWithDrawalResponse = await axiosInstance.delete<MembershipWithDrawalResponse>('/api/user');
+  const membershipWithDrawalResponse = await axiosInstance.delete<MembershipWithDrawalResponse>('/api/auth/user');
 
   return membershipWithDrawalResponse;
-}
-
-/**
- * 유저 정보 조회 API (GET) - 마이 페이지
- *
- * `search` 검색할 카테고리 문자열 [**string**]
- */
-export async function getUserInfo() {
-  const getUserInfoResponse = await axiosInstance.get<GetUserInfoResponse>('/api/user');
-
-  return getUserInfoResponse;
 }
 
 /**

@@ -1,61 +1,44 @@
 'use client';
 
-import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { getRecommandSymbol } from '@/service/symbol';
 import { useQuery } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
-import ChartNotify from '../ChartNotify';
+import { ToastContainer } from 'react-toastify';
+import { SymbolLikeCardList, SymbolLikeCardListLoading } from '../SymbolTabs/SymbolCard';
 import NoRecommandSymbol from './NoRecommandSymbol';
 
 function RecommandSymbol() {
-  const {
-    data: recommandSymbolResponse,
-    status,
-    error,
-  } = useQuery(['likeSymbol'], () => getRecommandSymbol(), {
-    refetchOnWindowFocus: false,
-    retry: 0,
-  });
-
-  const [resultState, setResultState] = useState<{ loginRequired: boolean; isEmpty: boolean }>({
-    loginRequired: false,
-    isEmpty: false,
-  });
-
-  useEffect(() => {
-    if (!error) return;
-
-    if ((error as AxiosError).response?.status === 401) {
-      setResultState((prev) => ({ ...prev, loginRequired: true }));
-    }
-  }, [error]);
-
-  useLayoutEffect(() => {
-    if (status === 'success') {
-      const payload = recommandSymbolResponse.data.data;
-
-      if (!payload || payload.length === 0) {
-        setResultState((prev) => ({ ...prev, isEmpty: true }));
-      }
-    }
-  }, [status]); /* eslint-disable-line */
+  const { data: recommandSymbolPayload, status: recommandSymbolStatus } = useQuery(
+    ['symbol', 'recommand'],
+    () => getRecommandSymbol(),
+    {
+      retry: false,
+      refetchOnWindowFocus: false,
+      select(response) {
+        return response.data;
+      },
+    },
+  );
 
   return (
-    <div>
-      {resultState.loginRequired ? (
-        <ChartNotify
-          title="로그인이 필요합니다"
-          content="로그인 후 이용해주세요"
-          buttonText="로그인하러 가기"
-          linkTarget="/login"
-        />
-      ) : null}
-      {resultState.isEmpty ? (
-        <NoRecommandSymbol />
-      ) : status === 'success' && !resultState.isEmpty ? (
-        <div>관심 심볼</div>
-      ) : null}
-    </div>
+    <>
+      <div className="mb-3 mt-5 box-border space-y-4">
+        {recommandSymbolStatus !== 'success' ? (
+          <SymbolLikeCardListLoading />
+        ) : recommandSymbolPayload.data && recommandSymbolPayload.data.length ? (
+          <SymbolLikeCardList symbols={recommandSymbolPayload.data} />
+        ) : (
+          <NoRecommandSymbol />
+        )}
+      </div>
+      <ToastContainer
+        position="bottom-center"
+        autoClose={3000}
+        hideProgressBar
+        newestOnTop={true}
+        pauseOnFocusLoss={false}
+        pauseOnHover={false}
+      />
+    </>
   );
 }
 

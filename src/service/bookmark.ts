@@ -12,7 +12,7 @@ import {
  * `id` 뉴스 id [**number**]
  */
 export async function addNewsBookmark({ id }: AddNewsBookmarkParam) {
-  const addNewsBookmarkResponse = await axiosInstance.post<AddNewsBookmarkResponse>(`/api/news/${id}`);
+  const addNewsBookmarkResponse = await axiosInstance.post<AddNewsBookmarkResponse>(`/api/auth/news/${id}`);
 
   return addNewsBookmarkResponse;
 }
@@ -23,7 +23,7 @@ export async function addNewsBookmark({ id }: AddNewsBookmarkParam) {
  * `id` 뉴스 id [**number**]
  */
 export async function deleteNewsBookmark({ id }: DeleteNewsBookmarkParam) {
-  const deleteNewsBookmarkResponse = await axiosInstance.delete<DeleteNewsBookmarkResponse>(`/api/news/${id}`);
+  const deleteNewsBookmarkResponse = await axiosInstance.delete<DeleteNewsBookmarkResponse>(`/api/auth/news/${id}`);
 
   return deleteNewsBookmarkResponse;
 }
