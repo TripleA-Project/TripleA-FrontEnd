@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { axiosInstance } from './axios';
 import {
   type GetAllCategoryResponse,
@@ -26,11 +27,7 @@ export async function getAllCategory() {
  * `search` 검색할 카테고리 문자열 [**string**]
  */
 export async function searchCategory({ search }: SearchCategorySearchParam) {
-  const searchCategoryResponse = await axiosInstance.get<SearchCategoryResponse>('/api/category', {
-    params: {
-      search,
-    },
-  } as SearchCategoryRequestConfig);
+  const searchCategoryResponse = await axiosInstance.get<SearchCategoryResponse>(`/api/category?search=${search}`);
 
   return searchCategoryResponse;
 }
@@ -39,7 +36,7 @@ export async function searchCategory({ search }: SearchCategorySearchParam) {
  * 관심 카테고리 조회 API (GET)
  */
 export async function getLikeCategory() {
-  const getLikeCategoryResponse = await axiosInstance.get<GetLikeCategoryResponse>('/api/category/like');
+  const getLikeCategoryResponse = await axiosInstance.get<GetLikeCategoryResponse>('/api/auth/category/like');
 
   return getLikeCategoryResponse;
 }
@@ -50,7 +47,7 @@ export async function getLikeCategory() {
  * `id` 카테고리 id [**number**]
  */
 export async function likeCategory({ id }: LikeCategoryParam) {
-  const likeCategoryResponse = await axiosInstance.post<LikeCategoryResponse>(`/api/category/${id}`);
+  const likeCategoryResponse = await axiosInstance.post<LikeCategoryResponse>(`/api/auth/category/${id}`);
 
   return likeCategoryResponse;
 }
@@ -61,7 +58,7 @@ export async function likeCategory({ id }: LikeCategoryParam) {
  * `id` 카테고리 id [**number**]
  */
 export async function disLikeCategory({ id }: DisLikeCategoryParam) {
-  const disLikeCategoryResponse = await axiosInstance.delete<DisLikeCategoryResponse>(`/api/category/${id}`);
+  const disLikeCategoryResponse = await axiosInstance.delete<DisLikeCategoryResponse>(`/api/auth/category/${id}`);
 
   return disLikeCategoryResponse;
 }

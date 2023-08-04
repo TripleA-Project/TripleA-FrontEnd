@@ -3,7 +3,7 @@ import { successSubscribe } from '@/service/subscribe';
 import { HttpStatusCode } from 'axios';
 import { redirect } from 'next/navigation';
 
-export const revalidate = 0;
+export const dynamic = 'force-dynamic';
 
 interface PageProps {
   params: {
@@ -18,7 +18,7 @@ interface PageProps {
 }
 
 export const metadata: Metadata = {
-  title: '결제',
+  title: 'Triple A | 결제',
   description: '결제',
 };
 
@@ -26,13 +26,8 @@ async function Payment({ searchParams }: PageProps) {
   const orderCode = searchParams ? searchParams['order_code'] : '';
   const status = searchParams ? searchParams['status'] : '';
 
-  console.log('orderCode: ', orderCode);
-  console.log('params: ', { searchParams });
-
   if (status === 'success') {
     const res = await successSubscribe({ order_code: orderCode });
-
-    console.log('payment: ', res);
 
     if (res.status === HttpStatusCode.Ok) {
       return redirect('/');

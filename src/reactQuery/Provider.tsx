@@ -20,7 +20,7 @@ function ReactQueryProvider({ options, children }: ReactQueryProviderProps) {
   return (
     <QueryClientProvider client={client}>
       {children}
-      <ReactQueryDevtools initialIsOpen={false} />
+      {/* <ReactQueryDevtools initialIsOpen={false} /> */}
     </QueryClientProvider>
   );
 }

@@ -7,11 +7,32 @@ module.exports = {
   ],
   theme: {
     extend: {
+      screens: {
+        card: { max: '500px' },
+        mobile: { max: '390px' },
+        tablet: { min: '390px', max: '767px' },
+        pc: '768px',
+      },
+      spacing: {
+        page: '52px 0 63px',
+      },
       backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+        checked: "url('/checked.png')",
+        notChecked: "url('/notChecked.png')",
+        circleChecked: "url('/CircleChecked.svg')",
+        circleNotChecked: "url('/CircleNotChecked.svg')",
+        blackCircle: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='2' fill='%23000'/%3e%3c/svg%3e")`,
+      },
+      colors: {
+        error: '#F60606',
+      },
+      animation: {
+        clock: 'rotate-clock 4s forwards infinite',
+        clockTop: 'clock-top-fill 4s linear forwards infinite',
+        clockBottom: 'clock-bottom-fill 4s linear forwards infinite',
+        lineChartLoading: 'line-chart-loading 4s infinite',
       },
     },
   },
-  plugins: [],
+  plugins: [require('tailwind-scrollbar')({ nocompatible: true })],
 };

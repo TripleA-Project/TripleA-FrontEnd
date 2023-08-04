@@ -1,6 +1,30 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url('animate.css');
+@import url('react-toastify/dist/ReactToastify.css');
+
+@layer components {
+  .input {
+    @apply box-border flex h-[46px] w-full items-center justify-center rounded-lg border border-[#DBDEE1] bg-white px-[18px] py-3 text-sm font-semibold text-black outline-none placeholder:font-normal placeholder:text-[#DBDEE1] [&:not(:placeholder-shown)]:border-black;
+  }
+
+  .inner {
+    @apply mx-auto box-border w-full max-w-screen-pc px-4 mobile:min-w-[390px];
+  }
+
+  .fixed_inner {
+    @apply left-0 right-0 mx-auto box-border w-full max-w-screen-pc px-4 mobile:min-w-[390px];
+  }
+}
+
+.animate__animated.animate__fadeInUp {
+  --animate-duration: 200ms;
+}
+
+.animate__animated.animate__fadeOutDown {
+  --animate-duration: 200ms;
+}
 
 .skeleton_loading * {
   background: linear-gradient(120deg, #e5e5e5 30%, #f0f0f0 38%, #f0f0f0 40%, #e5e5e5 48%);
@@ -12,5 +36,49 @@
 @keyframes load {
   100% {
     background-position: -100% 0;
+  }
+}
+
+@keyframes line-chart-loading {
+  from {
+    stroke-dasharray: 676px;
+    stroke-dashoffset: 676px;
+  }
+  to {
+    stroke-dasharray: 676px;
+    stroke-dashoffset: 0px;
+  }
+}
+
+@keyframes clock-top-fill {
+  to {
+    height: 80px;
+    scale: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes clock-bottom-fill {
+  from {
+    scale: 1 0;
+  }
+  70% {
+    scale: 1 0.4;
+  }
+  to {
+    scale: 1 0.5;
+    opacity: 0;
+  }
+}
+
+@keyframes rotate-clock {
+  from {
+    transform: rotate(0deg);
+  }
+  90% {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(180deg);
   }
 }

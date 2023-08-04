@@ -7,6 +7,8 @@ import {
   type ChartOptions,
   type MouseEventParams,
   LogicalRange,
+  LineData,
+  ISeriesApi,
 } from 'lightweight-charts';
 import { ChartContext, type ChartContextState } from '@/context/ChartContext';
 import ChartTimeMarker, { type TimeMarkerControl } from '../ChartTimeMarker';

@@ -21,9 +21,11 @@ export function validateEmail(email: string) {
  *
  * [조건]
  *
- * 1. 6자 이상 16자 이하의 문자열
+ * 1. 8자 이상 16자 이하의 문자열
  *
- * 2. 영문 대소문자, 0-9 숫자, 허용 특수문자: `.` , `-` 의 조합
+ * 2. 영문 대소문자, 0-9 숫자, 허용 특수문자의 조합
+ *
+ * 3. 특수문자는 최소1자 이상 포함되어야 됨
  */
 export function validatePassword(password: string) {
   //password 는 8~16자 이내, 영문(대소문자), 숫자, 특수문자(!@#$%^&*-_=+{};:,<.>) 각 1개 이상 포함하여야 함
@@ -34,12 +36,6 @@ export function validatePassword(password: string) {
   const passwordLengthRegExp = /^.{8,16}$/;
   const notAllowedCharRegExp = /[^a-zA-Z0-9\!\@\#\$\%\^\&\*\-\_\=\+\{\}\;\:\,\<\.\>]/g;
   const isContainSpecialRegExp = /[\!@\#\$\%\^\&\*\-\_\=\+\{\}\;\:\,\<\.\>]/g;
-
-  console.log({
-    passwordLengthRegExp: passwordLengthRegExp.test(password),
-    notAllowedCharRegExp: notAllowedCharRegExp.test(password),
-    isContainSpecialRegExp: isContainSpecialRegExp.test(password),
-  });
 
   if (!passwordLengthRegExp.test(password)) return { result: false, type: 'passwordLength' } as const;
   if (notAllowedCharRegExp.test(password)) return { result: false, type: 'notAllowedChar' } as const;
