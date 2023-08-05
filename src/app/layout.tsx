@@ -27,6 +27,7 @@ export const metadata: Metadata = {
       url: '/bgLogo.png',
     },
   },
+  metadataBase: new URL('https://triple-a-front-mh2nl26c1-ryan-thelion.vercel.app'),
 };
 
 export default function RootLayout({ children }: RootLayoutProps) {

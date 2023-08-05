@@ -40,13 +40,11 @@ export async function generateMetadata({ params, searchParams }: NewsDetailPageP
   }
 
   return {
-    title: `뉴스 상세`,
+    title: `Triple A | 뉴스 상세`,
     description: `Triple A 뉴스 상세 페이지`,
     openGraph: {
       title: status !== HttpStatusCode.Ok ? 'Triple A 뉴스 상세' : data.title,
-      url: `http://localhost:3000/detail/${params.id}${
-        searchParams.symbol ? `?symbol=${searchParams.symbol.toUpperCase()}` : ''
-      }`,
+      url: `/detail/${params.id}${searchParams.symbol ? `?symbol=${searchParams.symbol.toUpperCase()}` : ''}`,
       images: {
         url: thumbnailURL,
       },
