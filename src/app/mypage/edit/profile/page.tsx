@@ -6,6 +6,7 @@ import { getProfile } from '@/service/user';
 import { type ProfilePayload, type ProfileResponse } from '@/interfaces/Dto/User';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: 'Triple A | 내 정보 수정',

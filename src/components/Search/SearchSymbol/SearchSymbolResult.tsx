@@ -17,10 +17,6 @@ function SearchSymbolResultLoading() {
 }
 
 function SearchSymbolResult({ symbols, loading, onDispatch }: SearchSymbolResultProps) {
-  if (loading) {
-    return <SearchSymbolResultLoading />;
-  }
-
   if (!symbols?.length) {
     return (
       <div className="mb-8 mt-[60px]">

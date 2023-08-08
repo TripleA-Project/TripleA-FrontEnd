@@ -21,11 +21,15 @@ function YearSelect({ onYearselect, disabled = false }: MounthSelectProps) {
   useEffect(() => {
     if (!open) return;
 
-    const targetMonthElement = document.querySelector(`button[name="year_select-${year}"]`);
+    const targetYearElement = document.querySelector(`button[name="year_select-${year}"]`) as HTMLButtonElement | null;
 
-    if (!targetMonthElement) return;
+    if (!targetYearElement) return;
 
-    targetMonthElement.scrollIntoView({ behavior: 'smooth' });
+    const parent = targetYearElement.parentElement;
+
+    if (!parent) return;
+
+    parent.scroll({ top: targetYearElement.offsetTop + 32, behavior: 'smooth' });
   }, [open]); /* eslint-disable-line */
 
   return (

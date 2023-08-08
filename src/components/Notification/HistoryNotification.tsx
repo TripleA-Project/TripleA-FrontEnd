@@ -27,12 +27,7 @@ function HistoryNotification({
       onClose={onClose}
       closeOnClick={closeOnClick}
     >
-      <div
-        className="flex flex-col items-center justify-center p-4"
-        style={{
-          height: `calc(100vh - ${dimHeight}px)`,
-        }}
-      >
+      <div className="flex flex-col items-center justify-center p-4">
         <div className="w-[288px] rounded-[10px] bg-white p-[22px] shadow-[0_1px_15px_rgba(90,90,90,0.2)]">
           <div className="flex flex-col items-center">
             <NotificationIcons.VeryDissatisfied className="text-4xl" />

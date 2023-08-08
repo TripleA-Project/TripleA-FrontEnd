@@ -31,7 +31,7 @@ export async function generateMetadata({ params, searchParams }: NewsDetailPageP
 
   let thumbnailURL = '/bgLogo.png';
 
-  if (data.thumbnail && data.thumbnail !== '') {
+  if (data.thumbnail && data.thumbnail !== '' && data.thumbnail !== 'null') {
     const { status: thumbnailStatus } = await axios.get(data.thumbnail);
 
     if (thumbnailStatus === HttpStatusCode.Ok) {
@@ -39,16 +39,28 @@ export async function generateMetadata({ params, searchParams }: NewsDetailPageP
     }
   }
 
+  const title = status !== HttpStatusCode.Ok ? 'Triple A 뉴스 상세' : data.title;
+  const siteUrl = `/detail/${params.id}${searchParams.symbol ? `?symbol=${searchParams.symbol.toUpperCase()}` : ''}`;
+  const newsDescription = data.description ?? 'Triple A 뉴스 상세 페이지';
+
   return {
     title: `Triple A | 뉴스 상세`,
     description: `Triple A 뉴스 상세 페이지`,
     openGraph: {
-      title: status !== HttpStatusCode.Ok ? 'Triple A 뉴스 상세' : data.title,
-      url: `/detail/${params.id}${searchParams.symbol ? `?symbol=${searchParams.symbol.toUpperCase()}` : ''}`,
+      title,
+      url: siteUrl,
       images: {
         url: thumbnailURL,
       },
-      description: data.description ?? 'Triple A 뉴스 상세 페이지',
+      description: newsDescription,
+    },
+    twitter: {
+      title,
+      site: siteUrl,
+      images: {
+        url: thumbnailURL,
+      },
+      description: newsDescription,
     },
   };
 }

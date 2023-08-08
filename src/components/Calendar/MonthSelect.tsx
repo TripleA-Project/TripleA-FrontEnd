@@ -38,11 +38,15 @@ function MonthSelect({ onMonthselect, disabled = false }: MounthSelectProps) {
   useEffect(() => {
     if (!open) return;
 
-    const targetMonthElement = document.querySelector(`button[name="${month.label}"]`);
+    const targetMonthElement = document.querySelector(`button[name="${month.label}"]`) as HTMLButtonElement | null;
 
     if (!targetMonthElement) return;
 
-    targetMonthElement.scrollIntoView({ behavior: 'smooth' });
+    const parent = targetMonthElement.parentElement;
+
+    if (!parent) return;
+
+    parent.scroll({ top: targetMonthElement.offsetTop + 32, behavior: 'smooth' });
   }, [open]); /* eslint-disable-line */
 
   return (

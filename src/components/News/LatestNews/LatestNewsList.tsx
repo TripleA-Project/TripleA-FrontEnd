@@ -6,6 +6,7 @@ import { type NewsData } from '@/interfaces/NewsData';
 interface LatestNewsListProps {
   newsList: NewsData[];
   view: NewsView;
+  onBookmark?: (newsId: number) => void;
 }
 
 interface LoadingProps {
@@ -22,8 +23,12 @@ export function LatestNewsListLoading({ view, listLength = 10, gridItemLength = 
   );
 }
 
-function LatestNewsList({ newsList, view }: LatestNewsListProps) {
-  return view === 'box' ? <NewsList newsList={newsList} /> : <NewsGridList newsList={newsList} />;
+function LatestNewsList({ newsList, view, onBookmark }: LatestNewsListProps) {
+  return view === 'box' ? (
+    <NewsList newsList={newsList} onBookmark={onBookmark} />
+  ) : (
+    <NewsGridList newsList={newsList} />
+  );
 }
 
 export default LatestNewsList;

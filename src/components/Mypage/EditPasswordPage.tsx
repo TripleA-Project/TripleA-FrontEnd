@@ -41,13 +41,16 @@ function EditPasswordPage() {
 
   return (
     <StepForm
+      headerType="NoBarArrow"
+      headerTitle="비밀번호 변경"
+      renderStepProgressBar={false}
       defaultValues={{
         email: profileResponse.data?.email ?? '',
         fullName: profileResponse.data?.fullName ?? '',
       }}
     >
-      <ValidatePasswordForm hideHeader />
-      <EditPasswordForm hideHeader />
+      <ValidatePasswordForm />
+      <EditPasswordForm />
       <CompleteEditPassword hideHeader />
     </StepForm>
   );

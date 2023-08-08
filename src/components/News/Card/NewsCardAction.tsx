@@ -12,6 +12,7 @@ import { toastNotify } from '@/util/toastNotify';
 import { type Bookmark, type NewsData } from '@/interfaces/NewsData';
 
 interface NewsCardActionProps extends Pick<NewsData, 'newsId' | 'bookmark'> {
+  symbolName?: string;
   showCount?: boolean;
   onBookmark?: (newsId: number) => void;
 }
@@ -32,7 +33,7 @@ export function NewsCardActionLoading() {
   );
 }
 
-function NewsCardAction({ newsId, bookmark, showCount, onBookmark }: NewsCardActionProps) {
+function NewsCardAction({ newsId, symbolName, bookmark, showCount, onBookmark }: NewsCardActionProps) {
   const queryClient = useQueryClient();
 
   const { status } = useAuth();
@@ -99,7 +100,7 @@ function NewsCardAction({ newsId, bookmark, showCount, onBookmark }: NewsCardAct
 
     const shareClipboardButton = new ClipboardJS(shareBtnRef.current, {
       text() {
-        return `${location.origin}/detail/${newsId}`;
+        return `${location.origin}/detail/${newsId}${symbolName ? `?symbol=${symbolName.toUpperCase()}` : ''}`;
       },
     });
 

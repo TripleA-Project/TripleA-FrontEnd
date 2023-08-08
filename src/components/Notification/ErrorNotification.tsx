@@ -23,7 +23,7 @@ function ErrorNotification({
 }: ErrorNotificationProps) {
   return (
     <NotificationPortal active={active} dimHeight={dimHeight} onClose={onClose} closeOnClick={closeOnClick}>
-      <div className="bg-white p-4">
+      <div className="rounded-tl-2xl rounded-tr-2xl bg-white p-4">
         <div className="mb-[78px] mt-14 flex flex-col items-center">
           <NotificationIcons.Error className="mb-10 text-4xl" />
           {content

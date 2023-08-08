@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import SearchHeader from '@/components/Layout/Header/SearchHeader';
 import SearchResult from '@/components/Layout/Header/SearchHeader/SearchResult';
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 interface SearchPageProps {
@@ -15,7 +16,7 @@ export async function generateMetadata({ params }: SearchPageProps): Promise<Met
   const keyword = params.keyword;
 
   return {
-    title: keyword ? `검색: ${decodeURIComponent(keyword)}` : '검색',
+    title: keyword ? `Triple A | 검색: ${decodeURIComponent(keyword)}` : 'Triple A | 검색',
     description: keyword ? `Triple A ${decodeURIComponent(keyword)} 검색 결과` : `Triple A 검색`,
   };
 }

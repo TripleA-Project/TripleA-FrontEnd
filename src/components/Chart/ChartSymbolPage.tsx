@@ -9,6 +9,10 @@ import Chart from './Chart';
 import NotFound from '../NotFound';
 import { getSymbol } from '@/service/symbol';
 import { type ResampleFrequency } from '@/interfaces/Dto/Stock';
+import { TIMEOUT_CODE } from '@/service/axios';
+import Button from '../Button/Button';
+import { NotificationIcons } from '../Notification/NotificationIcons';
+import { ServerErrorNotificationTemplate } from '@/constants/notification';
 
 function ChartSymbolPage() {
   const searchParams = useSearchParams();
@@ -35,10 +39,52 @@ function ChartSymbolPage() {
 
   if (matchedSymbolStatus === 'error') {
     if (isAxiosError(matchedSymbolError)) {
-      const { response } = matchedSymbolError;
+      const { code, response } = matchedSymbolError;
 
       if (response?.status === HttpStatusCode.Unauthorized) {
         redirect(`/login?continueURL=/chart/symbol?name=${symbolName}&resample=${resample ?? 'daily'}`);
+      }
+
+      if (code === TIMEOUT_CODE) {
+        return (
+          <div
+            className="flex h-[70vh] flex-col items-center justify-center text-center"
+            style={{
+              fontFamily:
+                'system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji',
+            }}
+          >
+            <div className="bg-white p-4">
+              <div className="mb-4 flex flex-col items-center">
+                <NotificationIcons.Error className="mb-2 text-4xl" />
+                <h3 className="mb-4 text-2xl font-bold text-[#FD954A]">
+                  {ServerErrorNotificationTemplate.Timeout.title}
+                </h3>
+                {ServerErrorNotificationTemplate.Timeout.content
+                  .trim()
+                  .split('\n')
+                  .map((text) => {
+                    return (
+                      <p key={text} className="text-[#4E525D]">
+                        {text}
+                      </p>
+                    );
+                  })}
+                <Button
+                  bgColorTheme="orange"
+                  textColorTheme="white"
+                  fullWidth
+                  className="mt-4"
+                  onClick={() => {
+                    location.reload();
+                  }}
+                >
+                  새로고침
+                </Button>
+              </div>
+            </div>
+          </div>
+        );
       }
     }
   }

@@ -4,8 +4,8 @@ import { type Category } from '@/interfaces/Category';
 import { type NewsDetailSymbol } from '@/interfaces/Dto/News';
 
 interface NewsDetailChipListProps {
-  category: Category;
-  symbol: NewsDetailSymbol;
+  category?: Category;
+  symbol?: NewsDetailSymbol;
 }
 
 export function NewsDetailChipListLoading() {
@@ -28,8 +28,8 @@ function NewsDetailChipList({ category, symbol }: NewsDetailChipListProps) {
     <section className="relative overflow-hidden">
       <div className="overflow-auto scrollbar-none">
         <div className="flex w-full gap-4">
-          <CategoryChip showHashTagIcon category={category} />
-          <SymbolChip symbol={symbol as any} showPrice />
+          {category ? <CategoryChip showHashTagIcon category={category} /> : null}
+          {symbol ? <SymbolChip symbol={symbol as any} showPrice /> : null}
           <div className="-ml-2.5 w-10 shrink-0 bg-transparent" />
         </div>
       </div>

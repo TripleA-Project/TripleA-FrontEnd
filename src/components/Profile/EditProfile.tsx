@@ -22,13 +22,15 @@ function EditProfile({ user }: EditProfilePageProps) {
   if (mode === 'edit') {
     return (
       <StepForm
+        headerType="NoBarArrow"
+        headerTitle="프로필 수정"
         renderStepProgressBar={false}
         defaultValues={{
           email: user.email,
           fullName: user.fullName,
         }}
       >
-        <ValidatePasswordForm hideHeader />
+        <ValidatePasswordForm />
         <EditProfilesForm hideHeader />
         <CompleteEditProfiles hideHeader />
       </StepForm>

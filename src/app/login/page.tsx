@@ -11,7 +11,7 @@ interface LoginPageProps {
 }
 
 export const metadata: Metadata = {
-  title: '로그인',
+  title: 'Triple A | 로그인',
   description: 'Triple A 로그인',
 };
 

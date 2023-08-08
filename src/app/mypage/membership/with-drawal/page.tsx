@@ -6,6 +6,7 @@ import { CheckWillProcess, WithDrawalForm } from '@/components/Form/MembershipWi
 import { getProfile } from '@/service/user';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: 'Triple A | 회원 탈퇴',

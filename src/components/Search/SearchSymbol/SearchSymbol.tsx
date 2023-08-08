@@ -1,18 +1,23 @@
 'use client';
 
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
+import { HttpStatusCode } from 'axios';
 import { isMobile } from 'react-device-detect';
 import { AppIcons } from '@/components/Icons';
 import { searchSymbol } from '@/service/symbol';
 import { type SearchedSymbol } from '@/interfaces/Symbol';
 
 interface SearchSymbolProps {
+  disabled?: boolean;
+  submitWrapper?: HTMLDivElement | null;
   onSearch?: (symbols: SearchedSymbol[]) => void;
 }
 
-function SearchSymbol({ onSearch }: SearchSymbolProps) {
+function SearchSymbol({ onSearch, disabled, submitWrapper }: SearchSymbolProps) {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const isSearchingRef = useRef<boolean>(false);
+
+  const headerRef = useRef<HTMLElement | null>(null);
 
   const handleSearchInputKeyDown = async (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key !== 'Enter') return;
@@ -24,23 +29,28 @@ function SearchSymbol({ onSearch }: SearchSymbolProps) {
 
   const handleFocus = () => {
     if (isMobile) {
-      document.documentElement.style.minHeight = window.screen.height + 'px';
-      document.body.style.minHeight = window.screen.height + 'px';
-      document.body.classList.add('translate-y-0', '-mt-[52px]');
+      if (headerRef.current) {
+        headerRef.current.style.position = 'sticky';
+        headerRef.current.style.marginTop = '-52px';
+      }
 
-      document.querySelector('header')!.style.position = 'sticky';
+      if (submitWrapper) {
+        submitWrapper.style.position = 'relative';
+        submitWrapper.style.bottom = '0';
+        submitWrapper.style.padding = '0';
+      }
     }
   };
 
   const handleBlur = () => {
     if (isMobile) {
-      document.body.classList.remove('-mt-[52px]');
-      document.querySelector('header')!.style.removeProperty('position');
+      headerRef.current?.style.removeProperty('position');
+      headerRef.current?.style.removeProperty('margin-top');
 
       setTimeout(() => {
-        document.documentElement.style.removeProperty('min-height');
-        document.body.style.removeProperty('min-height');
-        document.body.classList.remove('translate-y-0');
+        submitWrapper?.style.removeProperty('position');
+        submitWrapper?.style.removeProperty('bottom');
+        submitWrapper?.style.removeProperty('padding');
       }, 100);
     }
   };
@@ -52,13 +62,28 @@ function SearchSymbol({ onSearch }: SearchSymbolProps) {
 
       const { data: payload } = await searchSymbol({ symbol: searchInputRef.current?.value ?? '' });
 
-      onSearch && onSearch(payload.status !== 200 ? [] : payload.data ?? []);
+      onSearch && onSearch(payload.status !== HttpStatusCode.Ok ? [] : payload.data ?? []);
     } catch (error) {
       onSearch && onSearch([]);
     } finally {
       isSearchingRef.current = false;
     }
   };
+
+  useEffect(() => {
+    headerRef.current = document.querySelector('header');
+
+    return () => {
+      if (isMobile) {
+        headerRef.current?.style.removeProperty('sticky');
+        headerRef.current?.style.removeProperty('margin-top');
+
+        submitWrapper?.style.removeProperty('position');
+        submitWrapper?.style.removeProperty('bottom');
+        submitWrapper?.style.removeProperty('padding');
+      }
+    };
+  }, []); /* eslint-disable-line */
 
   return (
     <div>
@@ -68,7 +93,8 @@ function SearchSymbol({ onSearch }: SearchSymbolProps) {
       >
         <input
           ref={searchInputRef}
-          className={`flex-1 border-none text-sm font-semibold text-black placeholder-[#DBDEE1] outline-none placeholder:font-normal`}
+          disabled={disabled}
+          className={`flex-1 border-none bg-white text-sm font-semibold text-black placeholder-[#DBDEE1] outline-none placeholder:font-normal`}
           placeholder="종목 검색"
           onFocus={handleFocus}
           onBlur={handleBlur}

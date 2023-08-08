@@ -178,10 +178,26 @@ function AutoComplete({ keyword, isFocus }: AutoCompleteProps) {
     };
   }, [keyword, isSymbolFetchSuccess, isCategoryFetchSuccess]); /* eslint-disable-line */
 
+  const getHasNotAutoCompleteResult = (keyword?: string) => {
+    if (!keyword) return true;
+
+    if (isKor(decodeURIComponent(keyword))) {
+      return !searchCategoryResult.length;
+    }
+
+    if (isEng(decodeURIComponent(keyword))) {
+      return !searchSymbolResult.length;
+    }
+
+    return true;
+  };
+
   return isFocus ? (
     <div
       id="auto_complete"
-      className="absolute left-0 top-[calc(100%+1px)] box-border max-h-[calc(100vh-115px-30px)] w-full overflow-y-auto overflow-x-hidden border-b border-b-[#FD954A] bg-white scrollbar-thin"
+      className={`absolute left-0 top-[calc(100%+1px)] box-border max-h-[calc(100vh-115px-30px)] w-full overflow-y-auto overflow-x-hidden ${
+        getHasNotAutoCompleteResult(keyword) ? 'border-b-0' : 'border-b border-b-[#FD954A]'
+      } bg-white scrollbar-thin`}
     >
       {keyword ? (
         <>
