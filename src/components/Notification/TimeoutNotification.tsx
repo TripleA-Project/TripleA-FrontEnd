@@ -14,7 +14,7 @@ function TimeoutNotification({ active, closeOnClick, onClose, title, content }: 
   return (
     <>
       <NotificationPortal active={active} onClose={onClose} closeOnClick={closeOnClick}>
-        <div className="bg-white p-4">
+        <div className="rounded-tl-2xl rounded-tr-2xl bg-white p-4">
           <div className="mb-4 flex flex-col items-center">
             <NotificationIcons.Error className="mb-2 text-4xl" />
             <h3 className="mb-4 text-2xl font-bold text-[#FD954A]">{title}</h3>

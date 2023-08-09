@@ -9,32 +9,53 @@ interface SelectedCategoryHorizonListProps {
   categories: Category[];
   shadowEffect?: boolean;
   closeButton?: boolean;
+  loading?: boolean;
 }
 
-function SelectedCategoryHorizonList({ categories, shadowEffect, closeButton }: SelectedCategoryHorizonListProps) {
+function SelectedCategoryHorizonList({
+  categories,
+  shadowEffect,
+  closeButton,
+  loading,
+}: SelectedCategoryHorizonListProps) {
   const { dispatch, isLike } = useCategoryList();
 
-  return categories.length ? (
+  if (loading) {
+    return (
+      <div
+        className="flex items-center gap-1 overflow-scroll scrollbar-none"
+        onWheel={(e) => e.currentTarget.scroll({ left: e.currentTarget.scrollLeft + e.deltaY })}
+      >
+        {Array.from({ length: 4 }).map((_, index) => (
+          <CategoryChip key={`horizonCategory-loading-${index}`} loading />
+        ))}
+      </div>
+    );
+  }
+
+  return (
     <div
-      className="flex items-center gap-1 overflow-scroll scrollbar-none"
+      className="flex min-h-[36px] items-center gap-1 overflow-scroll scrollbar-none"
       onWheel={(e) => e.currentTarget.scroll({ left: e.currentTarget.scrollLeft + e.deltaY })}
     >
-      {categories.map((category, idx) => {
-        return (
-          <CategoryChip
-            key={`${category.categoryId}-${idx}`}
-            category={category}
-            shadowEffect={shadowEffect}
-            closeButton={closeButton}
-            selected={isLike(category)}
-            onClose={() => {
-              dispatch(unSelectCategory({ category }));
-            }}
-          />
-        );
-      })}
+      {categories.length
+        ? categories.map((category, idx) => {
+            return (
+              <CategoryChip
+                key={`${category.categoryId}-${idx}`}
+                category={category}
+                shadowEffect={shadowEffect}
+                closeButton={closeButton}
+                selected={isLike(category)}
+                onClose={() => {
+                  dispatch(unSelectCategory({ category }));
+                }}
+              />
+            );
+          })
+        : null}
     </div>
-  ) : null;
+  );
 }
 
 export default SelectedCategoryHorizonList;

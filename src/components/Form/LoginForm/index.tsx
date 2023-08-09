@@ -75,8 +75,8 @@ function LoginForm({ continueURL }: LoginFormProps) {
       }
 
       queryClient.removeQueries({ queryKey: ['auth'] });
+      queryClient.invalidateQueries(['profile']);
 
-      router.prefetch(continueURL ?? '/');
       router.push(continueURL ?? '/');
 
       return;

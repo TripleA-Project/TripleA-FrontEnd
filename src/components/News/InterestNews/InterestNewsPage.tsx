@@ -11,65 +11,97 @@ import { useLikes } from '@/hooks/useLikes';
 
 function InterestNewsPage() {
   const { likedSymbols, likedCatgories, loginRequired, status } = useLikes();
-  const ref = useRef<HTMLDivElement>(null);
+
+  const linkIconRef = useRef<HTMLDivElement>(null);
+  const linkWrapperRef = useRef<HTMLDivElement>(null);
 
   if (loginRequired) {
     redirect('/login');
   }
 
   if (status === 'loading') {
-    return <></>
+    return <></>;
   }
 
   return (
     <>
-      <div ref={ref} className="box-border px-4">
-        <div className='h-4 z-[4] bg-white sticky top-[55px] -mt-4'></div>
-        <div className="sticky top-[71px] z-[4] box-border flex justify-center items-center border bg-white px-2 py-4">
-          <div className='flex items-center overflow-auto scrollbar-none gap-1'>
-            <div className="flex items-center gap-1 shrink-0 self-stretch sticky left-0 bg-white z-[4] pr-2">
-              <span className='text-xs shrink-0'>바로가기</span> 
-              <FiExternalLink className='shrink-0' />
+      <div className="box-border px-4">
+        <div className="sticky top-[55px] z-[5] -mt-4 h-4 bg-white"></div>
+        <div className="sticky top-[71px] z-[5] box-border flex items-center justify-center border bg-white px-2 py-4">
+          <div id="link_wrapper" ref={linkWrapperRef} className="flex items-center gap-1 overflow-auto scrollbar-none">
+            <div
+              ref={linkIconRef}
+              className="sticky left-0 z-[4] flex shrink-0 items-center gap-1 self-stretch bg-white pr-2"
+            >
+              <span className="shrink-0 text-xs">바로가기</span>
+              <FiExternalLink className="shrink-0" />
             </div>
-            <div className='gap-1 flex items-center'>
+            <div className="flex items-center gap-1">
+              {status === 'timeout' ? <div>관심 목록을 불러올 수 없습니다</div> : null}
               {likedCatgories
                 ? likedCatgories.inAllCategory.map((category) => (
                     <button
                       key={genLinkHashId({ category })}
-                      onClick={() => {
+                      onClick={(e) => {
                         const target = document.getElementById(genLinkHashId({ category }));
 
                         if (!target) return;
 
-                        window?.scrollTo({ top: 0 });
+                        /*
+                          left:
+                            button left - 
+                            stickyElement width - 
+                            stickyElement rightPadding - 
+                            wrapper padding
+                        */
 
-                        window?.scrollTo({ top: target.getBoundingClientRect().top - 121.5 });
+                        linkWrapperRef.current?.scroll({
+                          left: e.currentTarget.offsetLeft - linkIconRef.current!.offsetWidth - 8 - 8,
+                          behavior: 'smooth',
+                        });
+
+                        window?.scrollTo({
+                          top: target.offsetTop - linkWrapperRef.current!.offsetHeight - 114,
+                          behavior: 'smooth',
+                        });
                       }}
                     >
                       <CategoryChip category={category} />
                     </button>
                   ))
-                : null
-              }
+                : null}
               {likedSymbols
                 ? likedSymbols.symbols.map((symbol) => (
                     <button
                       key={genLinkHashId({ symbol })}
-                      onClick={() => {
+                      onClick={(e) => {
                         const target = document.getElementById(genLinkHashId({ symbol }));
 
                         if (!target) return;
 
-                        window?.scrollTo({ top: 0 });
+                        /*
+                          left:
+                            button left - 
+                            stickyElement width - 
+                            stickyElement rightPadding - 
+                            wrapper padding
+                        */
 
-                        window.scrollTo({ top: target.getBoundingClientRect().top - 121.5 - 16 });
+                        linkWrapperRef.current?.scroll({
+                          left: e.currentTarget.offsetLeft - linkIconRef.current!.offsetWidth - 8 - 8,
+                          behavior: 'smooth',
+                        });
+
+                        window?.scrollTo({
+                          top: target.offsetTop - linkWrapperRef.current!.offsetHeight - 114,
+                          behavior: 'smooth',
+                        });
                       }}
                     >
                       <SymbolChip symbol={symbol} />
                     </button>
                   ))
-                : null
-              }
+                : null}
             </div>
           </div>
         </div>

@@ -31,9 +31,11 @@ function Notification({ dimHeight, bottom, closeOnClick, onClose, children }: No
       />
       <div
         id="notification"
-        className={`${'fixed bottom-0 left-0 right-0 z-[12] mx-auto box-border w-full max-w-screen-pc overflow-hidden mobile:min-w-[390px]'} ${'rounded-tl-2xl rounded-tr-2xl border-transparent drop-shadow-[0_-4px_4px_rgba(0,0,0,0.06)]'}`}
+        className={`${'fixed_inner fixed bottom-0 z-[12] box-border w-full !p-0'} ${'rounded-tl-2xl rounded-tr-2xl border-transparent drop-shadow-[0_-4px_4px_rgba(0,0,0,0.06)]'}`}
         style={{
           ...(bottom && { bottom }),
+          ...(location.pathname === '/history' && dimHeight && { height: `calc(100% - 502px)` }),
+          ...(location.pathname === '/history' && { display: 'flex', justifyContent: 'center', alignItems: 'center' }),
         }}
       >
         {children}

@@ -7,6 +7,7 @@ import { getAllCategory, getLikeCategory } from '@/service/category';
 import { getLikeSymbol } from '@/service/symbol';
 import { type Category } from '@/interfaces/Category';
 import { type Symbol } from '@/interfaces/Symbol';
+import { TIMEOUT_CODE } from '@/service/axios';
 
 interface LikedSymbols {
   symbols: Symbol[];
@@ -23,7 +24,7 @@ interface UseLikesResult {
   likedCatgories: LikedCategories | null;
   empty: boolean;
   loginRequired: boolean;
-  status: 'loading' | 'success' | 'error';
+  status: 'loading' | 'success' | 'error' | 'timeout';
 }
 
 export const useLikes = () => {
@@ -94,6 +95,17 @@ export const useLikes = () => {
             status: 'error',
             loginRequired: true,
           }));
+
+          return;
+        }
+
+        if (likedCategoryError.code === TIMEOUT_CODE || likedSymbolError.code === TIMEOUT_CODE) {
+          setResult((prev) => ({
+            ...prev,
+            status: 'timeout',
+          }));
+
+          return;
         }
 
         return;

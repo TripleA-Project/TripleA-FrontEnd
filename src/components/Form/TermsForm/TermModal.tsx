@@ -12,7 +12,7 @@ interface TermModalProps {
 
 function TermModal({ title, className, children, onClose }: TermModalProps) {
   return createPortal(
-    <div className="fixed_inner fixed top-0 z-10 h-screen overflow-auto bg-white">
+    <div className="fixed_inner fixed top-0 z-10 h-[calc(100vh-63px)] overflow-auto bg-white scrollbar-thin">
       <div className="sticky top-0 flex flex-col justify-center gap-5 bg-white px-4 pt-5">
         <TfiClose
           role="button"
@@ -26,9 +26,7 @@ function TermModal({ title, className, children, onClose }: TermModalProps) {
           <hr className="mb-9 mt-3.5 border-b-[3px] border-b-black" />
         </section>
       </div>
-      <div className={`box-border max-w-screen-pc px-4 pb-[63px] mobile:min-w-[390px] ${className ?? ''}`}>
-        {children}
-      </div>
+      <div className={`box-border px-4 ${className ?? ''}`}>{children}</div>
     </div>,
     document.body,
   );

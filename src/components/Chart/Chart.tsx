@@ -41,7 +41,36 @@ interface ChartProps {
   resample: ResampleFrequency;
 }
 
+function getChartDate({ resample }: { resample: ResampleFrequency }) {
+  const today = dayjs();
+
+  switch (resample) {
+    case 'daily':
+      return {
+        startDate: today.set('month', today.get('month') - 1).set('date', 1),
+        endDate: today.clone(),
+      };
+    case 'weekly':
+      return {
+        startDate: today.set('month', today.get('month') - 3).set('date', 1),
+        endDate: today.clone(),
+      };
+    case 'monthly':
+      return {
+        startDate: dayjs(`${today.get('year')}-01-01`),
+        endDate: today.clone(),
+      };
+    case 'annually':
+      return {
+        startDate: dayjs(`${today.get('year') - 5}-01-01`),
+        endDate: today.clone(),
+      };
+  }
+}
+
 function Chart({ symbol, resample }: ChartProps) {
+  const { startDate, endDate } = getChartDate({ resample });
+
   const {
     data: chartDataPayload,
     status: chartDataStatus,
@@ -93,9 +122,6 @@ function Chart({ symbol, resample }: ChartProps) {
 
   const symbolLineChartRef = useRef<ISeriesApi<'Line'>>(null);
   const symbolHistogramChartRef = useRef<ISeriesApi<'Histogram'>>(null);
-
-  const startDate = dayjs(`${dayjs().get('year')}-01-01`);
-  const endDate = dayjs();
 
   const charts = {
     payload: [] as IChartApi[],

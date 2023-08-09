@@ -27,7 +27,7 @@ function LockNotification({
   return (
     <>
       <NotificationPortal active={active} onClose={onClose} closeOnClick={closeOnClick} dimHeight={dimHeight}>
-        <div className="bg-white p-4">
+        <div className="rounded-tl-2xl rounded-tr-2xl bg-white p-4">
           <div className="flex flex-col items-center">
             <h3 className="mb-2.5 text-2xl font-bold text-[#FD954A]">{title}</h3>
             {content

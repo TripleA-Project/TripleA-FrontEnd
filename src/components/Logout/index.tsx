@@ -14,6 +14,7 @@ export default function Logout() {
     onSuccess: async () => {
       await deleteCookie('accessToken');
 
+      queryClient.removeQueries({ queryKey: ['auth'] });
       queryClient.removeQueries({ queryKey: ['profile'] });
 
       replace('/');

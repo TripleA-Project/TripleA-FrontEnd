@@ -1,18 +1,22 @@
 'use client';
 
+import { HttpStatusCode } from 'axios';
 import SymbolLikeHeader from '@/components/Layout/Header/LikeHeader/SymbolLikeHeader';
 import { Symbol } from '@/interfaces/Symbol';
 import { searchSymbolNews } from '@/service/news';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { ToastContainer } from 'react-toastify';
 import NewsList, { NewsListLoading } from '../NewsList';
 import InfiniteTrigger from '../InfiniteTrigger';
+import { NewsData } from '@/interfaces/NewsData';
 
 interface SymbolNewsPageProps {
   symbol?: Symbol;
 }
 
 function SymbolNewsPage({ symbol }: SymbolNewsPageProps) {
+  const queryClient = useQueryClient();
+
   const {
     data: symbolNewsPageResponse,
     isSuccess,
@@ -32,7 +36,7 @@ function SymbolNewsPage({ symbol }: SymbolNewsPageProps) {
 
         const nextPage = LastPageResponse.data?.nextPage;
 
-        return status === 200 && nextPage ? nextPage : undefined;
+        return status === HttpStatusCode.Ok && nextPage ? nextPage : undefined;
       },
     },
   );
@@ -44,18 +48,17 @@ function SymbolNewsPage({ symbol }: SymbolNewsPageProps) {
         <h4 className="font-semibold">{`${symbol?.symbol.toUpperCase()} 관련 뉴스` ?? ''}</h4>
       </section>
       <section className="space-y-4">
-        {isLoading ? <NewsListLoading /> : null}
-        {isSuccess
-          ? symbolNewsPageResponse.pages.map((response) => {
-              return (
-                <NewsList
-                  key={`${Date.now()}-${response.data.data?.nextPage}`}
-                  newsList={response.data.data?.news ?? []}
-                />
-              );
-            })
-          : null}
-        {isFetchingNextPage && hasNextPage ? <NewsListLoading /> : null}
+        {isSuccess ? (
+          <NewsList
+            newsList={symbolNewsPageResponse.pages.flatMap((page) =>
+              page.data.data?.news ? (page.data.data.news as NewsData[]) : [],
+            )}
+            onBookmark={() => {
+              queryClient.invalidateQueries(['news', 'symbol', symbol?.symbol.toUpperCase()]);
+            }}
+          />
+        ) : null}
+        {(isLoading || isFetchingNextPage) && hasNextPage ? <NewsListLoading /> : null}
       </section>
       {!isFetchingNextPage && hasNextPage ? (
         <InfiniteTrigger onTrigger={fetchNextPage} isFetching={isFetchingNextPage} hasNextPage={hasNextPage} />

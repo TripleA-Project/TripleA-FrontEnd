@@ -7,8 +7,8 @@ import { DeltaPriceColor, DeltaPriceType, getPriceInfo } from '@/util/chart';
 import { type Symbol } from '@/interfaces/Symbol';
 
 export interface OnChipChangeResult {
-  type: 'like' | 'unlike' | 'unknown';
-  status: 'error' | 'success';
+  type: 'like' | 'unlike' | 'api' | 'unknown';
+  status: 'error' | 'success' | 'loading';
 }
 
 export interface SymbolChipProps {
@@ -41,32 +41,21 @@ function SymbolChip({
       ? getPriceInfo({ today: symbol.price.today ?? 0, yesterday: symbol.price.yesterday ?? 0 })
       : null;
 
-  const handleClick = () => {
+  const handleClick = async () => {
     if (onChange) {
-      setChecked((prev) => !prev);
-      changeTrigger.current = true;
-    }
-  };
+      if (changeTrigger.current === true) return;
 
-  const handleChange = async () => {
-    if (onChange && changeTrigger.current === true) {
+      changeTrigger.current = true;
+
       const { status } = await onChange();
 
-      if (status === 'error') {
-        setChecked((prev) => !prev);
-
-        changeTrigger.current = false;
-
-        return;
-      }
-
       changeTrigger.current = false;
+
+      if (status === 'success') {
+        setChecked((prev) => !prev);
+      }
     }
   };
-
-  useEffect(() => {
-    handleChange();
-  }, [checked]); /* eslint-disable-line */
 
   useEffect(() => {
     setChecked(!!selected);

@@ -101,8 +101,8 @@ function ColorTooltip() {
                   y2="18.5"
                   gradientUnits="userSpaceOnUse"
                 >
-                  <stop stop-color="#FD954A" />
-                  <stop offset="1" stop-color="#786BE4" />
+                  <stop stopColor="#FD954A" />
+                  <stop offset="1" stopColor="#786BE4" />
                 </linearGradient>
               </defs>
             </svg>

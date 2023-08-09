@@ -29,32 +29,21 @@ function CategoryChip({
   const [isRender, setIsRender] = useState(true);
   const changeTrigger = useRef<boolean>(false);
 
-  const handleClick = () => {
+  const handleClick = async () => {
     if (onChange) {
-      setChecked((prev) => !prev);
-      changeTrigger.current = true;
-    }
-  };
+      if (changeTrigger.current === true) return;
 
-  const handleChange = async () => {
-    if (onChange && changeTrigger.current === true) {
+      changeTrigger.current = true;
+
       const { status } = await onChange();
 
-      if (status === 'error') {
-        setChecked((prev) => !prev);
-
-        changeTrigger.current = false;
-
-        return;
-      }
-
       changeTrigger.current = false;
+
+      if (status === 'success') {
+        setChecked((prev) => !prev);
+      }
     }
   };
-
-  useEffect(() => {
-    handleChange();
-  }, [checked]); /* eslint-disable-line */
 
   useEffect(() => {
     setChecked(!!selected);
@@ -95,7 +84,7 @@ function CategoryChip({
     <div
       className={`box-border inline-flex h-9 w-max ${
         showHashTagIcon ? 'min-w-[84px]' : ''
-      } max-w-sm cursor-pointer select-none items-center justify-between rounded-full border px-3.5 py-2 align-top transition-transform ${
+      } max-w-sm shrink-0 cursor-pointer select-none items-center justify-between rounded-full border px-3.5 py-2 align-top transition-transform ${
         checked ? 'border-[#FC954A] bg-[#FFF0E4]' : 'border-[#E5E7EC] bg-white'
       } ${shadowEffect ? 'my-2.5 ml-[9px]' : 'm-0'} ${
         checked && shadowEffect ? 'shadow-[0_0_15px_0_rgba(252,149,74,0.3)]' : 'shadow-none'

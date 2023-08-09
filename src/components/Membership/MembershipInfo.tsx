@@ -14,6 +14,7 @@ function MembershipInfo() {
   const { mutate: unSubscribeMutate, status: unSubscribeStatus } = useMutation(() => unSubscribe(), {
     onSuccess: async () => {
       console.log('구독해제 되었습니다.');
+      queryClient.removeQueries(['auth']);
       queryClient.invalidateQueries(['profile']);
     },
     retry: 0,

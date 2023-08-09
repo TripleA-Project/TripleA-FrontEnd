@@ -1,10 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useQueryClient } from '@tanstack/react-query';
 import { UseStepFormContext } from '../StepForm';
 import Avatar from '@/components/Avatar';
 import EditField from '@/components/Profile/EditField';
-import { useEffect, useLayoutEffect, useState } from 'react';
 import { toastNotify } from '@/util/toastNotify';
 import { validateFullName } from '@/util/validate';
 import { ToastContainer } from 'react-toastify';
@@ -26,6 +27,8 @@ interface EditProfilesFormProps {
 }
 
 function EditProfilesForm(props: EditProfilesFormProps) {
+  const queryClient = useQueryClient();
+
   const {
     register,
     handleSubmit,
@@ -50,8 +53,6 @@ function EditProfilesForm(props: EditProfilesFormProps) {
   const onValid = async ({ email, fullName }: EditProfilesForm) => {
     const { password } = getValues() as EditProfileFormData;
 
-    console.log('submit: ', { email, fullName, password });
-
     try {
       await updateUserInfo({
         email,
@@ -61,6 +62,9 @@ function EditProfilesForm(props: EditProfilesFormProps) {
         newPassword: password,
         newPasswordCheck: password,
       });
+
+      queryClient.removeQueries(['auth']);
+      queryClient.invalidateQueries(['profile']);
 
       done();
     } catch (err) {
@@ -118,7 +122,7 @@ function EditProfilesForm(props: EditProfilesFormProps) {
           }}
         />
         <EditProfileMenu />
-        <div className="fixed bottom-[64px] left-0 flex w-full shrink-0 justify-center">
+        <div id="submit_wrapper" className="fixed bottom-[64px] left-0 z-[4] flex w-full shrink-0 justify-center">
           <Button
             type="submit"
             form="editProfile"

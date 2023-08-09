@@ -10,6 +10,7 @@ import CategoryForm from '@/components/Form/CategoryForm';
 import CompleteSignup from '@/components/Form/CompleteSignup';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: 'Triple A | 회원가입',
@@ -24,8 +25,8 @@ export default function Signup() {
       <PasswordForm />
       <NameForm />
       <TermsForm />
-      <SymbolForm skipable hasNotNavBar buttonText="다음" />
-      <CategoryForm skipable hasNotNavBar buttonText="다음" />
+      <SymbolForm skipable buttonText="다음" />
+      <CategoryForm skipable buttonText="다음" />
       <CompleteSignup hideHeader />
     </StepForm>
   );

@@ -7,21 +7,24 @@ import { type Category } from '@/interfaces/Category';
 
 interface OtherNewsProps {
   currentNewsId: number;
-  category: Category;
+  category?: Category;
 }
 
 function OtherNews({ currentNewsId, category }: OtherNewsProps) {
   const { data: OtherNewsListPayload, status } = useQuery(
-    ['category', 'news', category.category],
-    () => searchCategoryNews({ categoryId: category.categoryId }),
+    ['category', 'news', category?.category],
+    () => searchCategoryNews({ categoryId: category!.categoryId }),
     {
       retry: 0,
       refetchOnWindowFocus: false,
       select(response) {
         return response.data;
       },
+      enabled: !!category,
     },
   );
+
+  if (!category) return null;
 
   return status === 'loading' ? (
     <NewsListLoading length={3} />

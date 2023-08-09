@@ -1,29 +1,18 @@
 import { Metadata } from 'next';
 import SearchHeader from '@/components/Layout/Header/SearchHeader';
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-interface SearchPageProps {
-  searchParams: {
-    keyword?: string;
-  };
-}
+export const metadata: Metadata = {
+  title: 'Triple A | 검색',
+  description: 'Triple A 검색',
+};
 
-export async function generateMetadata({ searchParams }: SearchPageProps): Promise<Metadata> {
-  const keyword = searchParams.keyword;
-
-  return {
-    title: keyword ? `Triple A | 검색: ${keyword}` : 'Triple A | 검색',
-    description: keyword ? `Triple A ${keyword} 검색 결과` : `Triple A 검색`,
-  };
-}
-
-function Search({ searchParams }: SearchPageProps) {
-  const keyword = searchParams.keyword;
-
+function Search() {
   return (
     <>
-      <SearchHeader keyword={keyword} />
+      <SearchHeader />
     </>
   );
 }

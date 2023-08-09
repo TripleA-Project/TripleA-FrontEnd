@@ -53,7 +53,16 @@ function AddSymbolForm({ symbol }: AddSymbolFormProps) {
   });
 
   const handleChange: () => Promise<OnChipChangeResult> = async () => {
-    if (!isLike()) {
+    if (likedSymbolStatus === 'loading') {
+      return {
+        type: 'api',
+        status: 'loading',
+      };
+    }
+
+    const liked = isLike();
+
+    if (!liked) {
       try {
         await like(symbol.name.toUpperCase());
 
@@ -69,7 +78,7 @@ function AddSymbolForm({ symbol }: AddSymbolFormProps) {
       }
     }
 
-    if (isLike()) {
+    if (liked) {
       const unlikeTarget = likedSymbol!.data!.find((likedSymbol) => likedSymbol.symbol === symbol.name);
 
       try {
@@ -87,10 +96,7 @@ function AddSymbolForm({ symbol }: AddSymbolFormProps) {
       }
     }
 
-    return {
-      type: 'unknown',
-      status: 'error',
-    };
+    return { type: 'unknown', status: 'error' };
   };
 
   useEffect(() => {
