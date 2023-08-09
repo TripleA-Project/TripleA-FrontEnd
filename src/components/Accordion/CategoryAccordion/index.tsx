@@ -32,22 +32,22 @@ function CategoryAccordion() {
         </div>
       }
       detail={
-        <>
+        <div className="flex max-h-[252px] w-max flex-col gap-3 overflow-auto scrollbar-none">
           {likedCategoryStatus === 'loading' ? (
-            <div className="flex flex-col gap-3">
+            <>
               {Array.from({ length: 3 }).map((_, idx) => (
                 <CategoryChip key={idx} loading />
               ))}
-            </div>
+            </>
           ) : null}
           {likedCategory?.data ? (
-            <div className="flex w-max flex-col gap-3">
+            <>
               {likedCategory.data.map((category, idx) => {
                 return <CategoryChip key={`${category.category}${idx}`} category={category} selected />;
               })}
-            </div>
+            </>
           ) : null}
-        </>
+        </div>
       }
     />
   );

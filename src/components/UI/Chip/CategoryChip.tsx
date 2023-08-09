@@ -29,32 +29,21 @@ function CategoryChip({
   const [isRender, setIsRender] = useState(true);
   const changeTrigger = useRef<boolean>(false);
 
-  const handleClick = () => {
+  const handleClick = async () => {
     if (onChange) {
-      setChecked((prev) => !prev);
-      changeTrigger.current = true;
-    }
-  };
+      if (changeTrigger.current === true) return;
 
-  const handleChange = async () => {
-    if (onChange && changeTrigger.current === true) {
+      changeTrigger.current = true;
+
       const { status } = await onChange();
 
-      if (status === 'error') {
-        setChecked((prev) => !prev);
-
-        changeTrigger.current = false;
-
-        return;
-      }
-
       changeTrigger.current = false;
+
+      if (status === 'success') {
+        setChecked((prev) => !prev);
+      }
     }
   };
-
-  useEffect(() => {
-    handleChange();
-  }, [checked]); /* eslint-disable-line */
 
   useEffect(() => {
     setChecked(!!selected);
