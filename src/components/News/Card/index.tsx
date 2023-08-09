@@ -48,7 +48,12 @@ function NewsCard({ news, isLast, onBookmark }: NewsCardProps) {
           <NewsThumbnail src={news.thumbnail} />
           <NewsMeta title={news.title} source={news.source} publishedDate={news.publishedDate} />
         </section>
-        <NewsCardAction newsId={news.newsId} bookmark={news.bookmark} onBookmark={onBookmark} />
+        <NewsCardAction
+          newsId={news.newsId}
+          symbolName={news.symbol}
+          bookmark={news.bookmark}
+          onBookmark={onBookmark}
+        />
       </article>
     </article>
   );

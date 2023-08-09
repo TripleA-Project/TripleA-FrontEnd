@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { ToastContainer } from 'react-toastify';
-import { AxiosResponse, HttpStatusCode, isAxiosError } from 'axios';
+import { HttpStatusCode, isAxiosError } from 'axios';
 import { MdOutlineLink } from 'react-icons/md';
 import NewsDetailTitle, { NewsDetailTitleLoading } from './NewsDetailTitle';
 import NewsDetailMeta, { NewsDetailMetaLoaing } from './NewsDetailMeta';
@@ -22,10 +22,12 @@ import { HorizontalLine } from '../UI/DivideLine';
 import { NewsDetailNotification } from '../Notification';
 import TimeoutNotification from '../Notification/TimeoutNotification';
 import TopScrollButton from './TopScrollButton';
+import NotFound from '../NotFound';
 import { getNewsDetail } from '@/service/news';
 import { NewsDetailNotificationTemplate, ServerErrorNotificationTemplate } from '@/constants/notification';
 import { TIMEOUT_CODE } from '@/service/axios';
-import { type NewsDetailSymbol, type NewsDetailResponse } from '@/interfaces/Dto/News';
+import { type NewsDetailSymbol } from '@/interfaces/Dto/News';
+import { type APIResponse } from '@/interfaces/Dto/Core';
 
 interface NewsDetailProps {
   newsId: string;
@@ -67,7 +69,10 @@ export function NewsDetail({ newsId, requestSymbol }: NewsDetailProps) {
     },
   });
 
+  const contentAreaRef = useRef<HTMLDivElement>(null);
+
   const [isRender, setIsRender] = useState(false);
+  const [isNotFound, setIsNotFound] = useState(false);
   const [isTranslation, setIsTranslation] = useState(!!newsDetailPayload?.data?.kor?.title);
   const [detailNewsNotification, setDetailNewsNotification] = useState<{
     type: keyof typeof NewsDetailNotificationTemplate;
@@ -85,7 +90,7 @@ export function NewsDetail({ newsId, requestSymbol }: NewsDetailProps) {
     if (newsDetailStatus === 'loading') return;
 
     if (newsDetailStatus === 'error') {
-      if (isAxiosError(newsDetailError)) {
+      if (isAxiosError<APIResponse>(newsDetailError)) {
         const { code, response } = newsDetailError;
 
         if (code === TIMEOUT_CODE) {
@@ -94,15 +99,26 @@ export function NewsDetail({ newsId, requestSymbol }: NewsDetailProps) {
           return;
         }
 
-        if ((response as AxiosResponse<NewsDetailResponse>).status === HttpStatusCode.Unauthorized) {
-          setDetailNewsNotification((prev) => ({
-            ...prev,
-            type: 'NewsDetailLoginRequired',
-            active: true,
-            dimHeight: 54,
-          }));
+        if (response) {
+          if (response.data.status === HttpStatusCode.Unauthorized) {
+            setDetailNewsNotification((prev) => ({
+              ...prev,
+              type: 'NewsDetailLoginRequired',
+              active: true,
+              dimHeight: 54,
+            }));
 
-          return;
+            return;
+          }
+
+          if (
+            response.data.status === HttpStatusCode.InternalServerError &&
+            response.data?.data?.includes('뉴스를 찾을 수 없습니다')
+          ) {
+            setIsNotFound(true);
+
+            return;
+          }
         }
       }
 
@@ -119,14 +135,19 @@ export function NewsDetail({ newsId, requestSymbol }: NewsDetailProps) {
       if (!isTranslation) setIsTranslation(true);
     }
 
-    if (newsDetailPayload.data?.user.leftBenefitCount === 0) {
+    /*
+      - 현재 볼 수 있는 횟수를 모두 소진한 경우 
+        description이 null로 응답이 오는 것을 반영
+      - 요약문이 제공될 수 없는 환경
+    */
+    const hasDescription = newsDetailPayload.data?.eng.description;
+    if (newsDetailPayload.data?.user.leftBenefitCount === 0 && !hasDescription) {
       const getDimHeight = () => {
-        const hasDescription = newsDetailPayload.data?.kor.description;
+        console.log(contentAreaRef.current?.getBoundingClientRect());
 
-        const headerElement = document.querySelector('header')!;
-        const targetElement = document.getElementById(hasDescription ? 'detail-chips' : 'detail-meta')!;
+        if (!contentAreaRef.current) return 0;
 
-        return headerElement.getBoundingClientRect().height + targetElement.getBoundingClientRect().bottom + 8;
+        return contentAreaRef.current.getBoundingClientRect().top + 2;
       };
 
       setDetailNewsNotification((prev) => ({
@@ -146,39 +167,74 @@ export function NewsDetail({ newsId, requestSymbol }: NewsDetailProps) {
     setIsRender(true);
   }, [newsDetailStatus]); /* eslint-disable-line */
 
+  if (newsDetailStatus === 'loading') return <NewsDetailLoading />;
+  if (isNotFound) return <NotFound />;
+  if (isAxiosError(newsDetailError)) {
+    if (newsDetailError.response?.status === HttpStatusCode.Unauthorized)
+      return (
+        <>
+          <NewsDetailLoading />
+          <NewsDetailNotification
+            active={detailNewsNotification.active}
+            dimHeight={detailNewsNotification.dimHeight}
+            notificationType={detailNewsNotification.type}
+            newsId={Number(newsId)}
+            symbol={requestSymbol ? requestSymbol.name.toUpperCase() : undefined}
+            onClose={() => setDetailNewsNotification((prev) => ({ ...prev, active: false }))}
+          />
+        </>
+      );
+
+    if (newsDetailError.code === TIMEOUT_CODE)
+      return (
+        <>
+          <NewsDetailLoading />
+          <TimeoutNotification
+            active={showTimeoutNotification}
+            title={ServerErrorNotificationTemplate.Timeout.title}
+            content={ServerErrorNotificationTemplate.Timeout.content}
+            onClose={() => {
+              setShowTimeoutNotification(false);
+            }}
+          />
+        </>
+      );
+
+    return null;
+  }
+  if (!newsDetailPayload?.data) return null;
+
   return (
     <>
-      {!isRender ? <NewsDetailLoading /> : null}
-      {isRender && newsDetailPayload?.data ? (
-        <article
-          className={`mt-3 box-border ${newsDetailPayload.data?.user?.membership === 'BASIC' ? 'pb-14' : ''} px-4`}
-        >
-          <section className="mb-2.5">
-            <NewsDetailTitle
-              title={{ kor: newsDetailPayload.data.kor.title, eng: newsDetailPayload.data.eng.title }}
-              isTranslation={isTranslation}
-            />
-          </section>
-          <section id="detail-meta" className="mb-6">
-            <NewsDetailMeta
-              newsId={Number(newsId)}
-              bookmark={newsDetailPayload.data.bookmark}
-              source={newsDetailPayload.data.source}
-              publishedDate={newsDetailPayload.data.publishedDate}
-            />
-          </section>
-          {!newsDetailPayload.data.category || (!newsDetailPayload.data.symbol && !requestSymbol) ? null : (
-            <section id="detail-chips" className="mb-5">
-              <NewsDetailChipList
-                category={newsDetailPayload.data.category}
-                symbol={requestSymbol ?? newsDetailPayload.data.symbol}
-              />
-            </section>
-          )}
-          {!newsDetailPayload.data.kor.description && !newsDetailPayload.data.eng.description ? (
-            <NoDescription />
-          ) : (
-            <>
+      <article
+        className={`mt-3 box-border ${newsDetailPayload.data?.user?.membership === 'BASIC' ? 'pb-14' : ''} px-4`}
+      >
+        <section className="mb-2.5">
+          <NewsDetailTitle
+            title={{ kor: newsDetailPayload.data.kor.title, eng: newsDetailPayload.data.eng.title }}
+            isTranslation={isTranslation}
+          />
+        </section>
+        <section id="detail-meta" className="mb-6">
+          <NewsDetailMeta
+            newsId={Number(newsId)}
+            symbolName={requestSymbol?.name}
+            bookmark={newsDetailPayload.data.bookmark}
+            source={newsDetailPayload.data.source}
+            publishedDate={newsDetailPayload.data.publishedDate}
+          />
+        </section>
+        <section id="detail-chips" className="mb-5">
+          <NewsDetailChipList
+            category={newsDetailPayload.data.category}
+            symbol={requestSymbol ?? newsDetailPayload.data.symbol}
+          />
+        </section>
+        <div ref={contentAreaRef}>
+          {isRender ? (
+            !newsDetailPayload.data.kor.description && !newsDetailPayload.data.eng.description ? (
+              <NoDescription />
+            ) : (
               <NewsDetailContent
                 thumbnail={newsDetailPayload.data.thumbnail}
                 description={{
@@ -195,38 +251,42 @@ export function NewsDetail({ newsId, requestSymbol }: NewsDetailProps) {
                 isTranslation={isTranslation}
                 onSwitch={(isOn) => setIsTranslation(isOn)}
               />
-            </>
-          )}
-          <Link href={newsDetailPayload.data.url} className="mt-9 w-full">
-            <Button fullWidth bgColorTheme="orange" textColorTheme="white" className="mt-14 gap-2">
-              <MdOutlineLink className="text-2xl text-white" />
-              기사 원문 보러가기
-            </Button>
-          </Link>
-          <section className="my-6">
-            <HorizontalLine />
-            <div>
-              <h3 className="mb-4 mt-6 text-xl font-semibold">다른 기사 더 보기</h3>
-              <OtherNews currentNewsId={Number(newsId)} category={newsDetailPayload.data.category} />
-            </div>
-          </section>
-          {!newsDetailPayload.data.kor.description && !newsDetailPayload.data.eng.description ? null : (
-            <>
-              <section className="my-5">
-                <HorizontalLine />
-                <div className="pb-7 pt-5">
-                  <AddCategoryForm category={newsDetailPayload.data.category} />
-                </div>
-                <HorizontalLine style={{ marginTop: '-8px' }} />
-              </section>
-              <section className="mb-9">
-                <AddSymbolForm symbol={requestSymbol ?? newsDetailPayload.data.symbol} />
-              </section>
-            </>
-          )}
-          <TopScrollButton />
-        </article>
-      ) : null}
+            )
+          ) : null}
+        </div>
+        {isRender ? (
+          <>
+            <Link href={newsDetailPayload.data.url} className="mt-9 w-full">
+              <Button fullWidth bgColorTheme="orange" textColorTheme="white" className="mt-14 gap-2">
+                <MdOutlineLink className="text-2xl text-white" />
+                기사 원문 보러가기
+              </Button>
+            </Link>
+            <section className="my-6">
+              <HorizontalLine />
+              <div>
+                <h3 className="mb-4 mt-6 text-xl font-semibold">다른 기사 더 보기</h3>
+                <OtherNews currentNewsId={Number(newsId)} category={newsDetailPayload.data.category} />
+              </div>
+            </section>
+            {!newsDetailPayload.data.kor.description && !newsDetailPayload.data.eng.description ? null : (
+              <>
+                <section className="my-5">
+                  <HorizontalLine />
+                  <div className="pb-7 pt-5">
+                    <AddCategoryForm category={newsDetailPayload.data.category} />
+                  </div>
+                  <HorizontalLine style={{ marginTop: '-8px' }} />
+                </section>
+                <section className="mb-9">
+                  <AddSymbolForm symbol={requestSymbol ?? newsDetailPayload.data.symbol} />
+                </section>
+              </>
+            )}
+            <TopScrollButton />
+          </>
+        ) : null}
+      </article>
       {isRender && newsDetailPayload?.data?.user.membership === 'BASIC' ? (
         <BenefitBar benefitCount={newsDetailPayload.data.user.leftBenefitCount ?? 0} />
       ) : null}
@@ -237,14 +297,6 @@ export function NewsDetail({ newsId, requestSymbol }: NewsDetailProps) {
         newsId={Number(newsId)}
         symbol={requestSymbol ? requestSymbol.name.toUpperCase() : undefined}
         onClose={() => setDetailNewsNotification((prev) => ({ ...prev, active: false }))}
-      />
-      <TimeoutNotification
-        active={showTimeoutNotification}
-        title={ServerErrorNotificationTemplate.Timeout.title}
-        content={ServerErrorNotificationTemplate.Timeout.content}
-        onClose={() => {
-          setShowTimeoutNotification(false);
-        }}
       />
       <ToastContainer
         position="bottom-center"

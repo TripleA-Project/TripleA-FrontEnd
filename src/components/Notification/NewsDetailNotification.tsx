@@ -24,7 +24,7 @@ function NewsDetailNotification({
 }: NewsDetailNotificationProps) {
   return (
     <NotificationPortal active={active} dimHeight={dimHeight} onClose={onClose} closeOnClick={closeOnClick}>
-      <div className="bg-white p-4">
+      <div className="rounded-tl-2xl rounded-tr-2xl bg-white p-4">
         <div className="mb-[42px] mt-11 flex flex-col items-center">
           <NotificationIcons.VeryDissatisfied className="text-4xl " />
           <h3 className="my-6 text-xl font-semibold">

@@ -31,9 +31,9 @@ function ChartPageHome() {
 
   if (profileStatus === 'error') {
     if (isAxiosError(profileError)) {
-      const { status } = profileError;
+      const { response } = profileError;
 
-      if (status === HttpStatusCode.Unauthorized) {
+      if (response?.status === HttpStatusCode.Unauthorized) {
         redirect('/login?continueURL=/chart');
       }
 

@@ -36,7 +36,7 @@ export function TrendNewsCardError({ message }: { message: string }) {
       <section className="mb-3.5">
         <div className="relative mx-auto box-border aspect-[16/10] h-auto w-full max-w-2xl overflow-hidden rounded-lg border border-slate-400 bg-white">
           <Image
-            src="/LogoMainColor.svg"
+            src="/LogoOrange.svg"
             alt="logo image"
             fill={true}
             className="scale-down w-full scale-50 object-cover object-top"
@@ -72,7 +72,7 @@ function TrendNewsCard({ news }: TrendNewsCardProps) {
                 logo: news.logo,
               }}
             />
-            <NewsCardAction newsId={news.newsId} bookmark={news.bookmark} />
+            <NewsCardAction newsId={news.newsId} bookmark={news.bookmark} symbolName={news.symbol} />
           </section>
         </section>
       </section>

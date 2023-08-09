@@ -3,6 +3,7 @@ import SymbolForm from '@/components/Form/SymbolForm';
 import BackButtonHeader from '@/components/Layout/Header/BackButtonHeader';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: 'Triple A | 관심 심볼 설정',

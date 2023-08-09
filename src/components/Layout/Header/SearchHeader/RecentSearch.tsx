@@ -15,7 +15,7 @@ function RecentSearch() {
   const [history, setHistory] = useState<string[]>(getRecentSearchLocalStorage() ?? []);
 
   return (
-    <>
+    <div className="box-border border-b border-b-[#FD954A]">
       <div className="box-border flex h-12 w-full items-center justify-between px-4 py-3 ">
         <span className="text-sm font-medium text-[#4E525D]">최근 검색어</span>
         <button
@@ -39,11 +39,7 @@ function RecentSearch() {
           return (
             <Link
               key={`${keyword}-${idx}`}
-              href={
-                isKor(keyword) || !isEng(keyword)
-                  ? `/search/${encodeURIComponent(keyword)}`
-                  : `/chart/symbol?name=${keyword.toUpperCase()}&resample=daily`
-              }
+              href={`/search/${encodeURIComponent(keyword)}`}
               onClick={() => {
                 setRecentSearchLocalStorage(keyword);
               }}
@@ -69,7 +65,7 @@ function RecentSearch() {
           );
         })
       )}
-    </>
+    </div>
   );
 }
 

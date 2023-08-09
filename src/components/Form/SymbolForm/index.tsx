@@ -4,6 +4,7 @@ import { useLayoutEffect, useState, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useFormContext } from 'react-hook-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { throttle } from 'lodash';
 import { ToastContainer } from 'react-toastify';
 import { initLikedSymbolMap, initSelectedSymbolMap, reset, useSymbolList } from '@/redux/slice/symbolSlice';
 import Button from '@/components/Button/Button';
@@ -19,10 +20,9 @@ import { type SearchedSymbol } from '@/interfaces/Symbol';
 interface SymbolFormProps {
   buttonText?: string;
   skipable?: boolean;
-  hasNotNavBar?: boolean;
 }
 
-function SymbolForm({ buttonText = '선택 완료', hasNotNavBar }: SymbolFormProps) {
+function SymbolForm({ buttonText = '선택 완료' }: SymbolFormProps) {
   const queryClient = useQueryClient();
 
   const pathName = usePathname();
@@ -32,6 +32,24 @@ function SymbolForm({ buttonText = '선택 완료', hasNotNavBar }: SymbolFormPr
 
   const { status: authStatus } = useAuth();
 
+  const handleView = () => {
+    if (window.innerHeight < 700) {
+      formWrapperRef.current!.style.marginTop = '-32px';
+
+      return;
+    }
+
+    formWrapperRef.current!.style.removeProperty('margin-top');
+  };
+
+  const resizeThrottle = throttle((e: UIEvent) => {
+    handleView();
+  }, 300);
+
+  const cleanUp = () => {
+    formWrapperRef.current?.style.removeProperty('margin-top');
+  };
+
   const { data: likedSymbolList, status: likedSymbolStatus } = useQuery(['likedSymbolList'], () => getLikeSymbol(), {
     retry: 0,
     refetchOnWindowFocus: false,
@@ -39,6 +57,9 @@ function SymbolForm({ buttonText = '선택 완료', hasNotNavBar }: SymbolFormPr
       return payload.data;
     },
   });
+
+  const formWrapperRef = useRef<HTMLDivElement>(null);
+  const submitWrapperRef = useRef<HTMLDivElement>(null);
 
   const isSubmittingRef = useRef(false);
   const isSuccessRef = useRef(true);
@@ -199,8 +220,18 @@ function SymbolForm({ buttonText = '선택 완료', hasNotNavBar }: SymbolFormPr
     dispatch(initSelectedSymbolMap());
   }, [authStatus, likedSymbolStatus, likedSymbolList]); /* eslint-disable-line */
 
+  useLayoutEffect(() => {
+    window.addEventListener('resize', resizeThrottle);
+
+    handleView();
+
+    return () => {
+      cleanUp();
+    };
+  }, []); /* eslint-disable-line */
+
   return (
-    <>
+    <div ref={formWrapperRef} className="relative">
       <div className="my-11 space-y-3">
         <h3 className="flex items-center justify-center text-xl font-bold">
           <span className="relative inline-block align-top">
@@ -215,7 +246,11 @@ function SymbolForm({ buttonText = '선택 완료', hasNotNavBar }: SymbolFormPr
         </h4>
       </div>
       <form onSubmit={handleSubmit}>
-        <SearchSymbol onSearch={(symbols) => setSearchedSymbols(symbols)} />
+        <SearchSymbol
+          submitWrapper={submitWrapperRef.current}
+          onSearch={(symbols) => setSearchedSymbols(symbols)}
+          disabled={authStatus === 'Pending' || authStatus === 'Loading' || likedSymbolStatus !== 'success'}
+        />
         <SearchSymbolResult
           loading={authStatus === 'Pending' || authStatus === 'Loading' || likedSymbolStatus !== 'success'}
           symbols={searchedSymbols}
@@ -223,9 +258,14 @@ function SymbolForm({ buttonText = '선택 완료', hasNotNavBar }: SymbolFormPr
             if (requiredSubscribe) setShowSubScribeNotification(true);
           }}
         />
-        <div className={`fixed left-0 w-full ${hasNotNavBar ? 'bottom-2 ' : 'bottom-[calc(63px+8px)]'}`}>
-          <div className="mx-auto box-border w-full max-w-screen-pc space-y-4 px-4 mobile:min-w-[390px]">
-            <SelectedSymbolHorizonList symbols={selectedSymbols} shadowEffect closeButton />
+        <div ref={submitWrapperRef} className="fixed_inner fixed bottom-12">
+          <SelectedSymbolHorizonList
+            loading={authStatus === 'Pending' || authStatus === 'Loading' || likedSymbolStatus !== 'success'}
+            symbols={selectedSymbols}
+            shadowEffect
+            closeButton
+          />
+          <div className="mx-auto mt-4 box-border w-full">
             <Button
               type="submit"
               disabled={likedSymbolStatus === 'loading' || likeStatus === 'loading' || unlikeStatus === 'loading'}
@@ -258,8 +298,10 @@ function SymbolForm({ buttonText = '선택 완료', hasNotNavBar }: SymbolFormPr
           setShowSubScribeNotification(false);
         }}
       />
-    </>
+    </div>
   );
 }
 
 export default SymbolForm;
+
+// className={`fixed left-0 w-full ${hasNotNavBar ? 'bottom-2 ' : 'bottom-[calc(63px+8px)]'}`}

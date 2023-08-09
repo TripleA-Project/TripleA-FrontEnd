@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useLayoutEffect, useRef } from 'react';
-import { createPortal } from 'react-dom';
 import { throttle } from 'lodash';
 
 interface HeaderProps {
@@ -51,7 +50,7 @@ function Header({ fixed, scrollDownCallback, scrollUpCallback, className, header
     };
   }, []); /* eslint-disable-line */
 
-  return createPortal(
+  return (
     <header
       ref={headerRef}
       className={`fixed left-0 right-0 top-0 z-10 mx-auto w-full max-w-screen-pc bg-white mobile:min-w-[390px] ${
@@ -59,8 +58,7 @@ function Header({ fixed, scrollDownCallback, scrollUpCallback, className, header
       }`}
     >
       <div className={`${className ?? ''} box-border flex  items-center justify-between px-4 py-3.5`}>{children}</div>
-    </header>,
-    document.body,
+    </header>
   );
 }
 

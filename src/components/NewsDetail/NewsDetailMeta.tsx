@@ -4,6 +4,7 @@ import { Bookmark } from '@/interfaces/NewsData';
 
 interface NewsDetailMetaProps {
   newsId: number;
+  symbolName?: string;
   bookmark: Bookmark;
   source: string;
   publishedDate: string;
@@ -21,7 +22,7 @@ export function NewsDetailMetaLoaing() {
   );
 }
 
-function NewsDetailMeta({ newsId, bookmark, source, publishedDate }: NewsDetailMetaProps) {
+function NewsDetailMeta({ newsId, symbolName, bookmark, source, publishedDate }: NewsDetailMetaProps) {
   const convertSource = (source: string) => {
     const dotRemovedSource = source.replaceAll(/\..+/g, '');
 
@@ -37,7 +38,7 @@ function NewsDetailMeta({ newsId, bookmark, source, publishedDate }: NewsDetailM
         <span className="font-bold">{convertSource(source)} </span>
         <span className="font-semibold">{dayjs(publishedDate).format('YYYY.MM.DD HH:mm:ss')}</span>
       </section>
-      <NewsCardAction showCount={false} newsId={newsId} bookmark={bookmark} />
+      <NewsCardAction showCount={false} newsId={newsId} symbolName={symbolName} bookmark={bookmark} />
     </section>
   );
 }

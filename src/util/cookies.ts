@@ -1,16 +1,18 @@
 'use server';
 
+import { type ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies';
 import { cookies } from 'next/headers';
 
-interface SetCookieOption {
-  name: string;
-  value: string;
-  maxAge?: number;
-  expires?: Date | string;
-  domain?: string;
-  path?: string;
-  httpOnly?: boolean;
-}
+// interface SetCookieOption extends ResponseCookie{
+//   name: string;
+//   value: string;
+//   maxAge?: number;
+//   expires?: Date | string;
+//   domain?: string;
+//   path?: string;
+//   httpOnly?: boolean;
+// }
+interface SetCookieOption extends ResponseCookie {}
 
 export async function getCookie(name: string) {
   return cookies().get(name)?.value;

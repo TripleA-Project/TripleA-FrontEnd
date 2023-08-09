@@ -1,22 +1,27 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { ToastContainer } from 'react-toastify';
+import { HttpStatusCode } from 'axios';
 import NewsList, { NewsListLoading } from '@/components/News/NewsList';
 import InfiniteTrigger from '@/components/News/InfiniteTrigger';
 import { SymbolLikeCardList, SymbolLikeCardListLoading } from '@/components/Chart/SymbolTabs/SymbolCard';
+import { HorizontalLine } from '@/components/UI/DivideLine';
 import { NoResult } from './SearchResult';
 import { getSymbol } from '@/service/symbol';
 import { searchCategoryNews } from '@/service/news';
 import { type Category } from '@/interfaces/Category';
 import { type Symbol } from '@/interfaces/Symbol';
+import { type NewsData } from '@/interfaces/NewsData';
 
 interface CategoryNewsListProps {
   category: Category;
 }
 
 function CategoryNewsList({ category }: CategoryNewsListProps) {
+  const queryClient = useQueryClient();
+
   const [symbols, setSymbols] = useState<Symbol[]>([]);
   const [symbolLoading, setSymbolLoading] = useState(true);
 
@@ -38,7 +43,7 @@ function CategoryNewsList({ category }: CategoryNewsListProps) {
 
         const nextPage = LastPageResponse?.data?.nextPage;
 
-        return status === 200 && nextPage ? nextPage : undefined;
+        return status === HttpStatusCode.Ok && nextPage ? nextPage : undefined;
       },
     },
   );
@@ -85,22 +90,21 @@ function CategoryNewsList({ category }: CategoryNewsListProps) {
           {symbolLoading ? <SymbolLikeCardListLoading length={4} /> : <SymbolLikeCardList symbols={symbols} />}
         </div>
       </div>
-      <hr className="-mx-4 h-2 border-none bg-[#F5F7F9]" />
+      <HorizontalLine />
       <div>
         <h2 className="mb-4 mt-5 font-bold">관련 뉴스</h2>
         <div>
-          {isLoading ? <NewsListLoading /> : null}
-          {isSuccess && categoryNewsPageResponse.pages[0].data?.data?.news?.length
-            ? categoryNewsPageResponse.pages.map((response, idx) => {
-                return (
-                  <NewsList
-                    key={`${Date.now()}-${response.data?.data?.nextPage}`}
-                    newsList={response.data?.data?.news ?? []}
-                  />
-                );
-              })
-            : null}
-          {isFetchingNextPage && hasNextPage ? <NewsListLoading /> : null}
+          {isSuccess ? (
+            <NewsList
+              newsList={categoryNewsPageResponse.pages.flatMap((page) =>
+                page.data.data ? (page.data.data.news as NewsData[]) : [],
+              )}
+              onBookmark={() => {
+                queryClient.invalidateQueries(['news', 'category', category.categoryId]);
+              }}
+            />
+          ) : null}
+          {(isLoading || isFetchingNextPage) && hasNextPage ? <NewsListLoading /> : null}
         </div>
       </div>
       {!isFetchingNextPage && hasNextPage ? (

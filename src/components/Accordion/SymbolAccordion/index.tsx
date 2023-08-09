@@ -28,7 +28,7 @@ function SymbolAccordion() {
         </div>
       }
       detail={
-        <div className="flex w-max flex-col gap-3">
+        <div className="flex max-h-[252px] w-max flex-col gap-3 overflow-auto scrollbar-none">
           {likedSymbolStatus === 'loading' ? (
             <>
               {Array.from({ length: 3 }).map((_, idx) => (

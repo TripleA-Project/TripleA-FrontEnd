@@ -9,17 +9,7 @@ interface SearchCategoryResultProps {
   onDispatch?: (requiredSubscribe: boolean) => void;
 }
 
-function SearchCategoryResultLoading() {
-  return (
-    <div className="skeleton_loading">
-      <div className="mb-8 mt-[60px] h-[200px]" />
-    </div>
-  );
-}
-
 function SearchCategoryResult({ categories, loading, onDispatch }: SearchCategoryResultProps) {
-  if (loading) return <SearchCategoryResultLoading />;
-
   if (!categories?.length) return <AllCategoryList onDispatch={onDispatch} />;
 
   return (

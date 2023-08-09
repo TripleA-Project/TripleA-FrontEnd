@@ -6,7 +6,13 @@ import { NavIcons } from './NavIcons';
 
 export type NavPaths = 'Home' | 'Chart' | 'Search' | 'History' | 'Mypage';
 
-const shouldHiddenPaths = ['/login', '/signup', '/mypage/membership/with-drawal'];
+const shouldHiddenPaths = [
+  '/login',
+  '/signup',
+  '/mypage/edit/symbol',
+  '/mypage/edit/category',
+  '/mypage/membership/with-drawal',
+];
 
 function Navbar() {
   const pathName = usePathname();

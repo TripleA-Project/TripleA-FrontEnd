@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ErrorNotification } from '@/components/Notification';
 import { NotificationTemplate } from '@/constants/notification';
 import { type TabPage } from '.';
@@ -71,6 +71,16 @@ function Tabs() {
 
     push('/?tab=interest');
   }
+
+  useEffect(() => {
+    const tab: TabPage = !tabParams
+      ? 'latestNews'
+      : !!tabParams && tabParams === 'interest'
+      ? 'likeNews'
+      : 'latestNews';
+
+    setTabPage(tab);
+  }, [tabParams]);
 
   return (
     <>

@@ -9,32 +9,48 @@ interface SelectedSymbolHorizonListProps {
   symbols: SearchedSymbol[];
   shadowEffect?: boolean;
   closeButton?: boolean;
+  loading?: boolean;
 }
 
-function SelectedSymbolHorizonList({ symbols, shadowEffect, closeButton }: SelectedSymbolHorizonListProps) {
+function SelectedSymbolHorizonList({ symbols, shadowEffect, closeButton, loading }: SelectedSymbolHorizonListProps) {
   const { dispatch, isLike } = useSymbolList();
 
-  return symbols.length ? (
+  if (loading) {
+    return (
+      <div
+        className="flex items-center gap-1 overflow-scroll scrollbar-none"
+        onWheel={(e) => e.currentTarget.scroll({ left: e.currentTarget.scrollLeft + e.deltaY })}
+      >
+        {Array.from({ length: 4 }).map((_, index) => (
+          <SymbolChip key={`horizonSymbol-loading-${index}`} loading />
+        ))}
+      </div>
+    );
+  }
+
+  return (
     <div
-      className="flex items-center gap-1 overflow-scroll scrollbar-none"
+      className="flex min-h-[36px] items-center gap-1 overflow-scroll scrollbar-none"
       onWheel={(e) => e.currentTarget.scroll({ left: e.currentTarget.scrollLeft + e.deltaY })}
     >
-      {symbols.map((symbol, idx) => {
-        return (
-          <SymbolChip
-            key={`${symbol.symbol.toUpperCase()}-${symbol.symbolId}-${idx}`}
-            symbol={symbol}
-            shadowEffect={shadowEffect}
-            closeButton={closeButton}
-            selected={isLike(symbol)}
-            onClose={() => {
-              dispatch(unSelectSymbol({ symbol }));
-            }}
-          />
-        );
-      })}
+      {symbols.length
+        ? symbols.map((symbol, idx) => {
+            return (
+              <SymbolChip
+                key={`${symbol.symbol.toUpperCase()}-${symbol.symbolId}-${idx}`}
+                symbol={symbol}
+                shadowEffect={shadowEffect}
+                closeButton={closeButton}
+                selected={isLike(symbol)}
+                onClose={() => {
+                  dispatch(unSelectSymbol({ symbol }));
+                }}
+              />
+            );
+          })
+        : null}
     </div>
-  ) : null;
+  );
 }
 
 export default SelectedSymbolHorizonList;

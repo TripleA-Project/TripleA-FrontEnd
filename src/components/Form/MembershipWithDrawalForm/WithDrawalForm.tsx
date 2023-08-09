@@ -12,6 +12,8 @@ import { toastNotify } from '@/util/toastNotify';
 import { deleteCookie } from '@/util/cookies';
 import { type UseStepFormContext } from '../StepForm';
 import { type ProfilePayload } from '@/interfaces/Dto/User';
+import { useQueryClient } from '@tanstack/react-query';
+import { unSubscribe } from '@/service/subscribe';
 
 interface WithDrawalFormProps {
   user: ProfilePayload;
@@ -23,6 +25,7 @@ interface WithDrawalReason {
 }
 
 function WithDrawalForm({ user }: WithDrawalFormProps) {
+  const queryClient = useQueryClient();
   const { push } = useRouter();
 
   const {
@@ -35,12 +38,19 @@ function WithDrawalForm({ user }: WithDrawalFormProps) {
 
   const onValid = async (reason: WithDrawalReason) => {
     try {
+      if (user.membership === 'PREMIUM') {
+        await unSubscribe();
+      }
+
       const { data: payload } = await membershipWithDrawal();
 
       if (payload.status === HttpStatusCode.Ok) {
-        done();
-
         await deleteCookie('accessToken');
+
+        queryClient.removeQueries({ queryKey: ['auth'] });
+        queryClient.removeQueries({ queryKey: ['profile'] });
+
+        done();
 
         push('/');
 

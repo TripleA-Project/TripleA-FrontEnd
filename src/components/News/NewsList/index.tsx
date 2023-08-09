@@ -13,7 +13,7 @@ interface NewsListProps {
 
 export function NewsListLoading({ length = 10 }: LoadingProps) {
   return (
-    <section className="space-y-4">
+    <section className="flex flex-col gap-4">
       {Array.from({ length }).map((_, idx) => {
         return <NewsCardLoading key={`${Date.now()}-${idx}`} isLast={idx === length - 1} />;
       })}

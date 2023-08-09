@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { debounce } from 'lodash';
 import { isMobile } from 'react-device-detect';
 import { AppIcons } from '@/components/Icons';
@@ -8,12 +8,16 @@ import { searchCategory } from '@/service/category';
 import { type Category } from '@/interfaces/Category';
 
 interface SearchCategoryProps {
+  disabled?: boolean;
+  submitWrapper?: HTMLDivElement | null;
   onSearch?: (categories: Category[]) => void;
 }
 
-function SearchCategory({ onSearch }: SearchCategoryProps) {
+function SearchCategory({ onSearch, disabled, submitWrapper }: SearchCategoryProps) {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const isSearchingRef = useRef<boolean>(false);
+
+  const headerRef = useRef<HTMLElement | null>(null);
 
   const debounceChangeHandler = debounce(async (e: React.ChangeEvent) => {
     try {
@@ -45,24 +49,31 @@ function SearchCategory({ onSearch }: SearchCategoryProps) {
 
   const handleFocus = () => {
     if (isMobile) {
-      document.documentElement.style.minHeight = window.screen.height + 'px';
-      document.body.style.minHeight = window.screen.height + 'px';
-      document.body.classList.add('translate-y-0', '-mt-[52px]');
+      if (headerRef.current) {
+        headerRef.current.style.position = 'sticky';
+        headerRef.current.style.marginTop = '-52px';
+      }
 
-      document.querySelector('header')!.style.position = 'sticky';
+      if (submitWrapper) {
+        submitWrapper.style.position = 'relative';
+        submitWrapper.style.bottom = '0';
+        submitWrapper.style.padding = '0';
+      }
     }
   };
 
   const handleBlur = () => {
     if (isMobile) {
-      document.body.classList.remove('-mt-[52px]');
-      document.querySelector('header')!.style.removeProperty('position');
+      if (isMobile) {
+        headerRef.current?.style.removeProperty('position');
+        headerRef.current?.style.removeProperty('margin-top');
 
-      setTimeout(() => {
-        document.documentElement.style.removeProperty('min-height');
-        document.body.style.removeProperty('min-height');
-        document.body.classList.remove('translate-y-0');
-      }, 100);
+        setTimeout(() => {
+          submitWrapper?.style.removeProperty('position');
+          submitWrapper?.style.removeProperty('bottom');
+          submitWrapper?.style.removeProperty('padding');
+        }, 100);
+      }
     }
   };
 
@@ -85,6 +96,21 @@ function SearchCategory({ onSearch }: SearchCategoryProps) {
       isSearchingRef.current = false;
     }
   };
+
+  useEffect(() => {
+    headerRef.current = document.querySelector('header');
+
+    return () => {
+      if (isMobile) {
+        headerRef.current?.style.removeProperty('sticky');
+        headerRef.current?.style.removeProperty('margin-top');
+
+        submitWrapper?.style.removeProperty('position');
+        submitWrapper?.style.removeProperty('bottom');
+        submitWrapper?.style.removeProperty('padding');
+      }
+    };
+  }, []); /* eslint-disable-line */
 
   return (
     <div>

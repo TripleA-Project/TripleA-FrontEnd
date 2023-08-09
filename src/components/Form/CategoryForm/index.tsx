@@ -4,6 +4,7 @@ import { useLayoutEffect, useState, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useFormContext } from 'react-hook-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { throttle } from 'lodash';
 import { ToastContainer } from 'react-toastify';
 import { initLikedCategoryMap, initSelectedCategoryMap, reset, useCategoryList } from '@/redux/slice/categorySlice';
 import { SearchCategory, SearchCategoryResult, SelectedCategoryHorizonList } from '@/components/Search/SearchCategory';
@@ -19,10 +20,9 @@ import { type UseStepFormContext } from '../StepForm';
 interface CategoryFormProps {
   buttonText?: string;
   skipable?: boolean;
-  hasNotNavBar?: boolean;
 }
 
-function CategoryForm({ buttonText = '선택 완료', hasNotNavBar }: CategoryFormProps) {
+function CategoryForm({ buttonText = '선택 완료' }: CategoryFormProps) {
   const queryClient = useQueryClient();
 
   const pathName = usePathname();
@@ -33,6 +33,24 @@ function CategoryForm({ buttonText = '선택 완료', hasNotNavBar }: CategoryFo
   const formContext = useFormContext() as UseStepFormContext;
 
   const { status: authStatus } = useAuth();
+
+  const handleView = () => {
+    if (window.innerHeight < 700) {
+      formWrapperRef.current!.style.marginTop = '-40px';
+
+      return;
+    }
+
+    formWrapperRef.current!.style.removeProperty('margin-top');
+  };
+
+  const resizeThrottle = throttle((e: UIEvent) => {
+    handleView();
+  }, 300);
+
+  const cleanUp = () => {
+    formWrapperRef.current?.style.removeProperty('margin-top');
+  };
 
   const { data: likedCategoryListResponse, status: likedCategoryStatus } = useQuery(
     ['likedCategoryList'],
@@ -45,6 +63,9 @@ function CategoryForm({ buttonText = '선택 완료', hasNotNavBar }: CategoryFo
       },
     },
   );
+
+  const formWrapperRef = useRef<HTMLDivElement>(null);
+  const submitWrapperRef = useRef<HTMLDivElement>(null);
 
   const { mutateAsync: like, status: likeStatus } = useMutation((id: number) => likeCategory({ id }), {
     retry: 0,
@@ -136,8 +157,18 @@ function CategoryForm({ buttonText = '선택 완료', hasNotNavBar }: CategoryFo
     dispatch(initSelectedCategoryMap());
   }, [authStatus, likedCategoryStatus, likedCategoryListResponse]); /* eslint-disable-line */
 
+  useLayoutEffect(() => {
+    window.addEventListener('resize', resizeThrottle);
+
+    handleView();
+
+    return () => {
+      cleanUp();
+    };
+  }, []); /* eslint-disable-line */
+
   return (
-    <>
+    <div ref={formWrapperRef} className="relative">
       <div className="my-11 space-y-3">
         <h3 className="flex items-center justify-center text-xl font-bold">
           <span className="relative inline-block align-top">
@@ -152,7 +183,11 @@ function CategoryForm({ buttonText = '선택 완료', hasNotNavBar }: CategoryFo
         </h4>
       </div>
       <form onSubmit={handleSubmit}>
-        <SearchCategory onSearch={(categories) => setSearchedCategories(categories)} />
+        <SearchCategory
+          submitWrapper={submitWrapperRef.current}
+          onSearch={(categories) => setSearchedCategories(categories)}
+          disabled={authStatus === 'Pending' || authStatus === 'Loading' || likedCategoryStatus !== 'success'}
+        />
         <SearchCategoryResult
           loading={authStatus === 'Pending' || authStatus === 'Loading' || likedCategoryStatus !== 'success'}
           categories={searchedCategories}
@@ -162,9 +197,14 @@ function CategoryForm({ buttonText = '선택 완료', hasNotNavBar }: CategoryFo
             }
           }}
         />
-        <div className={`fixed left-0 w-full ${hasNotNavBar ? 'bottom-2 ' : 'bottom-[calc(63px+8px)]'}`}>
-          <div className="mx-auto box-border w-full max-w-screen-pc space-y-4 px-4 mobile:min-w-[390px]">
-            <SelectedCategoryHorizonList shadowEffect closeButton categories={selectedCategories} />
+        <div ref={submitWrapperRef} className={`fixed_inner fixed bottom-12 `}>
+          <SelectedCategoryHorizonList
+            loading={authStatus === 'Pending' || authStatus === 'Loading' || likedCategoryStatus !== 'success'}
+            shadowEffect
+            closeButton
+            categories={selectedCategories}
+          />
+          <div className="mx-auto mt-4 w-full">
             <Button
               type="submit"
               disabled={likeStatus === 'loading' || unlikeStatus === 'loading'}
@@ -197,7 +237,7 @@ function CategoryForm({ buttonText = '선택 완료', hasNotNavBar }: CategoryFo
           setShowSubScribeNotification(false);
         }}
       />
-    </>
+    </div>
   );
 }
 

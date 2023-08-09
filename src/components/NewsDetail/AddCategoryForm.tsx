@@ -9,7 +9,7 @@ import { type Category } from '@/interfaces/Category';
 import { type OnChipChangeResult } from '../UI/Chip/SymbolChip';
 
 interface AddCategoryFormProps {
-  category: Category;
+  category?: Category;
 }
 
 function AddCategoryForm({ category }: AddCategoryFormProps) {
@@ -39,7 +39,7 @@ function AddCategoryForm({ category }: AddCategoryFormProps) {
   const [liked, setLiked] = useState(isLike());
 
   function isLike() {
-    return !!likedCategory?.data?.find((likeCategory) => likeCategory.category === category.category);
+    return !!likedCategory?.data?.find((likeCategory) => likeCategory.category === category?.category);
   }
 
   const { mutateAsync: like } = useMutation((id: number) => likeCategory({ id }), {
@@ -69,9 +69,18 @@ function AddCategoryForm({ category }: AddCategoryFormProps) {
   });
 
   const handleChange: () => Promise<OnChipChangeResult> = async () => {
-    if (!isLike()) {
+    if (likedCategoryStatus === 'loading') {
+      return {
+        type: 'api',
+        status: 'loading',
+      };
+    }
+
+    const liked = isLike();
+
+    if (!liked) {
       const targetLikeCategory = allCategoryResponse?.data?.find(
-        (categoryItem) => categoryItem.category === category.category,
+        (categoryItem) => categoryItem.category === category?.category,
       );
 
       if (targetLikeCategory) {
@@ -93,9 +102,9 @@ function AddCategoryForm({ category }: AddCategoryFormProps) {
       }
     }
 
-    if (isLike()) {
+    if (liked) {
       const targetUnlikeCategory = likedCategory?.data?.find(
-        (likeCategory) => likeCategory.category === category.category,
+        (likeCategory) => likeCategory.category === category?.category,
       );
 
       if (targetUnlikeCategory) {
@@ -131,12 +140,14 @@ function AddCategoryForm({ category }: AddCategoryFormProps) {
   return (
     <>
       <h3 className="mb-4 text-xl font-semibold">관심 카테고리에 추가하기</h3>
-      <CategoryChip
-        loading={allCategoryStatus === 'loading' || likedCategoryStatus === 'loading'}
-        category={category}
-        selected={liked}
-        onChange={handleChange}
-      />
+      {category ? (
+        <CategoryChip
+          loading={allCategoryStatus === 'loading' || likedCategoryStatus === 'loading'}
+          category={category}
+          selected={liked}
+          onChange={handleChange}
+        />
+      ) : null}
     </>
   );
 }

@@ -32,13 +32,25 @@ function NewsHomeHeader({ isLikeNewsPage }: NewsHomeHeaderProps) {
             <AppIcons.Search className="shrink-0 text-xl text-[#373737]" />
           </Link>
           {isLikeNewsPage ? (
-            <button onClick={() => setOpenSetInterestModal(true)}>
+            <button
+              onClick={() => {
+                document.body.classList.add('!overflow-hidden');
+                setOpenSetInterestModal(true);
+              }}
+            >
               <MdTune className="text-2xl text-[#373737]" />
             </button>
           ) : null}
         </div>
       </Header>
-      {openSetInterestModal ? <SetInterestsPortal onClose={() => setOpenSetInterestModal(false)} /> : null}
+      {openSetInterestModal ? (
+        <SetInterestsPortal
+          onClose={() => {
+            document.body.classList.remove('!overflow-hidden');
+            setOpenSetInterestModal(false);
+          }}
+        />
+      ) : null}
     </>
   );
 }
