@@ -4,8 +4,8 @@ import Link from 'next/link';
 import NotificationPortal from './NotificationPortal';
 import Button from '../Button/Button';
 import { NotificationIcons } from './NotificationIcons';
-import { type NotificationProps } from './Notification';
 import { HistoryNotificationTemplate } from '@/constants/notification';
+import { type NotificationProps } from './Notification';
 
 interface HistoryNotificationProps extends Omit<NotificationProps, 'children'> {
   notificationType: keyof typeof HistoryNotificationTemplate;
@@ -31,14 +31,12 @@ function HistoryNotification({
         <div className="w-[288px] rounded-[10px] bg-white p-[22px] shadow-[0_1px_15px_rgba(90,90,90,0.2)]">
           <div className="flex flex-col items-center">
             <NotificationIcons.VeryDissatisfied className="text-4xl" />
-            <div className="mb-2 mt-2.5 text-center font-semibold">
-              {HistoryNotificationTemplate[notificationType].content
-                .trim()
-                .split('\n')
-                .map((text) => {
-                  return <p key={text}>{text}</p>;
-                })}
-            </div>
+            <div
+              className="mb-2 mt-2.5 text-center font-semibold"
+              dangerouslySetInnerHTML={{
+                __html: HistoryNotificationTemplate[notificationType].content.trim().replaceAll('\n', '<br />'),
+              }}
+            />
           </div>
           <Link href={HistoryNotificationTemplate[notificationType].linkURL}>
             <Button bgColorTheme="orange" textColorTheme="white" fullWidth className="!h-8 !rounded-[5px]">

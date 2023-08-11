@@ -18,6 +18,7 @@ import {
   type SearchKeywordNewsRequestConfig,
   type SearchKeywordNewsResponse,
   type AINewsAnalysisParam,
+  type AINewsAnalysisRequest,
   type AINewsAnalysisResponse,
   type GetNewsByIdResponse,
   type CollapseNews,
@@ -240,12 +241,20 @@ export async function getNewsById({ id }: GetNewsByIdSearchParam) {
 }
 
 /**
- * AI 뉴스 분석 API (GET)
+ * AI 뉴스 분석 API (POST)
  *
  * `id` 뉴스 id [**number**]
+ *
+ * `summary` [**string**]
  */
-export async function getAINewsAnalysis({ id }: AINewsAnalysisParam) {
-  const getAINewsAnalysisResponse = await axiosInstance.get<AINewsAnalysisResponse>(`/api/news/${id}/ai`);
+export async function getAINewsAnalysis({ id, summary }: AINewsAnalysisParam & AINewsAnalysisRequest) {
+  const getAINewsAnalysisResponse = await axiosInstance.post<
+    any,
+    AxiosResponse<AINewsAnalysisResponse>,
+    AINewsAnalysisRequest
+  >(`/api/auth/news/${id}/ai`, {
+    summary,
+  });
 
   return getAINewsAnalysisResponse;
 }

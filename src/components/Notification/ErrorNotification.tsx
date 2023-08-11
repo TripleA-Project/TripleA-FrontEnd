@@ -26,16 +26,10 @@ function ErrorNotification({
       <div className="rounded-tl-2xl rounded-tr-2xl bg-white p-4">
         <div className="mb-[78px] mt-14 flex flex-col items-center">
           <NotificationIcons.Error className="mb-10 text-4xl" />
-          {content
-            .trim()
-            .split('\n')
-            .map((text) => {
-              return (
-                <p key={text} className="font-bold">
-                  {text}
-                </p>
-              );
-            })}
+          <p
+            className="text-center font-bold"
+            dangerouslySetInnerHTML={{ __html: content.trim().replaceAll('\n', '<br />') }}
+          />
         </div>
         {linkURL !== '' ? (
           <Link href={linkURL}>
