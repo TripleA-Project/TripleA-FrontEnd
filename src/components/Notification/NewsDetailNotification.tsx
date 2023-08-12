@@ -27,24 +27,18 @@ function NewsDetailNotification({
       <div className="rounded-tl-2xl rounded-tr-2xl bg-white p-4">
         <div className="mb-[42px] mt-11 flex flex-col items-center">
           <NotificationIcons.VeryDissatisfied className="text-4xl " />
-          <h3 className="my-6 text-xl font-semibold">
-            {NewsDetailNotificationTemplate[notificationType].title
-              .trim()
-              .split('\n')
-              .map((text) => {
-                return <p key={text}>{text}</p>;
-              })}
-          </h3>
-          {NewsDetailNotificationTemplate[notificationType].content
-            .trim()
-            .split('\n')
-            .map((text) => {
-              return (
-                <p key={text} className="text-[#4E525D]">
-                  {text}
-                </p>
-              );
-            })}
+          <h3
+            className="my-6 text-center text-xl font-semibold"
+            dangerouslySetInnerHTML={{
+              __html: NewsDetailNotificationTemplate[notificationType].title.trim().replaceAll('\n', '<br />'),
+            }}
+          />
+          <p
+            className="text-center text-[#4E525D]"
+            dangerouslySetInnerHTML={{
+              __html: NewsDetailNotificationTemplate[notificationType].content.trim().replaceAll('\n', '<br />'),
+            }}
+          />
         </div>
         <Link
           href={

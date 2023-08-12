@@ -2,19 +2,30 @@
 
 import NewsDetailTranslation from './NewsDetailTranslation';
 import DetailThumbnail from './DetailThumbnail';
+import AINewsAnalysis from './AINewsAnalysis';
 
 interface NewsDetailContentProps {
+  newsId: number;
   onSwitch: (isOn: boolean) => void;
   thumbnail?: string;
   description: {
     kor: string;
     eng: string;
   };
+  summary: string;
   keywords: string[];
   isTranslation: boolean;
 }
 
-function NewsDetailContent({ thumbnail, description, keywords, isTranslation, onSwitch }: NewsDetailContentProps) {
+function NewsDetailContent({
+  newsId,
+  thumbnail,
+  description,
+  keywords,
+  summary,
+  isTranslation,
+  onSwitch,
+}: NewsDetailContentProps) {
   const getTextLineMap = (content?: string) => {
     return content
       ? content
@@ -26,14 +37,15 @@ function NewsDetailContent({ thumbnail, description, keywords, isTranslation, on
 
   return (
     <>
-      <section>
+      <section className="space-y-2">
         <NewsDetailTranslation
           initValue={description.kor ? true : false}
           disabled={description.kor ? false : true}
           onSwitch={onSwitch}
         />
+        <AINewsAnalysis newsId={newsId} summary={summary} />
       </section>
-      <section className="my-4">
+      <section id="detail_content" className="my-4">
         <DetailThumbnail src={thumbnail} />
       </section>
       <section className="break-all text-[15px] font-medium">

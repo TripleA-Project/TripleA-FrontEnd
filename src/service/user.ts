@@ -1,9 +1,12 @@
+import { AxiosResponse } from 'axios';
 import { axiosInstance } from './axios';
 import {
   type ProfileResponse,
   type MembershipWithDrawalResponse,
   type UpdateUserInfoRequest,
   type UpdateUserInfoResponse,
+  type FindPasswordRequest,
+  FindPasswordResponse,
 } from '@/interfaces/Dto/User';
 
 /**
@@ -66,4 +69,20 @@ export async function updateUserInfo({
   );
 
   return updateUserInfoResponse;
+}
+
+/**
+ * 새 비밀번호 발급(비밀번호 찾기) API (POST)
+ *
+ * `email` [**string**]
+ *
+ * `fullName` [**string**]
+ */
+export async function findPassword({ email, fullName }: FindPasswordRequest) {
+  const findPasswordResponse = await axiosInstance.post<any, AxiosResponse<FindPasswordResponse>, FindPasswordRequest>(
+    '/api/find/password',
+    { email, fullName },
+  );
+
+  return findPasswordResponse;
 }

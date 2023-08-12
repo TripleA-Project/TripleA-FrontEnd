@@ -18,16 +18,10 @@ function TimeoutNotification({ active, closeOnClick, onClose, title, content }: 
           <div className="mb-4 flex flex-col items-center">
             <NotificationIcons.Error className="mb-2 text-4xl" />
             <h3 className="mb-4 text-2xl font-bold text-[#FD954A]">{title}</h3>
-            {content
-              .trim()
-              .split('\n')
-              .map((text) => {
-                return (
-                  <p key={text} className="text-[#4E525D]">
-                    {text}
-                  </p>
-                );
-              })}
+            <p
+              className="text-center text-[#4E525D]"
+              dangerouslySetInnerHTML={{ __html: content.trim().replaceAll('\n', '<br />') }}
+            />
             <Button
               bgColorTheme="orange"
               textColorTheme="white"

@@ -13,6 +13,7 @@ import Button from '../Button/Button';
 import NoDescription from './NoDescription';
 import OtherNews from './OtherNews';
 import { NewsDetailTranslationLoading } from './NewsDetailTranslation';
+import { AINewsAnalysisLoading } from './AINewsAnalysis';
 import NewsDetailChipList, { NewsDetailChipListLoading } from './Chip/NewsDetailChipList';
 import NewsDetailContent from './NewsDetailContent';
 import AddCategoryForm from './AddCategoryForm';
@@ -46,8 +47,9 @@ function NewsDetailLoading() {
       <section id="detail-chips" className="mb-5">
         <NewsDetailChipListLoading />
       </section>
-      <section>
+      <section className="space-y-2">
         <NewsDetailTranslationLoading />
+        <AINewsAnalysisLoading />
       </section>
       <section className="my-4">
         <DetailThumbnailLoading />
@@ -236,6 +238,7 @@ export function NewsDetail({ newsId, requestSymbol }: NewsDetailProps) {
               <NoDescription />
             ) : (
               <NewsDetailContent
+                newsId={Number(newsId)}
                 thumbnail={newsDetailPayload.data.thumbnail}
                 description={{
                   kor:
@@ -247,6 +250,7 @@ export function NewsDetail({ newsId, requestSymbol }: NewsDetailProps) {
                       ? newsDetailPayload.data.eng.summary
                       : newsDetailPayload.data.eng.description!,
                 }}
+                summary={newsDetailPayload.data.eng.summary ?? ''}
                 keywords={newsDetailPayload.data.keyword}
                 isTranslation={isTranslation}
                 onSwitch={(isOn) => setIsTranslation(isOn)}

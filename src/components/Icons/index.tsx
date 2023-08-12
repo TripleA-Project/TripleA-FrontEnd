@@ -2,7 +2,7 @@ import { type IconBaseProps } from 'react-icons';
 import { SearchIcon } from './SearchIcon';
 import { BackArrowGray, NoBarBackArrowBlack } from './BackArrow';
 import { CloseFillDarkGray, CloseFillGray, CloseFillOrange } from './CloseFill';
-import { BlackLogo, GrayLogo, OrangeLogo } from './Logo';
+import { BlackLogo, ChatGptLogo, GrayLogo, OrangeLogo } from './Logo';
 import { LockIcon } from './Lock';
 import { BookmarkFill, BookmarkNoFill } from './Bookmark';
 import { HeartGrayFill, HeartOrangeFill, HeartOutline } from './Heart';
@@ -49,6 +49,7 @@ interface Logos {
   Orange: Icon;
   Gray: Icon;
   Black: Icon;
+  ChatGpt: Icon;
 }
 
 export type ProfileKeys = 'Profile1' | 'Profile2' | 'Profile3' | 'Profile4';
@@ -59,6 +60,7 @@ export const AppLogos: Logos = {
   Orange: (props) => <OrangeLogo {...props} />,
   Gray: (props) => <GrayLogo {...props} />,
   Black: (props) => <BlackLogo {...props} />,
+  ChatGpt: (props) => <ChatGptLogo {...props} />,
 };
 
 export const AppProfiles: Profiles = {
