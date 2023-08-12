@@ -5,8 +5,6 @@ import { useState } from 'react';
 import {
   deleteRecentSearchLocalStorage,
   getRecentSearchLocalStorage,
-  isEng,
-  isKor,
   setRecentSearchLocalStorage,
 } from '@/util/autocomplete';
 import { IoCloseOutline } from 'react-icons/io5';

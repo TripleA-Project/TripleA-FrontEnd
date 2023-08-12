@@ -1,21 +1,14 @@
-export function isEng(keyword: string) {
+export function isSymbolKeyword(keyword: string) {
   const regex = new RegExp(`^[a-zA-Z]{1,${keyword.length}}$`, 'g');
 
   return regex.test(keyword);
 }
 
-export function isKor(keyword: string) {
-  const regex = new RegExp(`^[가-힣\/]{1,${keyword.length}}$`, 'g');
+export function isCategoryKeyword(keyword: string) {
+  const regex = new RegExp(`^[가-힣\/ ]{1,${keyword.length}}$`, 'g');
 
   return regex.test(keyword);
 }
-
-// export function getSearchType(keyword: string): SearchType {
-//   const isSymbol = isEng(keyword);
-//   const isCategory = isKor(keyword);
-
-//   return isSymbol ? 'symbol' : isCategory ? 'category' : 'notMatched';
-// }
 
 export function getRecentSearchLocalStorage(): string[] | null {
   const recentSearch = localStorage.getItem('recent');

@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import CategoryNewsList from './CategoryNewsList';
 import { NoResult } from './SearchResult';
 import { searchCategory } from '@/service/category';
-import { isKor } from '@/util/autocomplete';
+import { isCategoryKeyword } from '@/util/autocomplete';
 import { type Category } from '@/interfaces/Category';
 
 interface CategoryResultProps {
@@ -19,7 +19,7 @@ function CategoryResult({ keyword }: CategoryResultProps) {
     {
       retry: false,
       refetchOnWindowFocus: false,
-      enabled: !!keyword && isKor(keyword),
+      enabled: !!keyword && isCategoryKeyword(keyword),
       select(response) {
         return response.data;
       },

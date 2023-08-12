@@ -103,6 +103,7 @@ function CategoryNewsList({ category }: CategoryNewsListProps) {
       <div>
         <h2 className="mb-4 mt-5 font-bold">관련 뉴스</h2>
         <div>
+          {isLoading ? <NewsListLoading /> : null}
           {isSuccess ? (
             <NewsList
               newsList={categoryNewsPageResponse.pages.flatMap((page) =>
