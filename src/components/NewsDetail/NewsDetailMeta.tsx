@@ -33,13 +33,15 @@ function NewsDetailMeta({ newsId, symbolName, bookmark, source, publishedDate }:
   };
 
   return (
-    <section className="flex items-center justify-between">
-      <section className="text-xs text-[#777777]">
-        <span className="font-bold">{convertSource(source)} </span>
-        <span className="font-semibold">{dayjs(publishedDate).format('YYYY.MM.DD HH:mm:ss')}</span>
+    <>
+      <section className="flex items-center justify-between">
+        <section className="text-xs text-[#777777]">
+          <span className="font-bold">{convertSource(source)} </span>
+          <span className="font-semibold">{dayjs(publishedDate).format('YYYY.MM.DD HH:mm:ss')}</span>
+        </section>
+        <NewsCardAction showCount={false} newsId={newsId} symbolName={symbolName} bookmark={bookmark} />
       </section>
-      <NewsCardAction showCount={false} newsId={newsId} symbolName={symbolName} bookmark={bookmark} />
-    </section>
+    </>
   );
 }
 

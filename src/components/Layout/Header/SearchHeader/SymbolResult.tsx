@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { searchSymbol } from '@/service/symbol';
-import { isEng } from '@/util/autocomplete';
+import { isSymbolKeyword } from '@/util/autocomplete';
 import { SearchedSymbol } from '@/interfaces/Symbol';
 import { NoResult } from './SearchResult';
 import Link from 'next/link';
@@ -20,7 +20,7 @@ function SymbolResult({ keyword }: SymbolResultProps) {
     {
       retry: false,
       refetchOnWindowFocus: false,
-      enabled: !!keyword && isEng(keyword),
+      enabled: !!keyword && isSymbolKeyword(keyword),
       select(response) {
         return response.data;
       },

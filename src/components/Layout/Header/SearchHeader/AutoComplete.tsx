@@ -7,7 +7,7 @@ import SymbolLogoImage from '@/components/Image/SymbolLogoImage';
 import RecentSearch from './RecentSearch';
 import { searchCategory } from '@/service/category';
 import { searchSymbol } from '@/service/symbol';
-import { isEng, isKor, setRecentSearchLocalStorage } from '@/util/autocomplete';
+import { isCategoryKeyword, isSymbolKeyword, setRecentSearchLocalStorage } from '@/util/autocomplete';
 import { type SearchedSymbol } from '@/interfaces/Symbol';
 import { type Category } from '@/interfaces/Category';
 
@@ -115,9 +115,11 @@ function createMatchCategoryElement({ keyword, category }: { keyword: string; ca
       className="box-border flex h-14 items-center p-4"
       onClick={handleClick}
     >
-      {beforeHighlightText ? <span className="font-semibold text-[#131F3C]">{beforeHighlightText}</span> : null}
-      {highlightText ? <span className="text-[#FD954A]">{highlightText}</span> : null}
-      {afterHighlightText ? <span className="font-semibold text-[#131F3C]">{afterHighlightText}</span> : null}
+      <div>
+        {beforeHighlightText ? <span className="font-semibold text-[#131F3C]">{beforeHighlightText}</span> : null}
+        {highlightText ? <span className="text-[#FD954A]">{highlightText}</span> : null}
+        {afterHighlightText ? <span className="font-semibold text-[#131F3C]">{afterHighlightText}</span> : null}
+      </div>
     </Link>
   );
 }
@@ -132,7 +134,7 @@ function AutoComplete({ keyword, isFocus }: AutoCompleteProps) {
   } = useQuery(['search', 'symbol', 'keyword', keyword], () => searchSymbol({ symbol: keyword! }), {
     retry: false,
     refetchOnWindowFocus: false,
-    enabled: !!keyword && isEng(keyword),
+    enabled: !!keyword && isSymbolKeyword(keyword),
     select(response) {
       return response.data;
     },
@@ -145,7 +147,7 @@ function AutoComplete({ keyword, isFocus }: AutoCompleteProps) {
   } = useQuery(['search', 'category', 'keyword', keyword], () => searchCategory({ search: keyword }), {
     retry: false,
     refetchOnWindowFocus: false,
-    enabled: !!keyword && isKor(decodeURIComponent(keyword)),
+    enabled: !!keyword && isCategoryKeyword(decodeURIComponent(keyword)),
     select(response) {
       return response.data;
     },
@@ -181,11 +183,11 @@ function AutoComplete({ keyword, isFocus }: AutoCompleteProps) {
   const getHasNotAutoCompleteResult = (keyword?: string) => {
     if (!keyword) return true;
 
-    if (isKor(decodeURIComponent(keyword))) {
+    if (isCategoryKeyword(decodeURIComponent(keyword))) {
       return !searchCategoryResult.length;
     }
 
-    if (isEng(decodeURIComponent(keyword))) {
+    if (isSymbolKeyword(decodeURIComponent(keyword))) {
       return !searchSymbolResult.length;
     }
 

@@ -104,8 +104,9 @@ function LoginForm({ continueURL }: LoginFormProps) {
                 } relative flex h-[46px] w-full items-center rounded-lg border bg-white px-4 py-3 transition duration-300`}
               >
                 <input
-                  placeholder="이메일 입력"
                   id="email"
+                  type="email"
+                  placeholder="이메일 입력"
                   className="flex-1 border-none text-sm font-semibold text-black placeholder-[#DBDEE1] outline-none placeholder:font-normal"
                   {...register('email', {
                     required: '이메일을 입력해주세요',
@@ -202,8 +203,13 @@ function LoginForm({ continueURL }: LoginFormProps) {
               자동 로그인
             </label>
           </div>
-          <Link className="text-sm font-medium text-[#5B6267] underline underline-offset-2" href="/signup">
+          <Link href="/signup" className="text-sm font-medium text-[#5B6267] underline underline-offset-2">
             회원가입
+          </Link>
+        </div>
+        <div className="mt-2 flex items-center justify-center">
+          <Link href="/password" className="text-sm font-medium text-[#5B6267] underline underline-offset-2">
+            비밀번호를 잊으셨나요?
           </Link>
         </div>
       </div>

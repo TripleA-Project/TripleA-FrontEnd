@@ -4,11 +4,7 @@ interface PageProps extends React.HTMLProps<HTMLElement> {
 
 function Page({ children, ...props }: PageProps) {
   return (
-    <main
-      id="page_wrapper"
-      className={`mx-auto box-border min-h-screen max-w-screen-pc p-page mobile:min-w-[390px]`}
-      {...props}
-    >
+    <main id="page_wrapper" className={`inner min-h-screen p-page`} {...props}>
       {children}
     </main>
   );

@@ -1,7 +1,7 @@
 import { AppIcons } from '@/components/Icons';
 import CategoryResult from './CategoryResult';
 import SymbolResult from './SymbolResult';
-import { isEng, isKor } from '@/util/autocomplete';
+import { isCategoryKeyword, isSymbolKeyword } from '@/util/autocomplete';
 
 interface SearchResultProps {
   keyword: string;
@@ -21,8 +21,8 @@ export function NoResult() {
 }
 
 function SearchResult({ keyword }: SearchResultProps) {
-  if (isKor(keyword)) return <CategoryResult keyword={keyword} />;
-  if (isEng(keyword)) return <SymbolResult keyword={keyword} />;
+  if (isCategoryKeyword(keyword)) return <CategoryResult keyword={keyword} />;
+  if (isSymbolKeyword(keyword)) return <SymbolResult keyword={keyword} />;
 
   return <NoResult />;
 }

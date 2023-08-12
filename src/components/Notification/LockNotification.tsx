@@ -30,16 +30,10 @@ function LockNotification({
         <div className="rounded-tl-2xl rounded-tr-2xl bg-white p-4">
           <div className="flex flex-col items-center">
             <h3 className="mb-2.5 text-2xl font-bold text-[#FD954A]">{title}</h3>
-            {content
-              .trim()
-              .split('\n')
-              .map((text) => {
-                return (
-                  <p key={text} className="text-[#4E525D]">
-                    {text}
-                  </p>
-                );
-              })}
+            <p
+              className="text-center text-[#4E525D]"
+              dangerouslySetInnerHTML={{ __html: content.trim().replaceAll('\n', '<br />') }}
+            />
             <div className="mt-6">
               <NotificationIcons.Lock />
             </div>

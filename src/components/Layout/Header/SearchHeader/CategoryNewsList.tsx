@@ -52,12 +52,21 @@ function CategoryNewsList({ category }: CategoryNewsListProps) {
     async function getRelatedSymbols(symbols: string[]) {
       const symbolPromises = await Promise.allSettled(symbols.map((symbol) => getSymbol({ symbol })));
 
+      const symbolSet = new Set();
+
       const symbolPromiseList = symbolPromises
         .filter((symbolPromise) => symbolPromise.status === 'fulfilled' && symbolPromise.value.data.data?.length)
         .flatMap((symbolPromise) => {
           if (symbolPromise.status !== 'fulfilled') return [];
 
           return symbolPromise.value.data.data as Symbol[];
+        })
+        .filter((symbol) => {
+          if (symbolSet.has(symbol.symbol.toUpperCase())) return false;
+
+          symbolSet.add(symbol.symbol.toUpperCase());
+
+          return true;
         })
         .slice(0, 4);
 
@@ -94,6 +103,7 @@ function CategoryNewsList({ category }: CategoryNewsListProps) {
       <div>
         <h2 className="mb-4 mt-5 font-bold">관련 뉴스</h2>
         <div>
+          {isLoading ? <NewsListLoading /> : null}
           {isSuccess ? (
             <NewsList
               newsList={categoryNewsPageResponse.pages.flatMap((page) =>
