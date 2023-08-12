@@ -18,7 +18,7 @@ function Navbar() {
   const pathName = usePathname();
 
   return !shouldHiddenPaths.includes(pathName) ? (
-    <nav className={`fixed bottom-0 left-0 z-10 w-full bg-white`}>
+    <nav className={`fixed_inner fixed bottom-0 z-10 w-full bg-white !p-0`}>
       <ul className="mx-auto box-border flex max-w-screen-pc items-center justify-between px-8 py-3 mobile:min-w-[390px]">
         <li>
           <Link href="/" className="flex flex-col items-center justify-center">

@@ -4,7 +4,6 @@ import LatestNewsPage from '@/components/News/LatestNewsPage';
 import NewsTab from '@/components/News/NewsTab';
 import InterestNewsPage from '@/components/News/InterestNews/InterestNewsPage';
 import NotFound from '@/components/NotFound';
-import { revalidatePath } from 'next/cache';
 
 export const dynamic = 'force-dynamic';
 
