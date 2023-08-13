@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { ToastContainer } from 'react-toastify';
 import StepForm from '@/components/Form/StepForm';
 import EmailForm from '@/components/Form/EmailForm';
 import EmailVerifyForm from '@/components/Form/EmailVerifyForm';
@@ -19,15 +20,25 @@ export const metadata: Metadata = {
 
 export default function Signup() {
   return (
-    <StepForm>
-      <EmailForm />
-      <EmailVerifyForm />
-      <PasswordForm />
-      <NameForm />
-      <TermsForm />
-      <SymbolForm skipable buttonText="다음" />
-      <CategoryForm skipable buttonText="다음" />
-      <CompleteSignup hideHeader />
-    </StepForm>
+    <>
+      <StepForm>
+        <EmailForm />
+        <EmailVerifyForm />
+        <PasswordForm />
+        <NameForm />
+        <TermsForm />
+        <SymbolForm skipable buttonText="다음" />
+        <CategoryForm skipable buttonText="다음" />
+        <CompleteSignup hideHeader />
+      </StepForm>
+      <ToastContainer
+        position="bottom-center"
+        autoClose={3000}
+        hideProgressBar
+        newestOnTop={true}
+        pauseOnFocusLoss={false}
+        pauseOnHover={false}
+      />
+    </>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { MdClear } from 'react-icons/md';
 import CategoryAccordion from '../Accordion/CategoryAccordion';
 import SymbolAccordion from '../Accordion/SymbolAccordion';
@@ -10,6 +10,12 @@ interface SetInterestModalProps {
 }
 
 function SetInterestModal({ onClose }: SetInterestModalProps) {
+  useEffect(() => {
+    return () => {
+      document.body.classList.remove('!overflow-hidden');
+    };
+  }, []);
+
   return (
     <div className="fixed_inner fixed top-0 z-10 h-screen overflow-auto bg-white">
       <div className="box-border px-4">
