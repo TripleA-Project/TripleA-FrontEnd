@@ -12,11 +12,12 @@ import { SearchCategory, SearchCategoryResult, SelectedCategoryHorizonList } fro
 import Button from '@/components/Button/Button';
 import { LockNotification } from '@/components/Notification';
 import { disLikeCategory, getLikeCategory, likeCategory } from '@/service/category';
-import useAuth from '@/hooks/useAuth';
+import { getProfile } from '@/service/user';
 import { LockNotificationTemplate } from '@/constants/notification';
 import { toastNotify } from '@/util/toastNotify';
 import { type Category } from '@/interfaces/Category';
 import { type UseStepFormContext } from '../StepForm';
+import { HttpStatusCode } from 'axios';
 
 interface CategoryFormProps {
   buttonText?: string;
@@ -32,8 +33,6 @@ function CategoryForm({ buttonText = '선택 완료' }: CategoryFormProps) {
   const isSuccessRef = useRef(true);
 
   const formContext = useFormContext() as UseStepFormContext;
-
-  const { status: authStatus } = useAuth();
 
   const handleView = () => {
     if (window.innerHeight < 700) {
@@ -52,6 +51,14 @@ function CategoryForm({ buttonText = '선택 완료' }: CategoryFormProps) {
   const cleanUp = () => {
     formWrapperRef.current?.style.removeProperty('margin-top');
   };
+
+  const { data: profileResponse, status: profileStatus } = useQuery(['profile'], () => getProfile(), {
+    retry: 0,
+    refetchOnWindowFocus: false,
+    select(response) {
+      return response.data;
+    },
+  });
 
   const { data: likedCategoryListResponse, status: likedCategoryStatus } = useQuery(
     ['likedCategoryList'],
@@ -114,7 +121,9 @@ function CategoryForm({ buttonText = '선택 완료' }: CategoryFormProps) {
 
     if (isSuccessRef.current === true) {
       if (pathName.startsWith('/signup')) {
-        formContext && formContext.done();
+        queryClient.invalidateQueries(['likedCategoryList']);
+
+        formContext.done();
 
         return;
       }
@@ -142,9 +151,13 @@ function CategoryForm({ buttonText = '선택 완료' }: CategoryFormProps) {
   };
 
   useLayoutEffect(() => {
-    if (authStatus === 'Pending' || authStatus === 'Loading' || likedCategoryStatus === 'loading') return;
+    if (profileStatus === 'loading' || likedCategoryStatus === 'loading') return;
 
-    if (authStatus !== 'AuthUser' || likedCategoryStatus === 'error' || likedCategoryListResponse.status !== 200) {
+    if (
+      profileStatus === 'error' ||
+      likedCategoryStatus === 'error' ||
+      likedCategoryListResponse.status !== HttpStatusCode.Ok
+    ) {
       push('/login?continueURL=/mypage/edit/category');
 
       return;
@@ -156,7 +169,7 @@ function CategoryForm({ buttonText = '선택 완료' }: CategoryFormProps) {
 
     dispatch(initLikedCategoryMap({ categories: likedCategoryListResponse.data ?? [] }));
     dispatch(initSelectedCategoryMap());
-  }, [authStatus, likedCategoryStatus, likedCategoryListResponse]); /* eslint-disable-line */
+  }, [profileStatus, likedCategoryStatus, likedCategoryListResponse]); /* eslint-disable-line */
 
   useLayoutEffect(() => {
     window.addEventListener('resize', resizeThrottle);
@@ -187,10 +200,10 @@ function CategoryForm({ buttonText = '선택 완료' }: CategoryFormProps) {
         <SearchCategory
           submitWrapper={submitWrapperRef.current}
           onSearch={(categories) => setSearchedCategories(categories)}
-          disabled={authStatus === 'Pending' || authStatus === 'Loading' || likedCategoryStatus !== 'success'}
+          disabled={profileStatus === 'loading' || likedCategoryStatus !== 'success'}
         />
         <SearchCategoryResult
-          loading={authStatus === 'Pending' || authStatus === 'Loading' || likedCategoryStatus !== 'success'}
+          loading={profileStatus === 'loading' || likedCategoryStatus !== 'success'}
           categories={searchedCategories}
           onDispatch={(requiredSubscribe) => {
             if (requiredSubscribe) {
@@ -200,7 +213,7 @@ function CategoryForm({ buttonText = '선택 완료' }: CategoryFormProps) {
         />
         <div ref={submitWrapperRef} className={`fixed_inner fixed bottom-12 `}>
           <SelectedCategoryHorizonList
-            loading={authStatus === 'Pending' || authStatus === 'Loading' || likedCategoryStatus !== 'success'}
+            loading={profileStatus === 'loading' || likedCategoryStatus !== 'success'}
             shadowEffect
             closeButton
             categories={selectedCategories}

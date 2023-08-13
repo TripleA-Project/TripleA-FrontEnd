@@ -13,7 +13,7 @@ import Button from '@/components/Button/Button';
 import { SearchSymbol, SelectedSymbolHorizonList, SearchSymbolResult } from '@/components/Search/SearchSymbol';
 import { LockNotification } from '@/components/Notification';
 import { disLikeSymbol, getLikeSymbol, likeSymbol } from '@/service/symbol';
-import useAuth from '@/hooks/useAuth';
+import { getProfile } from '@/service/user';
 import { toastNotify } from '@/util/toastNotify';
 import { LockNotificationTemplate } from '@/constants/notification';
 import { type UseStepFormContext } from '../StepForm';
@@ -31,8 +31,6 @@ function SymbolForm({ buttonText = '선택 완료' }: SymbolFormProps) {
   const { push } = useRouter();
 
   const formContext = useFormContext() as UseStepFormContext;
-
-  const { status: authStatus } = useAuth();
 
   const handleView = () => {
     if (window.innerHeight < 700) {
@@ -52,13 +50,25 @@ function SymbolForm({ buttonText = '선택 완료' }: SymbolFormProps) {
     formWrapperRef.current?.style.removeProperty('margin-top');
   };
 
-  const { data: likedSymbolList, status: likedSymbolStatus } = useQuery(['likedSymbolList'], () => getLikeSymbol(), {
+  const { data: profileResponse, status: profileStatus } = useQuery(['profile'], () => getProfile(), {
     retry: 0,
     refetchOnWindowFocus: false,
-    select(payload) {
-      return payload.data;
+    select(response) {
+      return response.data;
     },
   });
+
+  const { data: likedSymbolResponse, status: likedSymbolStatus } = useQuery(
+    ['likedSymbolList'],
+    () => getLikeSymbol(),
+    {
+      retry: 0,
+      refetchOnWindowFocus: false,
+      select(response) {
+        return response.data;
+      },
+    },
+  );
 
   const formWrapperRef = useRef<HTMLDivElement>(null);
   const submitWrapperRef = useRef<HTMLDivElement>(null);
@@ -83,15 +93,15 @@ function SymbolForm({ buttonText = '선택 완료' }: SymbolFormProps) {
   const { mutateAsync: unlike, status: unlikeStatus } = useMutation((id: number) => disLikeSymbol({ id }), {
     retry: 0,
     onSuccess(data, index) {
-      if (likedSymbolList?.data) {
-        const symbol = likedSymbolList.data.find((_, idx) => idx === index - 1)!.symbol;
+      if (likedSymbolResponse?.data) {
+        const symbol = likedSymbolResponse.data.find((_, idx) => idx === index - 1)!.symbol;
 
         successSymbolListRef.current.unlike.push(symbol);
       }
     },
     onError(error, index, context) {
-      if (likedSymbolList?.data) {
-        const symbol = likedSymbolList.data.find((_, idx) => idx === index - 1)!.symbol;
+      if (likedSymbolResponse?.data) {
+        const symbol = likedSymbolResponse.data.find((_, idx) => idx === index - 1)!.symbol;
 
         failSymbolListRef.current.unlike.push(symbol);
 
@@ -133,8 +143,8 @@ function SymbolForm({ buttonText = '선택 완료' }: SymbolFormProps) {
     if (Object.keys(requestUnLikeSymbolMap).length) {
       await Promise.allSettled([
         ...Object.keys(requestUnLikeSymbolMap).map((symbol) => {
-          if (likedSymbolList?.data) {
-            const unlikeTarget = likedSymbolList.data.find((likedSymbol) => likedSymbol.symbol === symbol);
+          if (likedSymbolResponse?.data) {
+            const unlikeTarget = likedSymbolResponse.data.find((likedSymbol) => likedSymbol.symbol === symbol);
 
             return unlike(unlikeTarget ? unlikeTarget.symbolId : -1);
           }
@@ -150,6 +160,8 @@ function SymbolForm({ buttonText = '선택 완료' }: SymbolFormProps) {
 
     if (isSuccessRef.current === true) {
       if (pathName.startsWith('/signup')) {
+        queryClient.invalidateQueries(['likedSymbolList']);
+
         formContext.done();
 
         return;
@@ -170,8 +182,10 @@ function SymbolForm({ buttonText = '선택 완료' }: SymbolFormProps) {
     dispatch(
       initLikedSymbolMap({
         symbols:
-          likedSymbolList?.data?.map((symbol) => {
-            const likedSymbolIdx = likedSymbolList.data?.findIndex((likeSymbol) => likeSymbol.symbol === symbol.symbol);
+          likedSymbolResponse?.data?.map((symbol) => {
+            const likedSymbolIdx = likedSymbolResponse.data?.findIndex(
+              (likeSymbol) => likeSymbol.symbol === symbol.symbol,
+            );
 
             return {
               ...symbol,
@@ -192,21 +206,25 @@ function SymbolForm({ buttonText = '선택 완료' }: SymbolFormProps) {
   };
 
   useLayoutEffect(() => {
-    if (authStatus === 'Pending' || authStatus === 'Loading' || likedSymbolStatus === 'loading') return;
+    if (profileStatus === 'loading' || likedSymbolStatus === 'loading') return;
 
-    if (authStatus !== 'AuthUser' || likedSymbolStatus === 'error' || likedSymbolList.status !== HttpStatusCode.Ok) {
+    if (
+      profileStatus === 'error' ||
+      likedSymbolStatus === 'error' ||
+      likedSymbolResponse.status !== HttpStatusCode.Ok
+    ) {
       push('/login?continueURL=/mypage/edit/symbol');
 
       return;
     }
 
-    if (likedSymbolList) {
+    if (likedSymbolResponse) {
       dispatch(reset());
       dispatch(
         initLikedSymbolMap({
           symbols:
-            likedSymbolList.data?.map((symbol) => {
-              const likedSymbolIdx = likedSymbolList.data?.findIndex(
+            likedSymbolResponse.data?.map((symbol) => {
+              const likedSymbolIdx = likedSymbolResponse.data?.findIndex(
                 (likeSymbol) => likeSymbol.symbol === symbol.symbol,
               );
 
@@ -220,7 +238,7 @@ function SymbolForm({ buttonText = '선택 완료' }: SymbolFormProps) {
     }
 
     dispatch(initSelectedSymbolMap());
-  }, [authStatus, likedSymbolStatus, likedSymbolList]); /* eslint-disable-line */
+  }, [profileStatus, likedSymbolStatus, likedSymbolResponse]); /* eslint-disable-line */
 
   useLayoutEffect(() => {
     window.addEventListener('resize', resizeThrottle);
@@ -251,10 +269,10 @@ function SymbolForm({ buttonText = '선택 완료' }: SymbolFormProps) {
         <SearchSymbol
           submitWrapper={submitWrapperRef.current}
           onSearch={(symbols) => setSearchedSymbols(symbols)}
-          disabled={authStatus === 'Pending' || authStatus === 'Loading' || likedSymbolStatus !== 'success'}
+          disabled={profileStatus === 'loading' || likedSymbolStatus !== 'success'}
         />
         <SearchSymbolResult
-          loading={authStatus === 'Pending' || authStatus === 'Loading' || likedSymbolStatus !== 'success'}
+          loading={profileStatus === 'loading' || likedSymbolStatus !== 'success'}
           symbols={searchedSymbols}
           onDispatch={(requiredSubscribe) => {
             if (requiredSubscribe) setShowSubScribeNotification(true);
@@ -262,7 +280,7 @@ function SymbolForm({ buttonText = '선택 완료' }: SymbolFormProps) {
         />
         <div ref={submitWrapperRef} className="fixed_inner fixed bottom-12">
           <SelectedSymbolHorizonList
-            loading={authStatus === 'Pending' || authStatus === 'Loading' || likedSymbolStatus !== 'success'}
+            loading={profileStatus === 'loading' || likedSymbolStatus !== 'success'}
             symbols={selectedSymbols}
             shadowEffect
             closeButton
