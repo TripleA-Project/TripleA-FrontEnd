@@ -7,6 +7,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { throttle } from 'lodash';
 import { ToastContainer } from 'react-toastify';
 import { initLikedCategoryMap, initSelectedCategoryMap, reset, useCategoryList } from '@/redux/slice/categorySlice';
+import MuiSpinner from '@/components/UI/Spinner/MuiSpinner';
 import { SearchCategory, SearchCategoryResult, SelectedCategoryHorizonList } from '@/components/Search/SearchCategory';
 import Button from '@/components/Button/Button';
 import { LockNotification } from '@/components/Notification';
@@ -211,9 +212,16 @@ function CategoryForm({ buttonText = '선택 완료' }: CategoryFormProps) {
               bgColorTheme="orange"
               textColorTheme="white"
               fullWidth
-              className="disabled:!cursor-progress disabled:!bg-slate-400"
+              className="relative disabled:!cursor-progress disabled:!bg-slate-300 disabled:!opacity-60"
             >
-              {likeStatus === 'loading' || unlikeStatus === 'loading' ? '요청처리 중' : buttonText}
+              {likeStatus === 'loading' || unlikeStatus === 'loading' ? (
+                <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center">
+                  <div className="translate-y-[3.4px]">
+                    <MuiSpinner />
+                  </div>
+                </div>
+              ) : null}
+              {buttonText}
             </Button>
           </div>
         </div>

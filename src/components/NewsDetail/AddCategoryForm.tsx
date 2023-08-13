@@ -7,6 +7,8 @@ import { disLikeCategory, getAllCategory, getLikeCategory, likeCategory } from '
 import { toastNotify } from '@/util/toastNotify';
 import { type Category } from '@/interfaces/Category';
 import { type OnChipChangeResult } from '../UI/Chip/SymbolChip';
+import { AxiosError, HttpStatusCode } from 'axios';
+import { APIResponse } from '@/interfaces/Dto/Core';
 
 interface AddCategoryFormProps {
   category?: Category;
@@ -46,8 +48,23 @@ function AddCategoryForm({ category }: AddCategoryFormProps) {
     onSuccess() {
       toastNotify('success', '관심 카테고리 생성 성공');
     },
-    onError() {
-      setLiked(!!isLike());
+    onError(error) {
+      if (error instanceof AxiosError) {
+        const { response } = error as AxiosError<APIResponse<string & { key?: string; value?: string }>>;
+
+        if (response?.data.status === HttpStatusCode.BadRequest) {
+          if (response.data.data?.key === 'benefit') {
+            toastNotify('error', '구독 후 4개 이상의 관심 카테고리 설정이 가능합니다.');
+
+            return;
+          }
+        }
+
+        toastNotify('error', '관심 카테고리 생성 실패');
+
+        return;
+      }
+
       toastNotify('error', '관심 카테고리 생성 실패');
     },
     onSettled() {

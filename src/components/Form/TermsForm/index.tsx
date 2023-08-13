@@ -1,16 +1,18 @@
 'use client';
 
-import Button from '@/components/Button/Button';
-import { SubmitHandler, useFormContext } from 'react-hook-form';
-import { UseStepFormContext } from '../StepForm';
 import { useRef, useState } from 'react';
-import { login, signup } from '@/service/auth';
-import { FormData } from '@/interfaces/FormData';
+import { useFormContext } from 'react-hook-form';
+import { AxiosError } from 'axios';
+import { MdOutlineArrowBackIosNew } from 'react-icons/md';
+import { UseStepFormContext } from '../StepForm';
+import FormTitle from '../FormTitle';
+import Button from '@/components/Button/Button';
 import ServiceTermModal from './ServiceTermModal';
 import PrivacyTermModal from './PrivacyTermModal';
-import FormTitle from '../FormTitle';
-import { MdOutlineArrowBackIosNew } from 'react-icons/md';
-import { setCookie } from '@/util/cookies';
+import { login, signup } from '@/service/auth';
+import { deleteCookie, setCookie } from '@/util/cookies';
+import { toastNotify } from '@/util/toastNotify';
+import { type FormData } from '@/interfaces/FormData';
 
 export interface TermsFormData {
   newsLetter: boolean;
@@ -21,9 +23,7 @@ function TermsForm() {
     register,
     handleSubmit,
     done,
-    getValues,
     setValue,
-    setError,
     formState: { errors },
   } = useFormContext() as UseStepFormContext<FormData>;
 
@@ -48,7 +48,7 @@ function TermsForm() {
 
   const title = `
     이용약관에 동의해주세요.
-    `;
+  `;
 
   const handleAllCheckChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!serviceTermCheckRef?.current || !privacyTermCheckRef?.current) return;
@@ -66,7 +66,7 @@ function TermsForm() {
     try {
       // 회원가입 => 저장된 정보로 로그인 => 액세스토큰 설정 => 심볼 , 카테고리 설정 페이지 이동
 
-      const signupResponse = await signup({
+      await signup({
         email: email!,
         password: password!,
         passwordCheck: passwordCheck!,
@@ -74,21 +74,30 @@ function TermsForm() {
         newsLetter: newsLetter!,
         emailKey: emailKey!,
       });
-      console.log(signupResponse);
 
       // login
 
       const loginResult = await login({ email: email!, password: password! });
 
+      await deleteCookie('accessToken');
+
       const accessToken = loginResult.headers['authorization'];
 
       if (accessToken) {
-        await setCookie('accessToken', (accessToken as string).replace('Bearer ', ''));
+        await setCookie('accessToken', (accessToken as string).replace('Bearer ', ''), { maxAge: 60 * 60, path: '/' });
       }
 
       done();
     } catch (error) {
-      console.error(error);
+      if (error instanceof AxiosError) {
+        toastNotify('error', '시스템 에러가 발생했습니다. 잠시후 다시 시도해주세요.');
+
+        return;
+      }
+
+      toastNotify('error', '시스템 에러가 발생했습니다. 잠시후 다시 시도해주세요.');
+
+      return;
     }
   };
 
@@ -168,6 +177,7 @@ function TermsForm() {
             <span className="ml-2.5 block">[선택] 뉴스레터 이메일 수신 동의</span>
           </label>
         </div>
+        {errors?.root ? <div className="text-sm text-error">{errors.root.message}</div> : null}
       </div>
       <Button
         type="submit"

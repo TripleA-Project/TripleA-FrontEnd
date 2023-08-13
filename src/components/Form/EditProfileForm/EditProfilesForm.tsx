@@ -1,21 +1,22 @@
 'use client';
 
 import { useState } from 'react';
+import { isAxiosError } from 'axios';
 import { useFormContext } from 'react-hook-form';
-import { useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { ToastContainer } from 'react-toastify';
 import { UseStepFormContext } from '../StepForm';
+import MuiSpinner from '@/components/UI/Spinner/MuiSpinner';
 import Avatar from '@/components/Avatar';
 import EditField from '@/components/Profile/EditField';
-import { toastNotify } from '@/util/toastNotify';
-import { validateFullName } from '@/util/validate';
-import { ToastContainer } from 'react-toastify';
 import Button from '@/components/Button/Button';
 import EditProfileMenu from '@/components/Profile/EditProfileMenu';
 import ReadOnlyInput from '@/components/Input/StepFormInput/ReadOnlyInput';
 import { updateUserInfo } from '@/service/user';
-import { EditProfileFormData } from '@/interfaces/FormData';
-import { isAxiosError } from 'axios';
-import { UpdateUserInfoResponse } from '@/interfaces/Dto/User';
+import { validateFullName } from '@/util/validate';
+import { toastNotify } from '@/util/toastNotify';
+import { type UpdateUserInfoResponse } from '@/interfaces/Dto/User';
+import { type EditProfileFormData } from '@/interfaces/FormData';
 
 export interface EditProfilesForm {
   fullName: string;
@@ -33,7 +34,6 @@ function EditProfilesForm(props: EditProfilesFormProps) {
     register,
     handleSubmit,
     getValues,
-    setValue,
     setError,
     clearErrors,
     setFocus,
@@ -44,6 +44,36 @@ function EditProfilesForm(props: EditProfilesFormProps) {
 
   const [isFullNameEdit, setIsFullNameEdit] = useState(false);
 
+  const { mutate: updateUserInfoMutate, status: updateUserInfoStatus } = useMutation(
+    ({ email, fullName, password }: Required<EditProfileFormData>) =>
+      updateUserInfo({
+        email,
+        fullName,
+        password,
+        passwordCheck: password,
+        newPassword: password,
+        newPasswordCheck: password,
+      }),
+    {
+      retry: 0,
+      onSuccess() {
+        queryClient.removeQueries(['auth']);
+        queryClient.invalidateQueries(['profile']);
+
+        done();
+      },
+      onError(error) {
+        if (isAxiosError<UpdateUserInfoResponse>(error)) {
+          const { response } = error;
+
+          if (response) {
+            setError('root', { type: 'validate', message: response.data.data ?? response.data.msg });
+          }
+        }
+      },
+    },
+  );
+
   watch((value, { type }) => {
     if (type === 'change' && errors.root) {
       clearErrors('root');
@@ -51,29 +81,11 @@ function EditProfilesForm(props: EditProfilesFormProps) {
   });
 
   const onValid = async ({ email, fullName }: EditProfilesForm) => {
-    const { password } = getValues() as EditProfileFormData;
+    if (updateUserInfoStatus === 'loading') return;
 
-    try {
-      await updateUserInfo({
-        email,
-        fullName,
-        password,
-        passwordCheck: password,
-        newPassword: password,
-        newPasswordCheck: password,
-      });
+    const { password } = getValues() as any;
 
-      queryClient.removeQueries(['auth']);
-      queryClient.invalidateQueries(['profile']);
-
-      done();
-    } catch (err) {
-      if (isAxiosError<UpdateUserInfoResponse>(err)) {
-        const { response } = err;
-
-        setError('root', { type: 'validate', message: response?.data.data ?? response?.data.msg });
-      }
-    }
+    updateUserInfoMutate({ email, fullName, password });
   };
 
   const onInvalid = () => {
@@ -127,9 +139,17 @@ function EditProfilesForm(props: EditProfilesFormProps) {
             type="submit"
             form="editProfile"
             bgColorTheme="orange"
-            className="!h-[54px] !rounded-md"
             textColorTheme="white"
+            disabled={updateUserInfoStatus === 'loading'}
+            className="relative !h-[54px] !rounded-md disabled:!bg-slate-300 disabled:!opacity-60"
           >
+            {updateUserInfoStatus === 'loading' ? (
+              <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center">
+                <div className="translate-y-[3.4px]">
+                  <MuiSpinner />
+                </div>
+              </div>
+            ) : null}
             변경완료
           </Button>
         </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import SymbolLogoImage from '@/components/Image/SymbolLogoImage';
 import { AppIcons } from '@/components/Icons';
 import { DeltaPriceColor, DeltaPriceType, getPriceInfo } from '@/util/chart';
@@ -32,7 +32,6 @@ function SymbolChip({
   onChange,
   onClose,
 }: SymbolChipProps) {
-  const [checked, setChecked] = useState(selected);
   const [isRender, setIsRender] = useState(true);
   const changeTrigger = useRef<boolean>(false);
 
@@ -47,19 +46,11 @@ function SymbolChip({
 
       changeTrigger.current = true;
 
-      const { status } = await onChange();
+      await onChange();
 
       changeTrigger.current = false;
-
-      if (status === 'success') {
-        setChecked((prev) => !prev);
-      }
     }
   };
-
-  useEffect(() => {
-    setChecked(!!selected);
-  }, [selected]);
 
   if (loading) {
     return (
@@ -77,9 +68,9 @@ function SymbolChip({
   return (symbol?.symbol || symbol?.name) && isRender ? (
     <div
       className={`box-border inline-flex h-9 w-max max-w-sm shrink-0 cursor-pointer select-none items-center justify-between rounded-full border px-3.5 py-2 align-top ${
-        checked ? 'border-[#FC954A] bg-[#FFF0E4]' : 'border-[#E5E7EC] bg-white'
+        selected ? 'border-[#FC954A] bg-[#FFF0E4]' : 'border-[#E5E7EC] bg-white'
       } ${shadowEffect ? 'my-2.5 ml-[9px]' : 'm-0'} ${
-        checked && shadowEffect ? 'shadow-[0_0_15px_0_rgba(252,149,74,0.3)]' : 'shadow-none'
+        selected && shadowEffect ? 'shadow-[0_0_15px_0_rgba(252,149,74,0.3)]' : 'shadow-none'
       }`}
       onClick={handleClick}
     >

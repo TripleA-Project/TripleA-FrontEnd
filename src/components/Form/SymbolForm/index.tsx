@@ -2,11 +2,13 @@
 
 import { useLayoutEffect, useState, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { HttpStatusCode } from 'axios';
 import { useFormContext } from 'react-hook-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { throttle } from 'lodash';
 import { ToastContainer } from 'react-toastify';
 import { initLikedSymbolMap, initSelectedSymbolMap, reset, useSymbolList } from '@/redux/slice/symbolSlice';
+import MuiSpinner from '@/components/UI/Spinner/MuiSpinner';
 import Button from '@/components/Button/Button';
 import { SearchSymbol, SelectedSymbolHorizonList, SearchSymbolResult } from '@/components/Search/SearchSymbol';
 import { LockNotification } from '@/components/Notification';
@@ -192,7 +194,7 @@ function SymbolForm({ buttonText = '선택 완료' }: SymbolFormProps) {
   useLayoutEffect(() => {
     if (authStatus === 'Pending' || authStatus === 'Loading' || likedSymbolStatus === 'loading') return;
 
-    if (authStatus !== 'AuthUser' || likedSymbolStatus === 'error' || likedSymbolList.status !== 200) {
+    if (authStatus !== 'AuthUser' || likedSymbolStatus === 'error' || likedSymbolList.status !== HttpStatusCode.Ok) {
       push('/login?continueURL=/mypage/edit/symbol');
 
       return;
@@ -272,9 +274,16 @@ function SymbolForm({ buttonText = '선택 완료' }: SymbolFormProps) {
               bgColorTheme="orange"
               textColorTheme="white"
               fullWidth
-              className="disabled:!cursor-progress disabled:!bg-slate-400"
+              className="relative disabled:!cursor-progress disabled:!bg-slate-300 disabled:!opacity-60"
             >
-              {likeStatus === 'loading' || unlikeStatus === 'loading' ? '요청처리 중' : buttonText}
+              {likeStatus === 'loading' || unlikeStatus === 'loading' ? (
+                <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center">
+                  <div className="translate-y-[3.4px]">
+                    <MuiSpinner />
+                  </div>
+                </div>
+              ) : null}
+              {buttonText}
             </Button>
           </div>
         </div>
