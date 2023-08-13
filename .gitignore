@@ -40,7 +40,7 @@ yarn-error.log*
 # env files
 .env
 .env.development
-.ent.test
+.env.test
 .env*.local
 
 # Stores VSCode versions used for testing VSCode extensions

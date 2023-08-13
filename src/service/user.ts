@@ -61,12 +61,13 @@ export async function updateUserInfo({
     ...(typeof newsLetter === 'boolean' && { newsLetter }),
   } as UpdateUserInfoRequest;
 
-  const updateUserInfoResponse = await axiosInstance.post<any, UpdateUserInfoResponse, UpdateUserInfoRequest>(
-    '/api/auth/user',
-    {
-      ...postPayload,
-    },
-  );
+  const updateUserInfoResponse = await axiosInstance.post<
+    any,
+    AxiosResponse<UpdateUserInfoResponse>,
+    UpdateUserInfoRequest
+  >('/api/auth/user', {
+    ...postPayload,
+  });
 
   return updateUserInfoResponse;
 }

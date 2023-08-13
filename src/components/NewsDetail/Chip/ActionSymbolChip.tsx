@@ -1,20 +1,20 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { AxiosError, HttpStatusCode } from 'axios';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import SymbolChip, { type OnChipChangeResult } from '@/components/UI/Chip/SymbolChip';
+import SymbolChip, { OnChipChangeResult } from '@/components/UI/Chip/SymbolChip';
 import { disLikeSymbol, getLikeSymbol, likeSymbol } from '@/service/symbol';
 import { toastNotify } from '@/util/toastNotify';
+import { type APIResponse } from '@/interfaces/Dto/Core';
 import { type NewsDetailSymbol } from '@/interfaces/Dto/News';
-import { AxiosError, HttpStatusCode } from 'axios';
-import { APIResponse } from '@/interfaces/Dto/Core';
-import ActionSymbolChip from './Chip/ActionSymbolChip';
+import MuiSpinner from '@/components/UI/Spinner/MuiSpinner';
 
-interface AddSymbolFormProps {
+interface ActionSymbolChipProps {
   symbol: NewsDetailSymbol;
 }
 
-function AddSymbolForm({ symbol }: AddSymbolFormProps) {
+function ActionSymbolChip({ symbol }: ActionSymbolChipProps) {
   const queryClient = useQueryClient();
 
   const {
@@ -30,6 +30,12 @@ function AddSymbolForm({ symbol }: AddSymbolFormProps) {
   });
 
   const [liked, setLiked] = useState(isLike());
+
+  const isFetchingRef = useRef<boolean>(false);
+
+  function isFetching() {
+    return !!isFetchingRef.current;
+  }
 
   function isLike() {
     return !!likedSymbol?.data?.find((likeSymbol) => likeSymbol.symbol === symbol.name);
@@ -60,6 +66,8 @@ function AddSymbolForm({ symbol }: AddSymbolFormProps) {
     },
     onSettled() {
       queryClient.invalidateQueries(['likedSymbolList']);
+
+      isFetchingRef.current = false;
     },
   });
 
@@ -72,11 +80,17 @@ function AddSymbolForm({ symbol }: AddSymbolFormProps) {
     },
     onSettled() {
       queryClient.invalidateQueries(['likedSymbolList']);
+
+      isFetchingRef.current = false;
     },
   });
 
   const handleChange: () => Promise<OnChipChangeResult> = async () => {
+    isFetchingRef.current = true;
+
     if (likedSymbolStatus === 'loading' || likedSymbolFetchStatus === 'fetching') {
+      isFetchingRef.current = false;
+
       return {
         type: 'api',
         status: 'loading',
@@ -131,17 +145,22 @@ function AddSymbolForm({ symbol }: AddSymbolFormProps) {
   }, [likedSymbolStatus, likedSymbol]); /* eslint-disable-line */
 
   return (
-    <>
-      <h3 className="mb-4 text-xl font-semibold">관심 종목에 추가하기</h3>
-      <ActionSymbolChip symbol={symbol} />
-      {/* <SymbolChip
+    <div className="relative inline-block align-top">
+      {isFetching() ? (
+        <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center">
+          <div className="translate-y-[3.4px]">
+            <MuiSpinner size={26} />
+          </div>
+        </div>
+      ) : null}
+      <SymbolChip
         loading={likedSymbolStatus === 'loading'}
         symbol={symbol as any}
         selected={liked}
         onChange={handleChange}
-      /> */}
-    </>
+      />
+    </div>
   );
 }
 
-export default AddSymbolForm;
+export default ActionSymbolChip;
