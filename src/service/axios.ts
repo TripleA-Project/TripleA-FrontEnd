@@ -39,10 +39,9 @@ function createAxiosInstance() {
 
         if (response) {
           if (response.data?.status === HttpStatusCode.Unauthorized) {
-            const refreshToken = await getCookie('refreshToken');
             const isAutoLogin = await getCookie('autoLogin');
 
-            if (refreshToken && isAutoLogin) {
+            if (isAutoLogin) {
               try {
                 const refreshResponse = await requestAccessToken();
 
