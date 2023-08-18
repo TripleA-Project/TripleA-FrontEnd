@@ -4,6 +4,7 @@ import LatestNewsPage from '@/components/News/LatestNewsPage';
 import NewsTab from '@/components/News/NewsTab';
 import InterestNewsPage from '@/components/News/InterestNews/InterestNewsPage';
 import NotFound from '@/components/NotFound';
+import Footer from '@/components/Layout/Footer';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,13 +22,16 @@ export const metadata: Metadata = {
 
 async function Home({ searchParams }: HomeProps) {
   return (
-    <div className="box-border bg-white px-4">
-      <NewsHomeHeader isLikeNewsPage={!!searchParams.tab && searchParams.tab === 'interest'} />
-      <section className="my-5">
-        <NewsTab />
-      </section>
-      {searchParams?.tab ? searchParams.tab === 'interest' ? <InterestNewsPage /> : <NotFound /> : <LatestNewsPage />}
-    </div>
+    <>
+      <div className="box-border bg-white px-4">
+        <NewsHomeHeader isLikeNewsPage={!!searchParams.tab && searchParams.tab === 'interest'} />
+        <section className="my-5">
+          <NewsTab />
+        </section>
+        {searchParams?.tab ? searchParams.tab === 'interest' ? <InterestNewsPage /> : <NotFound /> : <LatestNewsPage />}
+      </div>
+      <Footer />
+    </>
   );
 }
 export default Home;

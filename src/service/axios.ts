@@ -8,7 +8,7 @@ function createAxiosInstance() {
   const axiosInstance = axios.create({
     baseURL: process.env.NEXT_PUBLIC_SERVER,
     withCredentials: true,
-    timeout: 15000,
+    timeout: 30000,
     timeoutErrorMessage: '요청을 처리하는 시간이 오래걸려 중단되었습니다. 이용에 불편을 드려 죄송합니다.',
   });
 

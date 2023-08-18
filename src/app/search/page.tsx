@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import SearchHeader from '@/components/Layout/Header/SearchHeader';
+import Footer from '@/components/Layout/Footer';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -13,6 +14,7 @@ function Search() {
   return (
     <>
       <SearchHeader />
+      <Footer />
     </>
   );
 }

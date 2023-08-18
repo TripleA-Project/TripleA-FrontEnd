@@ -12,6 +12,7 @@ module.exports = {
         mobile: { max: '390px' },
         tablet: { min: '390px', max: '767px' },
         pc: '768px',
+        footer: { max: '650px' },
       },
       spacing: {
         page: '52px 0 63px',

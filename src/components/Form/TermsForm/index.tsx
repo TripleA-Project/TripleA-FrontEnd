@@ -10,7 +10,7 @@ import Button from '@/components/Button/Button';
 import ServiceTermModal from './ServiceTermModal';
 import PrivacyTermModal from './PrivacyTermModal';
 import { login, signup } from '@/service/auth';
-import { deleteCookie, setCookie } from '@/util/cookies';
+import { deleteCookie, getCookie, setCookie } from '@/util/cookies';
 import { toastNotify } from '@/util/toastNotify';
 import { type FormData } from '@/interfaces/FormData';
 
@@ -77,9 +77,13 @@ function TermsForm() {
 
       // login
 
-      const loginResult = await login({ email: email!, password: password! });
+      const hasAccessToken = await getCookie('accessToken');
 
-      await deleteCookie('accessToken');
+      if (hasAccessToken) {
+        await deleteCookie('accessToken');
+      }
+
+      const loginResult = await login({ email: email!, password: password! });
 
       const accessToken = loginResult.headers['authorization'];
 
@@ -87,7 +91,9 @@ function TermsForm() {
         await setCookie('accessToken', (accessToken as string).replace('Bearer ', ''), { maxAge: 60 * 60, path: '/' });
       }
 
-      done();
+      setTimeout(() => {
+        done();
+      }, 0);
     } catch (error) {
       if (error instanceof AxiosError) {
         toastNotify('error', '시스템 에러가 발생했습니다. 잠시후 다시 시도해주세요.');
