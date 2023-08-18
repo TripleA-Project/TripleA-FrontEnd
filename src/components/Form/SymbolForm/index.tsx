@@ -247,6 +247,8 @@ function SymbolForm({ buttonText = '선택 완료' }: SymbolFormProps) {
 
     return () => {
       cleanUp();
+
+      window.removeEventListener('resize', resizeThrottle);
     };
   }, []); /* eslint-disable-line */
 

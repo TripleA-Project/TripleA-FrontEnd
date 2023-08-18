@@ -171,15 +171,15 @@ export function NewsDetail({ newsId, requestSymbol }: NewsDetailProps) {
 
   if (newsDetailStatus === 'loading') return <NewsDetailLoading />;
   if (isNotFound) return <NotFound />;
-  if (isAxiosError(newsDetailError)) {
+  if (newsDetailError && isAxiosError(newsDetailError)) {
     if (newsDetailError.response?.status === HttpStatusCode.Unauthorized)
       return (
         <>
           <NewsDetailLoading />
           <NewsDetailNotification
             active={detailNewsNotification.active}
-            dimHeight={detailNewsNotification.dimHeight}
-            notificationType={detailNewsNotification.type}
+            dimHeight={54}
+            notificationType={'NewsDetailLoginRequired'}
             newsId={Number(newsId)}
             symbol={requestSymbol ? requestSymbol.name.toUpperCase() : undefined}
             onClose={() => setDetailNewsNotification((prev) => ({ ...prev, active: false }))}

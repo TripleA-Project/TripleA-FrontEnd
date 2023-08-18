@@ -162,7 +162,6 @@ function Chart({ symbol, resample }: ChartProps) {
           }));
         }
       }
-
       return;
     }
 

@@ -1,7 +1,7 @@
 'use client';
 
 import Button from '@/components/Button/Button';
-import { FieldErrors, useForm, useFormContext } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 import { validateFullName } from '@/util/validate';
 
 import { UseStepFormContext } from '../StepForm';

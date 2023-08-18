@@ -3,7 +3,6 @@ import { successSubscribe } from '@/service/subscribe';
 import { HttpStatusCode } from 'axios';
 import { redirect } from 'next/navigation';
 
-export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 interface PageProps {
