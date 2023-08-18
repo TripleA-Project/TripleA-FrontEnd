@@ -4,7 +4,6 @@ import LatestNewsPage from '@/components/News/LatestNewsPage';
 import NewsTab from '@/components/News/NewsTab';
 import InterestNewsPage from '@/components/News/InterestNews/InterestNewsPage';
 import NotFound from '@/components/NotFound';
-import Footer from '@/components/Layout/Footer';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,7 +29,6 @@ async function Home({ searchParams }: HomeProps) {
         </section>
         {searchParams?.tab ? searchParams.tab === 'interest' ? <InterestNewsPage /> : <NotFound /> : <LatestNewsPage />}
       </div>
-      <Footer />
     </>
   );
 }

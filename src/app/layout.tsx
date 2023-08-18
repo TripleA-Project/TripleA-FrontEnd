@@ -5,6 +5,7 @@ import { Metadata } from 'next';
 import { Noto_Sans } from 'next/font/google';
 import Page from '@/components/Layout/Page';
 import Navbar from '@/components/Layout/Navbar';
+import Footer from '@/components/Layout/Footer';
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -44,6 +45,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
           <ReactQueryProvider>
             <Page>{children}</Page>
             <Navbar />
+            <Footer />
           </ReactQueryProvider>
         </ReduxProvider>
       </body>

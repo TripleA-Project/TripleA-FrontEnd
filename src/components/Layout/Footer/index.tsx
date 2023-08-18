@@ -1,22 +1,50 @@
 'use client';
 
-import { useEffect } from 'react';
+import { throttle } from 'lodash';
+import { usePathname } from 'next/navigation';
+import { useEffect, useRef } from 'react';
 
 function Footer() {
+  const pathName = usePathname();
+
+  const footerRef = useRef<HTMLElement>(null);
+
+  const allowedPathList = ['/', '/mypage'];
+
+  const handleResize = () => {
+    const page = document.getElementById('page_wrapper');
+
+    if (page) {
+      page.style.minHeight = `calc(100vh - ${footerRef.current?.getBoundingClientRect()?.height ?? 128}px`;
+    }
+  };
+
+  const resizeThrottle = throttle((e: UIEvent) => {
+    handleResize();
+  }, 300);
+
   useEffect(() => {
+    if (!allowedPathList.includes(pathName)) return;
+
     const page = document.getElementById('page_wrapper');
 
     if (page) {
       page.style.paddingBottom = '0';
+      page.style.minHeight = `calc(100vh - ${footerRef.current?.getBoundingClientRect()?.height ?? 128}px`;
     }
 
-    return () => {
-      page?.style.removeProperty('padding-bottom');
-    };
-  }, []);
+    window.addEventListener('resize', resizeThrottle);
 
-  return (
-    <footer className="inner mb-[63px] !p-0">
+    return () => {
+      window.removeEventListener('resize', resizeThrottle);
+
+      page?.style.removeProperty('padding-bottom');
+      page?.style.removeProperty('min-height');
+    };
+  }, [pathName]); /* eslint-disable-line */
+
+  return allowedPathList.includes(pathName) ? (
+    <footer ref={footerRef} className="inner mb-[63px] !p-0">
       <div className="box-border flex w-full flex-wrap gap-8 bg-gray-200 px-2 footer:flex-col footer:pb-4">
         <div className="box-border w-[65%] py-4 text-xs footer:w-full">
           <h3 className="sr-only">사업자 정보</h3>
@@ -67,7 +95,7 @@ function Footer() {
         </div>
       </div>
     </footer>
-  );
+  ) : null;
 }
 
 export default Footer;

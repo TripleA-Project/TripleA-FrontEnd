@@ -178,6 +178,8 @@ function CategoryForm({ buttonText = '선택 완료' }: CategoryFormProps) {
 
     return () => {
       cleanUp();
+
+      window.removeEventListener('resize', resizeThrottle);
     };
   }, []); /* eslint-disable-line */
 
