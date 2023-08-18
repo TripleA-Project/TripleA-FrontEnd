@@ -27,7 +27,11 @@ export const metadata: Metadata = {
       url: '/bgLogo.png',
     },
   },
-  metadataBase: new URL(process.env.VERCEL_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'),
+  metadataBase: new URL(
+    process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000',
+  ),
 };
 
 export default function RootLayout({ children }: RootLayoutProps) {
