@@ -31,7 +31,7 @@ function SubscribeButton({ subscribeRedirectURL }: SubscribeButtonProps) {
     data: membership,
     status,
     error,
-  } = useQuery(['subscribe', 'edit'], () => getProfile(), {
+  } = useQuery(['profile'], () => getProfile(), {
     refetchOnWindowFocus: false,
     retry: 0,
     select: (response) => response.data.data?.membership,
@@ -50,7 +50,7 @@ function SubscribeButton({ subscribeRedirectURL }: SubscribeButtonProps) {
             fullWidth
             onClick={async () => {
               const { data: response, status } = await subscribe({
-                url: subscribeRedirectURL || `${location.origin}/payment`,
+                url: subscribeRedirectURL || `${process.env.NEXT_PUBLIC_SITE_URL}/payment`,
               });
 
               if (status === 200) {
@@ -120,7 +120,7 @@ function SubscribeButton({ subscribeRedirectURL }: SubscribeButtonProps) {
           이용가능합니다.
         `}
         buttonText={'로그인'}
-        linkURL={'/login?continueURL=/mypage/edit/subscribe'}
+        linkURL={'/login?continueURL=/mypage/membership'}
         closeOnClick
         active={showNotification}
         onClose={() => {

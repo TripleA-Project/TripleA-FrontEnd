@@ -13,6 +13,7 @@ import { login, signup } from '@/service/auth';
 import { deleteCookie, getCookie, setCookie } from '@/util/cookies';
 import { toastNotify } from '@/util/toastNotify';
 import { type FormData } from '@/interfaces/FormData';
+import { useQueryClient } from '@tanstack/react-query';
 
 export interface TermsFormData {
   newsLetter: boolean;
@@ -26,6 +27,8 @@ function TermsForm() {
     setValue,
     formState: { errors },
   } = useFormContext() as UseStepFormContext<FormData>;
+
+  const queryClient = useQueryClient();
 
   const serviceTermCheckRef = useRef<HTMLInputElement>(null);
   const privacyTermCheckRef = useRef<HTMLInputElement>(null);
@@ -90,6 +93,9 @@ function TermsForm() {
       if (accessToken) {
         await setCookie('accessToken', (accessToken as string).replace('Bearer ', ''), { maxAge: 60 * 60, path: '/' });
       }
+
+      queryClient.removeQueries(['auth']);
+      queryClient.invalidateQueries(['profile']);
 
       setTimeout(() => {
         done();
