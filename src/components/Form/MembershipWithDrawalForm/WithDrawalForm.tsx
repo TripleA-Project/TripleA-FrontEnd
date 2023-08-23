@@ -38,9 +38,9 @@ function WithDrawalForm({ user }: WithDrawalFormProps) {
 
   const onValid = async (reason: WithDrawalReason) => {
     try {
-      if (user.membership === 'PREMIUM') {
-        await unSubscribe();
-      }
+      // if (user.membership === 'PREMIUM') {
+      //   await unSubscribe();
+      // }
 
       const { data: payload } = await membershipWithDrawal();
 
