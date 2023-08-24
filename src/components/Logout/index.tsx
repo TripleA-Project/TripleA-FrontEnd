@@ -13,6 +13,7 @@ export default function Logout() {
     retry: 0,
     onSuccess: async () => {
       await deleteCookie('accessToken');
+      await deleteCookie('autoLogin');
 
       queryClient.removeQueries();
 
