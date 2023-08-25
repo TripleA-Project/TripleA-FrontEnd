@@ -46,8 +46,12 @@ function Footer() {
   return allowedPathList.includes(pathName) ? (
     <footer ref={footerRef} className="inner mb-[63px] !p-0">
       <div className="box-border flex w-full flex-wrap gap-8 bg-gray-200 px-2 footer:flex-col footer:pb-4">
-        <div className="box-border w-[65%] py-4 text-xs footer:w-full">
+        <div className="box-border w-[65%] py-4 text-xs not-italic footer:w-full">
           <h3 className="sr-only">사업자 정보</h3>
+          <div className="flex gap-2">
+            <p className="w-24 font-bold">회사명</p>
+            <p>주식회사 시스메틱</p>
+          </div>
           <div className="flex gap-2">
             <p className="w-24 font-bold">사업자 등록번호</p>
             <p className="">711-86-00050</p>
@@ -58,7 +62,7 @@ function Footer() {
           </div>
           <div className="flex gap-2">
             <p className="w-24 font-bold">주소</p>
-            <address>서울시 영등포구 당산로 41길 11, E동 1202호</address>
+            <address className="not-italic">서울시 영등포구 당산로 41길 11, E동 1202호</address>
           </div>
           <div className="flex gap-2">
             <p className="font-bold">대표자/개인정보관리책임자</p>
@@ -74,13 +78,15 @@ function Footer() {
             <div className="flex w-max gap-2">
               <p className="w-14">1:1 문의</p>
               <address>
-                <a href="mailto:help@moya.ai">help@moya.ai</a>
+                <a href="mailto:help@moya.ai" className="not-italic">
+                  help@moya.ai
+                </a>
               </address>
             </div>
             <div className="flex w-max gap-2">
               <p className="w-14">제휴문의</p>
               <address>
-                <a href="mailto:ceo@sysmetic.co.kr" className="w-max">
+                <a href="mailto:ceo@sysmetic.co.kr" className="w-max not-italic">
                   ceo@sysmetic.co.kr
                 </a>
               </address>
@@ -88,7 +94,9 @@ function Footer() {
             <div className="flex w-max gap-2">
               <p className="w-14">TEL</p>
               <address>
-                <a href="tel:0263381880">02-6338-1880</a>
+                <a href="tel:0263381880" className="not-italic">
+                  02-6338-1880
+                </a>
               </address>
             </div>
           </div>
