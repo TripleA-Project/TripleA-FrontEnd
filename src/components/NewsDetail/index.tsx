@@ -35,7 +35,7 @@ interface NewsDetailProps {
   requestSymbol?: NewsDetailSymbol;
 }
 
-function NewsDetailLoading() {
+export function NewsDetailLoading() {
   return (
     <article className="mt-3 box-border px-4">
       <section className="mb-2.5">
@@ -202,7 +202,7 @@ export function NewsDetail({ newsId, requestSymbol }: NewsDetailProps) {
         </>
       );
 
-    return null;
+    return <>에러에요</>;
   }
   if (!newsDetailPayload?.data) return null;
 

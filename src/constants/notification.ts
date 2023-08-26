@@ -55,7 +55,17 @@ export const NewsDetailNotificationTemplate = {
       키워드, AI분석을 확인할 수 있어요!
     `,
     buttonText: '구독하러 가기',
-    linkURL: '/mypage/edit/subscribe',
+    linkURL: '/mypage/membership',
+  },
+  Empty: {
+    title: `
+      No data
+    `,
+    content: `
+      관련 뉴스를 찾을 수 없습니다.
+    `,
+    buttonText: '홈으로',
+    linkURL: '/',
   },
 };
 
@@ -106,8 +116,16 @@ export const ServerErrorNotificationTemplate = {
       요청 만료
     `,
     content: `
-      요청을 처리하는 시간이 
-      오래걸려 중단되었습니다. 
+      요청을 처리하는 시간이 오래걸려 중단되었습니다. 
+      이용에 불편을 드려 죄송합니다.
+    `,
+  },
+  InternalServerError: {
+    title: `
+      서버 에러
+    `,
+    content: `
+      서버 에러로 인해 중단되었습니다.
       이용에 불편을 드려 죄송합니다.
     `,
   },

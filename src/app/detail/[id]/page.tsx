@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Metadata } from 'next';
-import { redirect } from 'next/navigation';
 import axios, { HttpStatusCode } from 'axios';
-import NewsDetail from '@/components/NewsDetail';
+import { NewsDetailLoading } from '@/components/NewsDetail';
+import NewsDetailFetcher from '@/components/NewsDetail/NewsDetailFetcher';
 import NewsDetailHeader from '@/components/Layout/Header/NewsDetailHeader';
-import { getNewsById } from '@/service/news';
+import Detail from '@/components/NewsDetail/Detail';
 import NotFound from '@/components/NotFound';
+import Unauthorized from '@/components/ErrorBoundary/ErrorFallback/NewsDetail/Unauthorized';
+import { getNewsById } from '@/service/news';
 import { getSymbol } from '@/service/symbol';
 import { type Symbol } from '@/interfaces/Symbol';
 import { type NewsDetailSymbol } from '@/interfaces/Dto/News';
@@ -65,38 +67,54 @@ export async function generateMetadata({ params, searchParams }: NewsDetailPageP
   };
 }
 
-async function Detail({ params, searchParams }: NewsDetailPageProps) {
+async function DetailPage({ params, searchParams }: NewsDetailPageProps) {
   const id = params.id;
   const symbol = searchParams.symbol;
   const isInvalidPath = !params?.id || Number.isNaN(Number(params.id));
 
-  let requestSymbol: NewsDetailSymbol | undefined = undefined;
+  // let requestSymbol: NewsDetailSymbol | undefined = undefined;
 
-  try {
-    if (!isInvalidPath) {
-      const matchedSymbol = await getSymbol({ symbol });
+  if (isInvalidPath)
+    return (
+      <>
+        <NewsDetailHeader />
+        <NotFound />
+      </>
+    );
 
-      if (matchedSymbol.data.status === HttpStatusCode.Unauthorized) {
-        redirect(`/login?continueURL=/detail/${id}${symbol ? `?symbol=${symbol}` : ''}`);
-      }
+  // if (!isInvalidPath) {
+  //   const matchedSymbol = await getSymbol({ symbol });
 
-      if (matchedSymbol.data.data?.length) {
-        const { symbol, symbolId, ...targetSymbol } = matchedSymbol.data.data[0] as Symbol;
+  //   if (matchedSymbol.data.status === HttpStatusCode.Unauthorized) {
+  //     return (
+  //       <>
+  //         <NewsDetailHeader />
+  //         <Unauthorized />
+  //       </>
+  //     );
+  //   }
 
-        requestSymbol = {
-          ...targetSymbol,
-          name: symbol.toUpperCase(),
-        } as NewsDetailSymbol;
-      }
-    }
-  } catch (err) {}
+  //   if (Array.isArray(matchedSymbol.data.data) && matchedSymbol.data.data?.length) {
+  //     const { symbol, symbolId, ...targetSymbol } = matchedSymbol.data.data[0] as Symbol;
+
+  //     requestSymbol = {
+  //       ...targetSymbol,
+  //       name: symbol.toUpperCase(),
+  //     } as NewsDetailSymbol;
+  //   }
+  // }
 
   return (
     <>
       <NewsDetailHeader />
-      {isInvalidPath ? <NotFound /> : <NewsDetail newsId={id} requestSymbol={requestSymbol} />}
+      <Suspense fallback={<NewsDetailLoading />}>
+        {/* @ts-expect-error server component */}
+        <NewsDetailFetcher newsId={Number(id)} symbolName={symbol}>
+          <Detail />
+        </NewsDetailFetcher>
+      </Suspense>
     </>
   );
 }
 
-export default Detail;
+export default DetailPage;
