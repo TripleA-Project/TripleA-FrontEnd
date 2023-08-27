@@ -1,3 +1,5 @@
+'use client';
+
 import { toastNotify } from '@/util/toastNotify';
 import { useState } from 'react';
 

@@ -1,16 +1,12 @@
 import React, { Suspense } from 'react';
 import { Metadata } from 'next';
 import axios, { HttpStatusCode } from 'axios';
-import { NewsDetailLoading } from '@/components/NewsDetail';
+import NewsDetailLoading from '@/components/NewsDetail/Loading';
 import NewsDetailFetcher from '@/components/NewsDetail/NewsDetailFetcher';
 import NewsDetailHeader from '@/components/Layout/Header/NewsDetailHeader';
 import Detail from '@/components/NewsDetail/Detail';
 import NotFound from '@/components/NotFound';
-import Unauthorized from '@/components/ErrorBoundary/ErrorFallback/NewsDetail/Unauthorized';
 import { getNewsById } from '@/service/news';
-import { getSymbol } from '@/service/symbol';
-import { type Symbol } from '@/interfaces/Symbol';
-import { type NewsDetailSymbol } from '@/interfaces/Dto/News';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -72,8 +68,6 @@ async function DetailPage({ params, searchParams }: NewsDetailPageProps) {
   const symbol = searchParams.symbol;
   const isInvalidPath = !params?.id || Number.isNaN(Number(params.id));
 
-  // let requestSymbol: NewsDetailSymbol | undefined = undefined;
-
   if (isInvalidPath)
     return (
       <>
@@ -81,28 +75,6 @@ async function DetailPage({ params, searchParams }: NewsDetailPageProps) {
         <NotFound />
       </>
     );
-
-  // if (!isInvalidPath) {
-  //   const matchedSymbol = await getSymbol({ symbol });
-
-  //   if (matchedSymbol.data.status === HttpStatusCode.Unauthorized) {
-  //     return (
-  //       <>
-  //         <NewsDetailHeader />
-  //         <Unauthorized />
-  //       </>
-  //     );
-  //   }
-
-  //   if (Array.isArray(matchedSymbol.data.data) && matchedSymbol.data.data?.length) {
-  //     const { symbol, symbolId, ...targetSymbol } = matchedSymbol.data.data[0] as Symbol;
-
-  //     requestSymbol = {
-  //       ...targetSymbol,
-  //       name: symbol.toUpperCase(),
-  //     } as NewsDetailSymbol;
-  //   }
-  // }
 
   return (
     <>

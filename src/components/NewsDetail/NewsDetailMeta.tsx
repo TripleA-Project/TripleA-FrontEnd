@@ -10,18 +10,6 @@ interface NewsDetailMetaProps {
   publishedDate: string;
 }
 
-export function NewsDetailMetaLoaing() {
-  return (
-    <section className="flex items-center justify-between">
-      <section className="skeleton_loading">
-        <span className="mr-0.5 inline-block h-4 w-10" />
-        <span className="inline-block h-4 w-20" />
-      </section>
-      <NewsCardActionLoading />
-    </section>
-  );
-}
-
 function NewsDetailMeta({ newsId, symbolName, bookmark, source, publishedDate }: NewsDetailMetaProps) {
   const convertSource = (source: string) => {
     const dotRemovedSource = source.replaceAll(/\..+/g, '');

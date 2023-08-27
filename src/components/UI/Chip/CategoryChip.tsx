@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useRef, useState } from 'react';
 import { MdGrid3X3 } from 'react-icons/md';
 import { AppIcons } from '@/components/Icons';

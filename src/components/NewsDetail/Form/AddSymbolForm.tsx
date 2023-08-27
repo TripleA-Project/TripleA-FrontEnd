@@ -8,7 +8,7 @@ import { toastNotify } from '@/util/toastNotify';
 import { type NewsDetailSymbol } from '@/interfaces/Dto/News';
 import { AxiosError, HttpStatusCode } from 'axios';
 import { APIResponse } from '@/interfaces/Dto/Core';
-import ActionSymbolChip from './Chip/ActionSymbolChip';
+import ActionSymbolChip from '../Chip/ActionSymbolChip';
 
 interface AddSymbolFormProps {
   symbol: NewsDetailSymbol;
