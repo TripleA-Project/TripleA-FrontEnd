@@ -1,4 +1,6 @@
-interface News {
+import { type NewsData } from './NewsData';
+
+export interface News {
   id: number;
   deleted: boolean;
 }
@@ -17,4 +19,9 @@ export interface NewsHistory {
   date: string;
   bookmark: Bookmark;
   history: History;
+}
+
+export interface HistoryNews {
+  date: string;
+  newsList: NewsData[];
 }

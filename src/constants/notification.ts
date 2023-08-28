@@ -108,6 +108,23 @@ export const HistoryNotificationTemplate = {
     buttonText: '구독하러 가기',
     linkURL: '/mypage/membership',
   },
+  LoginRequired: {
+    content: `
+      내가 본 뉴스를 보시려면
+      로그인을 해주세요
+    `,
+    buttonText: '로그인 하러가기',
+    linkURL: '/login?continueURL=/history',
+  },
+  Timeout: {
+    content: `
+      요청을 처리하는 시간이 오래걸려
+      중단되었습니다.
+      이용에 붎편을 드려 죄송합니다.
+    `,
+    buttonText: '새로고침',
+    linkURL: '/history',
+  },
 };
 
 export const ServerErrorNotificationTemplate = {

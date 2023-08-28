@@ -33,7 +33,7 @@ export interface CalenderDate {
 export interface MuiCalendarProps {
   disabled?: boolean;
   activeRangeSelect?: boolean;
-  onChangeDate?: ({ startDate, endDate, isRangeSelected }: ChangeDatePayload) => void;
+  onChangeDate?: ({ selectedDate, startDate, endDate, isRangeSelected }: ChangeDatePayload) => void;
 }
 
 const CustomPickersDay = styled(PickersDay, {

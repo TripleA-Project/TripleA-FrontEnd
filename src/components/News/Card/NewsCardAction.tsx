@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import ClipboardJS from 'clipboard';
 import { ErrorNotification } from '@/components/Notification';
 import { AppIcons } from '@/components/Icons';
@@ -14,7 +14,7 @@ import { type Bookmark, type NewsData } from '@/interfaces/NewsData';
 interface NewsCardActionProps extends Pick<NewsData, 'newsId' | 'bookmark'> {
   symbolName?: string;
   showCount?: boolean;
-  onBookmark?: (newsId: number) => void;
+  onBookmark?: (newsId: number) => void | Promise<void>;
 }
 
 export function NewsCardActionLoading() {
@@ -34,7 +34,7 @@ export function NewsCardActionLoading() {
 }
 
 function NewsCardAction({ newsId, symbolName, bookmark, showCount, onBookmark }: NewsCardActionProps) {
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
 
   const { status } = useAuth();
 
@@ -65,7 +65,6 @@ function NewsCardAction({ newsId, symbolName, bookmark, showCount, onBookmark }:
         toastNotify('error', `북마크 ${variables === 'add' ? '생성' : '삭제'} 실패`);
       },
       onSettled: () => {
-        queryClient.invalidateQueries(['news', 'detail', newsId]);
         onBookmark && onBookmark(newsId);
       },
     },

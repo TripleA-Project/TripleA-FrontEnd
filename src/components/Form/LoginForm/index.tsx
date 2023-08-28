@@ -36,7 +36,7 @@ function LoginForm({ continueURL }: LoginFormProps) {
     formState: { isValid, errors },
   } = useForm<LoginForm>();
 
-  const router = useRouter();
+  const { replace, refresh } = useRouter();
 
   const autoLoginRef = useRef<HTMLInputElement>(null);
 
@@ -77,7 +77,9 @@ function LoginForm({ continueURL }: LoginFormProps) {
       queryClient.removeQueries({ queryKey: ['auth'] });
       queryClient.invalidateQueries(['profile']);
 
-      router.replace(continueURL ?? '/');
+      refresh();
+
+      replace(continueURL ?? '/');
 
       return;
     } catch (error) {

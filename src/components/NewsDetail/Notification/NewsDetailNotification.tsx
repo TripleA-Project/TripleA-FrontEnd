@@ -16,7 +16,6 @@ function getNotificationType(
 }
 
 function NewsDetailNotification({ newsDetail }: NewsDetailNotificationProps) {
-  // const notificationType = 'NoReadToday';
   const notificationType = getNotificationType(newsDetail);
 
   return notificationType ? (

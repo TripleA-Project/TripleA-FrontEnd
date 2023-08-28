@@ -14,7 +14,6 @@ function Accordion({ summary, detail, defaultOpen = true }: AccordionProps) {
   const [open, setOpen] = useState(defaultOpen);
 
   const handleOpen = () => {
-    console.log('click');
     setOpen((prev) => !prev);
   };
 

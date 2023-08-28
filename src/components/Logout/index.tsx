@@ -1,14 +1,14 @@
 'use client';
 
+import { useLayoutEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { logout } from '@/service/auth';
 import { deleteCookie } from '@/util/cookies';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
-import { useLayoutEffect } from 'react';
 
 export default function Logout() {
   const queryClient = useQueryClient();
-  const { replace } = useRouter();
+  const { replace, refresh } = useRouter();
   const { mutate: loginMutate } = useMutation(() => logout(), {
     retry: 0,
     onSuccess: async () => {
@@ -16,6 +16,8 @@ export default function Logout() {
       await deleteCookie('autoLogin');
 
       queryClient.removeQueries();
+
+      refresh();
 
       replace('/');
     },

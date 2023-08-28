@@ -60,8 +60,6 @@ function YearSelect({ onYearselect, disabled = false }: MounthSelectProps) {
                     setYear(year);
 
                     onYearselect && onYearselect(year);
-
-                    console.log({ year });
                   }}
                 >
                   {year}
