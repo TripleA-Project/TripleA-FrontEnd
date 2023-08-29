@@ -6,7 +6,7 @@ import CategoryChip from '@/components/UI/Chip/CategoryChip';
 import { disLikeCategory, getAllCategory, getLikeCategory, likeCategory } from '@/service/category';
 import { toastNotify } from '@/util/toastNotify';
 import { type Category } from '@/interfaces/Category';
-import { type OnChipChangeResult } from '../UI/Chip/SymbolChip';
+import { type OnChipChangeResult } from '../../UI/Chip/SymbolChip';
 import { AxiosError, HttpStatusCode } from 'axios';
 import { APIResponse } from '@/interfaces/Dto/Core';
 

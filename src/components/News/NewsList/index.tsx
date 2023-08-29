@@ -8,7 +8,7 @@ interface LoadingProps {
 
 interface NewsListProps {
   newsList: NewsData[];
-  onBookmark?: (newsId: number) => void;
+  onBookmark?: (newsId: number) => void | Promise<void>;
 }
 
 export function NewsListLoading({ length = 10 }: LoadingProps) {

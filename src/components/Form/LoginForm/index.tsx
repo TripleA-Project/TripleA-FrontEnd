@@ -36,7 +36,7 @@ function LoginForm({ continueURL }: LoginFormProps) {
     formState: { isValid, errors },
   } = useForm<LoginForm>();
 
-  const router = useRouter();
+  const { replace, refresh } = useRouter();
 
   const autoLoginRef = useRef<HTMLInputElement>(null);
 
@@ -77,7 +77,9 @@ function LoginForm({ continueURL }: LoginFormProps) {
       queryClient.removeQueries({ queryKey: ['auth'] });
       queryClient.invalidateQueries(['profile']);
 
-      router.replace(continueURL ?? '/');
+      refresh();
+
+      replace(continueURL ?? '/');
 
       return;
     } catch (error) {
@@ -146,8 +148,8 @@ function LoginForm({ continueURL }: LoginFormProps) {
                     required: '비밀번호를 입력해주세요',
                     validate: (value) => {
                       const passwordLength = /^.{8,16}$/;
-                      const notAllowdChar = /[^a-zA-Z0-9\!\@\#\$\%\^\&\*\-\_\=\+\{\}\;\:\,\<\.\>]/g;
-                      const isContainAllowdSpec = /[\!@\#\$\%\^\&\*\-\_\=\+\{\}\;\:\,\<\.\>]/g;
+                      const notAllowdChar = /[^a-zA-Z0-9\!\@\#\$\%\^\&\*\-\_\=\+\{\}\;\:\,\<\.\>\(\)]/g;
+                      const isContainAllowdSpec = /[\!@\#\$\%\^\&\*\-\_\=\+\{\}\;\:\,\<\.\>\(\)]/g;
 
                       if (!passwordLength.test(value)) return '패스워드는 8자 이상, 16자 이하입니다';
                       if (notAllowdChar.test(value)) return '패스워드는 영문 대소문자, 0-9 숫자로 구성되어야 합니다';

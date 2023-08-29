@@ -8,7 +8,7 @@ import { type NewsData } from '@/interfaces/NewsData';
 interface NewsCardProps {
   news: NewsData;
   isLast?: boolean;
-  onBookmark?: (newsId: number) => void;
+  onBookmark?: (newsId: number) => void | Promise<void>;
 }
 
 export function NewsCardLoading({ isLast }: { isLast?: boolean }) {

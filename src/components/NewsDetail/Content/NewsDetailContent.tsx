@@ -1,8 +1,8 @@
 'use client';
 
-import NewsDetailTranslation from './NewsDetailTranslation';
-import DetailThumbnail from './DetailThumbnail';
-import AINewsAnalysis from './AINewsAnalysis';
+import NewsDetailTranslation from '../NewsDetailTranslation';
+import DetailThumbnail from '../DetailThumbnail';
+import AINewsAnalysis from '../AINewsAnalysis';
 
 interface NewsDetailContentProps {
   newsId: number;
@@ -45,7 +45,7 @@ function NewsDetailContent({
         />
         <AINewsAnalysis newsId={newsId} summary={summary} />
       </section>
-      <section id="detail_content" className="my-4">
+      <section className="my-4">
         <DetailThumbnail src={thumbnail} />
       </section>
       <section className="break-all text-[15px] font-medium">

@@ -1,6 +1,8 @@
-import HistoryPage from '@/components/HistoryPage';
-import HistoryHeader from '@/components/Layout/Header/HistoryHeader';
 import { Metadata } from 'next';
+import { Suspense } from 'react';
+import HistoryHeader from '@/components/Layout/Header/HistoryHeader';
+import HistoryPage from '@/components/HistoryPage';
+import HistoryInitialFetcher from '@/components/HistoryPage/HistoryInitialFetcher';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -15,7 +17,12 @@ function HistoryNewsPage() {
     <>
       <HistoryHeader />
       <div className="box-border px-4">
-        <HistoryPage />
+        <Suspense fallback={<></>}>
+          {/* @ts-expect-error server component */}
+          <HistoryInitialFetcher>
+            <HistoryPage />
+          </HistoryInitialFetcher>
+        </Suspense>
       </div>
     </>
   );

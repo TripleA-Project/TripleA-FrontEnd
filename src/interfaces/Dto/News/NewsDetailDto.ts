@@ -20,7 +20,7 @@ interface NewsDetailTranlateResult {
   content: string;
 }
 
-interface UserPayload {
+export interface UserPayload {
   user: {
     membership: keyof typeof MEMBERSHIP;
     leftBenefitCount: number | null;

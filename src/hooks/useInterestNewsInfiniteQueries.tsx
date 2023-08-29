@@ -109,7 +109,6 @@ export const useInterestNewsInfiniteQueries: () => InterestQueryHookResult = () 
   });
 
   const getStatus = () => {
-    // console.log('getStatus: ', { newsQueries, isFetch });
     if (!isFetch) return queryPayload.status;
 
     if (!newsQueries?.length) return 'idle';
@@ -121,8 +120,6 @@ export const useInterestNewsInfiniteQueries: () => InterestQueryHookResult = () 
   };
 
   const queriesStatus = getStatus();
-
-  // console.log({ queriesStatus, newsQueries });
 
   function getFetchQueries(payload: InterestQueryHookPayload) {
     const fetchQueries = payload?.nextPages?.filter((query) => Number.isInteger(query.nextPage));
@@ -198,8 +195,6 @@ export const useInterestNewsInfiniteQueries: () => InterestQueryHookResult = () 
   useEffect(() => {
     if (queriesStatus !== 'success') {
       if (queryPayload.status !== queriesStatus) {
-        console.log(`${queryPayload.status} => ${queriesStatus} `);
-
         setQueryPayload((prev) => ({
           ...prev,
           status: queriesStatus,

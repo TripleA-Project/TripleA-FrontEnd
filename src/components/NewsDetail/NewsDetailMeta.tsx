@@ -1,6 +1,9 @@
+'use client';
+
 import dayjs from 'dayjs';
-import NewsCardAction, { NewsCardActionLoading } from '../News/Card/NewsCardAction';
-import { Bookmark } from '@/interfaces/NewsData';
+import { useQueryClient } from '@tanstack/react-query';
+import NewsCardAction from '../News/Card/NewsCardAction';
+import { type Bookmark } from '@/interfaces/NewsData';
 
 interface NewsDetailMetaProps {
   newsId: number;
@@ -10,19 +13,9 @@ interface NewsDetailMetaProps {
   publishedDate: string;
 }
 
-export function NewsDetailMetaLoaing() {
-  return (
-    <section className="flex items-center justify-between">
-      <section className="skeleton_loading">
-        <span className="mr-0.5 inline-block h-4 w-10" />
-        <span className="inline-block h-4 w-20" />
-      </section>
-      <NewsCardActionLoading />
-    </section>
-  );
-}
-
 function NewsDetailMeta({ newsId, symbolName, bookmark, source, publishedDate }: NewsDetailMetaProps) {
+  const queryClient = useQueryClient();
+
   const convertSource = (source: string) => {
     const dotRemovedSource = source.replaceAll(/\..+/g, '');
 
@@ -39,7 +32,15 @@ function NewsDetailMeta({ newsId, symbolName, bookmark, source, publishedDate }:
           <span className="font-bold">{convertSource(source)} </span>
           <span className="font-semibold">{dayjs(publishedDate).format('YYYY.MM.DD HH:mm:ss')}</span>
         </section>
-        <NewsCardAction showCount={false} newsId={newsId} symbolName={symbolName} bookmark={bookmark} />
+        <NewsCardAction
+          showCount={false}
+          newsId={newsId}
+          symbolName={symbolName}
+          bookmark={bookmark}
+          onBookmark={(newsId) => {
+            queryClient.invalidateQueries(['news', 'detail', newsId]);
+          }}
+        />
       </section>
     </>
   );

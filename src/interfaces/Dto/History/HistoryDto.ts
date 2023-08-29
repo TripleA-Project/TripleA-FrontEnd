@@ -12,6 +12,6 @@ export interface GetNewsHistoryRequestConfig extends AxiosRequestConfig {
   params: GetNewsHistorySearchParam;
 }
 
-type HistoryPayload = NewsHistory[];
+export type HistoryPayload = NewsHistory[];
 
 export interface GetNewsHistroyResponse extends APIResponse<HistoryPayload> {}

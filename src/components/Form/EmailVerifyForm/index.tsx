@@ -46,8 +46,6 @@ function EmailVerifyForm() {
     } catch (error) {
       const { response } = error as AxiosError<APIResponse<{ key: string; value: string }>>;
 
-      console.log('Error: ', response);
-
       const { data: errorPayload, msg } = response!.data;
 
       setError('code', { type: 'validate', message: errorPayload ? errorPayload.value : msg });

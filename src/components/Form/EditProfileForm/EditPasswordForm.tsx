@@ -76,12 +76,12 @@ function EditPasswordForm(props: EditProfilesFormProps) {
   const getCheckListOfPassword = () => {
     const password = getValues('newPassword');
 
-    const specialChars = `! @ # $ % ^ & * _ - + { } ; : , < . >`;
+    const specialChars = `! @ # $ % ^ & * _ - + { } ; : , < . > ( )`;
 
     const passwordLengthRegExp = /^.{8,16}$/;
     const alphaRegExp = /[a-zA-Z]/g;
     const numberRegExp = /[0-9]/g;
-    const isContainSpecialRegExp = /[\!@\#\$\%\^\&\*\-\_\=\+\{\}\;\:\,\<\.\>]/g;
+    const isContainSpecialRegExp = /[\!@\#\$\%\^\&\*\-\_\=\+\{\}\;\:\,\<\.\>\(\)]/g;
 
     return createCheckList({
       checkList: [
