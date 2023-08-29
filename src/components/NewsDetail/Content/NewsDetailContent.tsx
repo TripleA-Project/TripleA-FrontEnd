@@ -3,8 +3,10 @@
 import NewsDetailTranslation from '../NewsDetailTranslation';
 import DetailThumbnail from '../DetailThumbnail';
 import AINewsAnalysis from '../AINewsAnalysis';
+import { ProfilePayload } from '@/interfaces/Dto/User';
 
 interface NewsDetailContentProps {
+  user?: ProfilePayload;
   newsId: number;
   onSwitch: (isOn: boolean) => void;
   thumbnail?: string;
@@ -18,6 +20,7 @@ interface NewsDetailContentProps {
 }
 
 function NewsDetailContent({
+  user,
   newsId,
   thumbnail,
   description,
@@ -43,7 +46,7 @@ function NewsDetailContent({
           disabled={description.kor ? false : true}
           onSwitch={onSwitch}
         />
-        <AINewsAnalysis newsId={newsId} summary={summary} />
+        <AINewsAnalysis user={user} newsId={newsId} summary={summary} />
       </section>
       <section className="my-4">
         <DetailThumbnail src={thumbnail} />

@@ -2,13 +2,15 @@ import React, { useState } from 'react';
 import SwitchAIAnalysis from './SwitchAIAnalysis';
 import { AppLogos } from '@/components/Icons';
 import AINewsAnalysisModal from './Modal/AINewsAnalysisModal';
+import { ProfilePayload } from '@/interfaces/Dto/User';
 
 interface AINewsAnalysisProps {
   newsId: number;
   summary: string;
+  user?: ProfilePayload;
 }
 
-function AINewsAnalysis({ newsId, summary }: AINewsAnalysisProps) {
+function AINewsAnalysis({ newsId, summary, user }: AINewsAnalysisProps) {
   const [aiNewsAnalysisActive, setAINewsAnalysisActive] = useState(false);
 
   return (
@@ -28,6 +30,7 @@ function AINewsAnalysis({ newsId, summary }: AINewsAnalysisProps) {
         </div>
       </div>
       <AINewsAnalysisModal
+        user={user}
         active={aiNewsAnalysisActive}
         onClose={() => {
           setAINewsAnalysisActive(false);

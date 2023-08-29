@@ -17,13 +17,15 @@ import { AddCategoryForm, AddSymbolForm } from './Form';
 import TopScrollButton from './TopScrollButton';
 import BenefitBar from './BenefitBar';
 import { type NewsDetailPayload, type NewsDetailSymbol, type UserPayload } from '@/interfaces/Dto/News';
+import { ProfilePayload } from '@/interfaces/Dto/User';
 
 interface DetailProps {
   newsDetailPayload?: UserPayload & NewsDetailPayload;
   requestSymbol?: NewsDetailSymbol;
+  user?: ProfilePayload;
 }
 
-function Detail({ newsDetailPayload, requestSymbol }: DetailProps) {
+function Detail({ newsDetailPayload, requestSymbol, user }: DetailProps) {
   const [isTransition, setIsTransition] = useState(!!newsDetailPayload?.kor.title);
 
   if (!newsDetailPayload) return null;
@@ -59,6 +61,7 @@ function Detail({ newsDetailPayload, requestSymbol }: DetailProps) {
               <NoDescription />
             ) : (
               <NewsDetailContent
+                user={user}
                 newsId={newsDetailPayload.newsId}
                 thumbnail={newsDetailPayload.thumbnail}
                 description={{

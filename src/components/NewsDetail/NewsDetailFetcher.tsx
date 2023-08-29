@@ -7,6 +7,7 @@ import { getSymbol } from '@/service/symbol';
 import { checkNewsDetailApiError } from '@/util/handleApiError';
 import { type NewsDetailResponse, type NewsDetailSymbol } from '@/interfaces/Dto/News';
 import { type Symbol } from '@/interfaces/Symbol';
+import { getProfile } from '@/service/user';
 
 interface NewsDetailFetcherProps {
   newsId: number;
@@ -52,10 +53,21 @@ async function NewsDetailFetcher({ newsId, symbolName, children }: NewsDetailFet
     } as NewsDetailSymbol;
   }
 
+  const userResponse = await getProfile().catch((err) => {
+    return err as AxiosError;
+  });
+
+  if (userResponse instanceof AxiosError) {
+    return <InternalServerError />;
+  }
+
+  const userPayload = userResponse.data.data;
+
   const childComponent = cloneElement(children, {
     key: `newsDetailFetcherChildren`,
     newsDetailPayload,
     requestSymbol,
+    user: userPayload,
   });
 
   return <>{childComponent}</>;

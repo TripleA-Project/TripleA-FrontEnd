@@ -18,3 +18,12 @@ export interface AINewsAnalysisPayload {
 }
 
 export interface AINewsAnalysisResponse extends APIResponse<AINewsAnalysisPayload> {}
+
+export interface AINewsAnalysisDemoRequest {
+  openai_api_key: string;
+  id: number;
+  article?: string;
+  regenerate?: boolean;
+}
+
+export interface AINewsAnalysisDemoResponse extends Omit<AINewsAnalysisPayload, 'leftBenefitCount'> {}
