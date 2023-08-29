@@ -23,6 +23,8 @@ import {
   type GetNewsByIdResponse,
   type CollapseNews,
   type CollapseNewsPayload,
+  AINewsAnalysisDemoResponse,
+  AINewsAnalysisDemoRequest,
 } from '@/interfaces/Dto/News';
 import {
   type GetNewsHistoryRequestConfig,
@@ -257,4 +259,21 @@ export async function getAINewsAnalysis({ id, summary }: AINewsAnalysisParam & A
   });
 
   return getAINewsAnalysisResponse;
+}
+
+export async function getAINewsAnalysisDemo({ id }: AINewsAnalysisParam) {
+  const getAINewsAnalysisDemoResponse = await axios.get<AINewsAnalysisDemoResponse>(
+    process.env.NEXT_PUBLIC_WISE_AI_URL!,
+    {
+      headers: {
+        Authorization: `${process.env.NEXT_PUBLIC_WISE_TOKEN}`,
+      },
+      params: {
+        openai_api_key: process.env.NEXT_PUBLIC_OPENAI_KEY,
+        id,
+      } as AINewsAnalysisDemoRequest,
+    },
+  );
+
+  return getAINewsAnalysisDemoResponse;
 }

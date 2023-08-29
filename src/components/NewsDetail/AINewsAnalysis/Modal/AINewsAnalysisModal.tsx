@@ -1,18 +1,19 @@
-'use client';
-
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import Analysis, { type AnalysisProps } from '../Analysis';
 import AINewsAnalysisError from '../AINewsAnalysisError';
 import Loading from '../Loading';
 import Header from './Header';
+import { ProfilePayload } from '@/interfaces/Dto/User';
+import AnalysisDemo from '../AnalysisDemo';
 
 export interface AINewsAnalysisModalProps extends AnalysisProps {
   active?: boolean;
   onClose?: () => void;
+  user?: ProfilePayload;
 }
 
-function AINewsAnalysisModal({ id, summary, active = false, onClose }: AINewsAnalysisModalProps) {
+function AINewsAnalysisModal({ id, summary, active = false, onClose, user }: AINewsAnalysisModalProps) {
   const handleClick = () => {
     onClose && onClose();
   };
@@ -33,7 +34,11 @@ function AINewsAnalysisModal({ id, summary, active = false, onClose }: AINewsAna
               <div className="mb-4">
                 <Header onClose={onClose} />
               </div>
-              <Analysis id={id} summary={summary} />
+              {user?.email === process.env.NEXT_PUBLIC_DEMO_ACCOUNT ? (
+                <AnalysisDemo id={id} summary={summary} />
+              ) : (
+                <Analysis id={id} summary={summary} />
+              )}
             </Suspense>
           </ErrorBoundary>
         </div>
