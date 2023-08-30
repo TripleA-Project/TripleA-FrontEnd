@@ -1,6 +1,7 @@
-import axios, { HttpStatusCode, isAxiosError } from 'axios';
+import axios, { AxiosError, HttpStatusCode, isAxiosError } from 'axios';
 import { getCookie, setCookie } from '@/util/cookies';
 import { requestAccessToken } from './auth';
+import { APIResponse } from '@/interfaces/Dto/Core';
 
 export const TIMEOUT_CODE = 'ECONNABORTED';
 
@@ -46,8 +47,9 @@ function createAxiosInstance() {
                 const refreshResponse = await requestAccessToken();
 
                 const accessToken = refreshResponse.headers['authorization'];
-
+                console.log('refreshResponse: ', refreshResponse);
                 if (accessToken) {
+                  console.log('refreshToken: ', accessToken);
                   await setCookie('accessToken', (accessToken as string).replace('Bearer ', ''), {
                     maxAge: 60 * 60,
                     path: '/',
@@ -56,6 +58,12 @@ function createAxiosInstance() {
 
                 return axiosInstance(config!);
               } catch (error) {
+                console.log('[refreshError] ', { error });
+                if (error instanceof AxiosError) {
+                  const { response } = error as AxiosError<APIResponse>;
+
+                  console.log('refresh res data: ', response?.data);
+                }
                 throw error;
               }
             }
