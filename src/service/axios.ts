@@ -48,10 +48,7 @@ function createAxiosInstance() {
 
                 const accessToken = refreshResponse.headers['authorization'];
 
-                console.log('[success] refreshResponse: ', refreshResponse);
-
                 if (accessToken) {
-                  console.log('refresh AccessToken: ', accessToken);
                   await setCookie('accessToken', (accessToken as string).replace('Bearer ', ''), {
                     maxAge: 60 * 60,
                     path: '/',

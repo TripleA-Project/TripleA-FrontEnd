@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { cookies } from 'next/headers';
 import { Suspense } from 'react';
 import HistoryHeader from '@/components/Layout/Header/HistoryHeader';
 import HistoryPage from '@/components/HistoryPage';
@@ -13,6 +14,9 @@ export const metadata: Metadata = {
 };
 
 function HistoryNewsPage() {
+  console.log('isServer: ', typeof window === 'undefined');
+  console.log('refresh cookie: ', cookies().get('refreshToken'));
+
   return (
     <>
       <HistoryHeader />
