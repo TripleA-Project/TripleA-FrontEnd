@@ -61,6 +61,10 @@ function LoginForm({ continueURL }: LoginFormProps) {
       const accessToken = response.headers['authorization'] as string;
       const autoLogin = await getCookie('autoLogin');
 
+      const serverSetCookie = response.headers['set-cookie'];
+
+      console.log({ serverSetCookie });
+
       if (accessToken) {
         await setCookie('accessToken', accessToken.replace('Bearer ', ''), { path: '/', maxAge: 60 * 60 });
       }
