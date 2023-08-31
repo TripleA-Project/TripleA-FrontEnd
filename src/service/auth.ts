@@ -26,6 +26,8 @@ export async function login({ email, password }: LoginRequest) {
     password,
   });
 
+  console.log('[login] ', loginResponse.headers['set-cookie']);
+
   return loginResponse;
 }
 

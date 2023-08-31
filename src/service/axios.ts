@@ -44,24 +44,6 @@ function createAxiosInstance() {
 
   axiosInstance.interceptors.response.use(
     async (res) => {
-      if (typeof window === 'undefined') {
-        if (res.headers.authorization) {
-          const token = (res.headers.authorization as string).replace('Bearer ', '');
-
-          console.log({ token });
-
-          const test = await axios.post(
-            `${process.env.NEXT_PUBLIC_SITE_URL}/api/token`,
-            { token },
-            { withCredentials: true },
-          );
-
-          res.headers['set-cookie'] = test.headers['set-cookie'];
-
-          //console.log('testSetCookie: ', test.headers['set-cookie']);
-        }
-      }
-
       return res;
     },
     async (error) => {
