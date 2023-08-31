@@ -11,7 +11,7 @@ import { useLikes } from '@/hooks/useLikes';
 
 function Tabs() {
   const searchParams = useSearchParams();
-  const tabParams = searchParams.get('tab');
+  const tabParams = searchParams?.get('tab');
   const tab: TabPage = !tabParams ? 'latestNews' : !!tabParams && tabParams === 'interest' ? 'likeNews' : 'latestNews';
 
   const [tabPage, setTabPage] = useState<TabPage>(tab);

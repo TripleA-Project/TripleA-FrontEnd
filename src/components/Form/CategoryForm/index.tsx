@@ -120,7 +120,7 @@ function CategoryForm({ buttonText = '선택 완료' }: CategoryFormProps) {
     isSubmittingRef.current = false;
 
     if (isSuccessRef.current === true) {
-      if (pathName.startsWith('/signup')) {
+      if (pathName?.startsWith('/signup')) {
         queryClient.invalidateQueries(['likedCategoryList']);
 
         formContext.done();

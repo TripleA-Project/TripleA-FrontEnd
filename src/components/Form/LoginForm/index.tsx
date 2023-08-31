@@ -13,6 +13,7 @@ import Button from '@/components/Button/Button';
 import { login } from '@/service/auth';
 import { validateEmail } from '@/util/validate';
 import { deleteCookie, getCookie, setCookie } from '@/util/cookies';
+import axios from 'axios';
 
 export interface LoginFormProps {
   continueURL?: string;
@@ -61,13 +62,11 @@ function LoginForm({ continueURL }: LoginFormProps) {
       const accessToken = response.headers['authorization'] as string;
       const autoLogin = await getCookie('autoLogin');
 
-      const serverSetCookie = response.headers['set-cookie'];
-
-      console.log({ serverSetCookie });
-
       if (accessToken) {
         await setCookie('accessToken', accessToken.replace('Bearer ', ''), { path: '/', maxAge: 60 * 60 });
       }
+
+      console.log('[login] ', response.headers['set-cookie']);
 
       if (autoLoginRef?.current) {
         if (autoLoginRef.current.checked && !autoLogin) {

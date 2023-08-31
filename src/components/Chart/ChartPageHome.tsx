@@ -13,7 +13,7 @@ import { HttpStatusCode, isAxiosError } from 'axios';
 
 function ChartPageHome() {
   const searchParams = useSearchParams();
-  const tab = searchParams.get('tab');
+  const tab = searchParams?.get('tab');
 
   const {
     data: profileResponse,

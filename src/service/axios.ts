@@ -15,6 +15,20 @@ function createAxiosInstance() {
 
   axiosInstance.interceptors.request.use(
     async (req) => {
+      if (typeof window === 'undefined') {
+        const cookies = await import('next/headers').then((mod) => mod.cookies);
+
+        const cookieList = cookies().getAll();
+        console.log({ cookieList });
+        // const cookie = cookieList.length
+        //   ? cookieList
+        //       .map(({ name, value }, idx, arr) => `${name}=${idx === arr.length - 1 ? value : `${value} `}`)
+        //       .join(';')
+        //   : '';
+
+        // req.headers.Cookie = cookie;
+      }
+
       const accessToken = await getCookie('accessToken');
 
       if (accessToken) {
@@ -30,6 +44,24 @@ function createAxiosInstance() {
 
   axiosInstance.interceptors.response.use(
     async (res) => {
+      if (typeof window === 'undefined') {
+        if (res.headers.authorization) {
+          const token = (res.headers.authorization as string).replace('Bearer ', '');
+
+          console.log({ token });
+
+          const test = await axios.post(
+            `${process.env.NEXT_PUBLIC_SITE_URL}/api/token`,
+            { token },
+            { withCredentials: true },
+          );
+
+          res.headers['set-cookie'] = test.headers['set-cookie'];
+
+          //console.log('testSetCookie: ', test.headers['set-cookie']);
+        }
+      }
+
       return res;
     },
     async (error) => {
@@ -48,11 +80,17 @@ function createAxiosInstance() {
 
                 const accessToken = refreshResponse.headers['authorization'];
 
+                console.log('[success] ', refreshResponse.data);
+
                 if (accessToken) {
-                  await setCookie('accessToken', (accessToken as string).replace('Bearer ', ''), {
-                    maxAge: 60 * 60,
-                    path: '/',
-                  });
+                  if (typeof window === 'undefined') {
+                    config!.headers.Authorization = `Bearer ${accessToken}`;
+                  } else {
+                    await setCookie('accessToken', (accessToken as string).replace('Bearer ', ''), {
+                      maxAge: 60 * 60,
+                      path: '/',
+                    });
+                  }
                 }
 
                 return axiosInstance(config!);
@@ -60,6 +98,7 @@ function createAxiosInstance() {
                 if (error instanceof AxiosError) {
                   const { response } = error as AxiosError<APIResponse>;
 
+                  console.log(error.message);
                   console.log('[refreshErrorRequest] ', response?.request['_header']);
                   console.log('[refreshErrorResponsePayload] ', response?.data);
 

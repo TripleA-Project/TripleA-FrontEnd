@@ -12,8 +12,8 @@ function Unauthorized() {
   const params = useParams();
   const searchParams = useSearchParams();
 
-  const newsId = Number(params.id);
-  const symbolName = searchParams.get('symbol');
+  const newsId = Number(params?.id);
+  const symbolName = searchParams?.get('symbol');
 
   const { title, content, buttonText } = NewsDetailNotificationTemplate.NewsDetailLoginRequired;
 

@@ -159,7 +159,7 @@ function SymbolForm({ buttonText = '선택 완료' }: SymbolFormProps) {
     isSubmittingRef.current = false;
 
     if (isSuccessRef.current === true) {
-      if (pathName.startsWith('/signup')) {
+      if (pathName?.startsWith('/signup')) {
         queryClient.invalidateQueries(['likedSymbolList']);
 
         formContext.done();

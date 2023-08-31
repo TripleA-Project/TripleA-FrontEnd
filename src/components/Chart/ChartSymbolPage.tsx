@@ -16,8 +16,8 @@ import { ServerErrorNotificationTemplate } from '@/constants/notification';
 
 function ChartSymbolPage() {
   const searchParams = useSearchParams();
-  const symbolName = searchParams.get('name');
-  const resample = searchParams.get('resample');
+  const symbolName = searchParams?.get('name');
+  const resample = searchParams?.get('resample');
 
   const {
     data: matchedSymbolResponse,
