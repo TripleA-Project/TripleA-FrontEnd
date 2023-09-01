@@ -261,7 +261,7 @@ export async function getAINewsAnalysis({ id, summary }: AINewsAnalysisParam & A
   return getAINewsAnalysisResponse;
 }
 
-export async function getAINewsAnalysisDemo({ id }: AINewsAnalysisParam) {
+export async function getAINewsAnalysisDemo({ id, summary }: AINewsAnalysisParam & AINewsAnalysisRequest) {
   const getAINewsAnalysisDemoResponse = await axios.get<AINewsAnalysisDemoResponse>(
     process.env.NEXT_PUBLIC_WISE_AI_URL!,
     {
@@ -271,6 +271,7 @@ export async function getAINewsAnalysisDemo({ id }: AINewsAnalysisParam) {
       params: {
         openai_api_key: process.env.NEXT_PUBLIC_OPENAI_KEY,
         id,
+        article: summary,
       } as AINewsAnalysisDemoRequest,
     },
   );

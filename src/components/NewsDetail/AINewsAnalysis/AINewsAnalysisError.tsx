@@ -7,6 +7,7 @@ import { NotificationIcons } from '@/components/Notification/NotificationIcons';
 import { AxiosError, HttpStatusCode } from 'axios';
 import { type FallbackProps } from 'react-error-boundary';
 import { type APIResponse } from '@/interfaces/Dto/Core';
+import { QueryClient, useQueryClient } from '@tanstack/react-query';
 
 interface ErrorMeta {
   icon?: React.ReactNode;
@@ -15,7 +16,11 @@ interface ErrorMeta {
   button?: React.ReactNode;
 }
 
-function createErrorMeta({ error, resetErrorBoundary }: FallbackProps): ErrorMeta {
+function createErrorMeta({
+  error,
+  resetErrorBoundary,
+  queryClient,
+}: FallbackProps & { queryClient: QueryClient }): ErrorMeta {
   if (error instanceof AxiosError) {
     const { response } = error as AxiosError<APIResponse>;
 
@@ -58,7 +63,16 @@ function createErrorMeta({ error, resetErrorBoundary }: FallbackProps): ErrorMet
       이용에 불편을 드려 죄송합니다.
     `,
     button: (
-      <Button bgColorTheme="orange" textColorTheme="white" fullWidth onClick={() => resetErrorBoundary()}>
+      <Button
+        bgColorTheme="orange"
+        textColorTheme="white"
+        fullWidth
+        onClick={() => {
+          queryClient.refetchQueries(['news', 'analysis']);
+
+          resetErrorBoundary();
+        }}
+      >
         다시 시도하기
       </Button>
     ),
@@ -66,7 +80,9 @@ function createErrorMeta({ error, resetErrorBoundary }: FallbackProps): ErrorMet
 }
 
 function AINewsAnalysisError({ error, resetErrorBoundary }: FallbackProps) {
-  const { icon, title, content, button } = createErrorMeta({ error, resetErrorBoundary });
+  const queryClient = useQueryClient();
+
+  const { icon, title, content, button } = createErrorMeta({ error, resetErrorBoundary, queryClient });
 
   return (
     <div className="flex flex-col items-center">
