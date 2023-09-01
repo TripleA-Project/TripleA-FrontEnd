@@ -8,6 +8,7 @@ import { AxiosError, HttpStatusCode } from 'axios';
 import { type FallbackProps } from 'react-error-boundary';
 import { type APIResponse } from '@/interfaces/Dto/Core';
 import { QueryClient, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
 
 interface ErrorMeta {
   icon?: React.ReactNode;
@@ -53,6 +54,17 @@ function createErrorMeta({
         ),
       };
     }
+
+    if (response?.data.status === HttpStatusCode.Conflict) {
+      return {
+        icon: <NotificationIcons.Error className="text-4xl" />,
+        title: `잠시만 기다려주세요`,
+        content: `
+          서버에 요청중입니다.
+          잠시만 기다려주세요.
+        `,
+      };
+    }
   }
 
   return {
@@ -84,6 +96,26 @@ function AINewsAnalysisError({ error, resetErrorBoundary }: FallbackProps) {
 
   const { icon, title, content, button } = createErrorMeta({ error, resetErrorBoundary, queryClient });
 
+  useEffect(() => {
+    let timer: NodeJS.Timeout | null = null;
+
+    if (error instanceof AxiosError) {
+      if (error?.response?.data?.status === HttpStatusCode.Conflict) {
+        timer = setTimeout(() => {
+          queryClient.refetchQueries(['news', 'analysis']);
+
+          resetErrorBoundary();
+        }, 3000);
+      }
+    }
+
+    return () => {
+      if (timer) {
+        clearTimeout(timer);
+      }
+    };
+  }, [error]); /* eslint-disable-line */
+
   return (
     <div className="flex flex-col items-center">
       {icon}
@@ -92,7 +124,7 @@ function AINewsAnalysisError({ error, resetErrorBoundary }: FallbackProps) {
         className="text-center text-[#4E525D]"
         dangerouslySetInnerHTML={{ __html: content.trim().replaceAll('\n', '<br />') }}
       />
-      {button}
+      {button ?? null}
     </div>
   );
 }
