@@ -37,6 +37,16 @@ export async function deleteCookie(name: string) {
     expires: new Date(),
     path: '/',
   } as SetCookieOption);
+
+  if (name === 'refreshToken') {
+    cookies().set({
+      name,
+      value: '',
+      expires: new Date(),
+      domain: 'moya.ai',
+      path: '/',
+    });
+  }
 }
 
 export async function syncCookie(email: string) {
