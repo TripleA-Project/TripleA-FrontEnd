@@ -1,20 +1,29 @@
 'use client';
 
 import React, { useEffect } from 'react';
+import { AxiosResponse } from 'axios';
+import { useRouter } from 'next/navigation';
+import { InfiniteData, QueryObserverResult, RefetchOptions, RefetchQueryFilters } from '@tanstack/react-query';
 import FitPage from '@/components/Layout/FitPage';
+import Button from '@/components/Button/Button';
 import { NotificationIcons } from '@/components/Notification/NotificationIcons';
 import { ServerErrorNotificationTemplate } from '@/constants/notification';
-import Button from '@/components/Button/Button';
-import { useRouter } from 'next/navigation';
+import { LatestNewsResponse } from '@/interfaces/Dto/News';
 
-function InternalServerError() {
+interface LatestNewsTimeoutProps {
+  refetch: <TPageData>(
+    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined,
+  ) => Promise<QueryObserverResult<InfiniteData<AxiosResponse<LatestNewsResponse, any>>, unknown>>;
+}
+
+function LatestNewsTimeout({ refetch }: LatestNewsTimeoutProps) {
   const { refresh } = useRouter();
-  const { title, content } = ServerErrorNotificationTemplate.InternalServerError;
+  const { title, content } = ServerErrorNotificationTemplate.Timeout;
 
   useEffect(() => {
-    return () => {
-      refresh();
-    };
+    refresh();
+
+    refetch();
   }, []); /* eslint-disable-line */
 
   return (
@@ -36,6 +45,8 @@ function InternalServerError() {
             textColorTheme="white"
             onClick={() => {
               refresh();
+
+              refetch();
             }}
           >
             새로 고침
@@ -46,4 +57,4 @@ function InternalServerError() {
   );
 }
 
-export default InternalServerError;
+export default LatestNewsTimeout;

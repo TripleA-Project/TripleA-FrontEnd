@@ -2,20 +2,24 @@
 
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
-import { HttpStatusCode, isAxiosError } from 'axios';
+import { useInfiniteQuery, useIsFetching, useQueryClient } from '@tanstack/react-query';
+import { AxiosError, HttpStatusCode, isAxiosError } from 'axios';
 import { ToastContainer } from 'react-toastify';
 import { useNewsListFilter } from '@/redux/slice/newsListFilterSlice';
 import { LatestNewsHeader, LatestNewsList, LatestNewsListLoading } from './LatestNews';
 import { TrendNewsHeader } from './TrendNews';
-import TrendNewsCard, { TrendNewsCardError, TrendNewsCardLoading } from './Card/TrendNewsCard';
+import TrendNewsCard, { TrendNewsCardLoading } from './Card/TrendNewsCard';
 import InfiniteTrigger from './InfiniteTrigger';
+import LatestNewsTimeout from '../ErrorBoundary/ErrorFallback/LatestNews/Timeout';
+import LatestNewsInternalServerError from '../ErrorBoundary/ErrorFallback/LatestNews/InternalServerError';
 import { HorizontalLine } from '../UI/DivideLine';
 import { latestNews } from '@/service/news';
 import { TIMEOUT_CODE } from '@/service/axios';
+import { APIResponse } from '@/interfaces/Dto/Core';
 
 function LatestNewsPage() {
   const queryClient = useQueryClient();
+  const isFetching = useIsFetching();
 
   const { filter } = useNewsListFilter();
 
@@ -26,6 +30,7 @@ function LatestNewsPage() {
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
+    refetch,
     error,
   } = useInfiniteQuery(['news', 'latest'], ({ pageParam = 0 }) => latestNews({ page: pageParam }), {
     retry: false,
@@ -39,19 +44,29 @@ function LatestNewsPage() {
     },
   });
 
-  const isTimeoutError = error && isAxiosError(error) && error.code === TIMEOUT_CODE;
-
   if (isSuccess && latestNewsPageResponse.pages[0].data.status !== HttpStatusCode.Ok) {
     redirect('/login');
+  }
+
+  if (error) {
+    if (error instanceof AxiosError) {
+      const { code } = error as AxiosError<APIResponse>;
+
+      if (code === TIMEOUT_CODE) {
+        return <LatestNewsTimeout refetch={refetch} />;
+      }
+
+      return <LatestNewsInternalServerError refetch={refetch} />;
+    }
+
+    return <LatestNewsInternalServerError refetch={refetch} />;
   }
 
   return (
     <>
       <section className="mb-6 mt-[18px]">
         <TrendNewsHeader />
-        {isTimeoutError ? (
-          <TrendNewsCardError message={error.message} />
-        ) : isLoading || !latestNewsPageResponse?.pages[0]?.data.data?.news ? (
+        {isLoading || isFetching || !latestNewsPageResponse?.pages[0]?.data.data?.news ? (
           <TrendNewsCardLoading />
         ) : (
           <Link
@@ -86,7 +101,9 @@ function LatestNewsPage() {
               }}
             />
           ) : null}
-          {(isLoading || isFetchingNextPage) && hasNextPage ? <LatestNewsListLoading view={filter.view} /> : null}
+          {(isLoading || isFetchingNextPage || isFetching) && hasNextPage ? (
+            <LatestNewsListLoading view={filter.view} />
+          ) : null}
         </div>
       </section>
       {!isFetchingNextPage && hasNextPage ? (

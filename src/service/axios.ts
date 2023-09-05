@@ -1,7 +1,9 @@
 import axios, { AxiosError, HttpStatusCode, isAxiosError } from 'axios';
-import { getCookie, setCookie } from '@/util/cookies';
+import { getCookie, getCookies, setCookie } from '@/util/cookies';
 import { requestAccessToken } from './auth';
+import { serverUserTokenCookies } from '@/app/layout';
 import { APIResponse } from '@/interfaces/Dto/Core';
+import { ProfileResponse } from '@/interfaces/Dto/User';
 
 export const TIMEOUT_CODE = 'ECONNABORTED';
 
@@ -16,17 +18,17 @@ function createAxiosInstance() {
   axiosInstance.interceptors.request.use(
     async (req) => {
       if (typeof window === 'undefined') {
-        const cookies = await import('next/headers').then((mod) => mod.cookies);
+        const cookies = await getCookies();
 
-        const cookieList = cookies().getAll();
-        console.log({ cookieList });
-        // const cookie = cookieList.length
-        //   ? cookieList
-        //       .map(({ name, value }, idx, arr) => `${name}=${idx === arr.length - 1 ? value : `${value} `}`)
-        //       .join(';')
-        //   : '';
+        console.log({ cookies });
 
-        // req.headers.Cookie = cookie;
+        const cookie = cookies.length
+          ? cookies
+              .map(({ name, value }, idx, arr) => `${name}=${idx === arr.length - 1 ? value : `${value} `}`)
+              .join(';')
+          : '';
+
+        req.headers.Cookie = cookie;
       }
 
       const accessToken = await getCookie('accessToken');
@@ -66,10 +68,28 @@ function createAxiosInstance() {
 
                 if (accessToken) {
                   if (typeof window === 'undefined') {
+                    const { data: profileResponse } = await axiosInstance.get<ProfileResponse>('/api/auth/user/me', {
+                      headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                      },
+                    });
+
+                    console.log('[user]', profileResponse.data);
+
+                    serverUserTokenCookies.set({
+                      email: profileResponse.data!.email,
+                      cookieName: 'accessToken',
+                      cookieValue: (accessToken as string).replace('Bearer ', ''),
+                      cookieOptions: {
+                        path: '/',
+                        maxAge: Number(process.env.NEXT_PUBLIC_ACCESS_TOKEN_MAXAGE),
+                      },
+                    });
+
                     config!.headers.Authorization = `Bearer ${accessToken}`;
                   } else {
                     await setCookie('accessToken', (accessToken as string).replace('Bearer ', ''), {
-                      maxAge: 60 * 60,
+                      maxAge: Number(process.env.NEXT_PUBLIC_ACCESS_TOKEN_MAXAGE),
                       path: '/',
                     });
                   }

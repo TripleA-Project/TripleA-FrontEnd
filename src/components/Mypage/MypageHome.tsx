@@ -1,13 +1,17 @@
 'use client';
 
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useIsFetching, useQuery } from '@tanstack/react-query';
 import { HttpStatusCode, isAxiosError } from 'axios';
-import { redirect } from 'next/navigation';
 import Profile from '../Profile';
 import MembershipInfo from '../Membership/MembershipInfo';
 import MyPageMenu from './MyPageMenu';
+import MyPageHomeLoading from './MyPageHomeLoading';
+import MyPageUnauthorized from '../ErrorBoundary/ErrorFallback/Mypage/Unauthorized';
+import MypageTimeout from '../ErrorBoundary/ErrorFallback/Mypage/Timeout';
+import MypageInternalServerError from '../ErrorBoundary/ErrorFallback/Mypage/InternalServerError';
 import { getProfile } from '@/service/user';
+import { TIMEOUT_CODE } from '@/service/axios';
 
 function MypageHome() {
   const {
@@ -22,22 +26,26 @@ function MypageHome() {
     },
   });
 
-  if (profileStatus === 'loading') return null;
+  const isFetching = useIsFetching(['profile']);
+
+  if (profileStatus === 'loading' || isFetching) return <MyPageHomeLoading />;
 
   if (profileStatus === 'error') {
     if (isAxiosError(profileError)) {
-      const { response } = profileError;
+      const { code, response } = profileError;
 
       if (response?.status === HttpStatusCode.Unauthorized) {
-        redirect('/login?continueURL=/mypage');
+        return <MyPageUnauthorized />;
       }
+
+      if (code === TIMEOUT_CODE) return <MypageTimeout />;
     }
 
-    return null;
+    return <MypageInternalServerError />;
   }
 
   if (profileResponse?.status === HttpStatusCode.Unauthorized) {
-    redirect('/login?continueURL=/mypage');
+    return <MyPageUnauthorized />;
   }
 
   return (

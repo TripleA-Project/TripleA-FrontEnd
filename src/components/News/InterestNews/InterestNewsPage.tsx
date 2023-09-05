@@ -3,24 +3,41 @@
 import { useRef } from 'react';
 import { redirect } from 'next/navigation';
 import { ToastContainer } from 'react-toastify';
+import { useIsFetching } from '@tanstack/react-query';
 import { FiExternalLink } from 'react-icons/fi';
 import CategoryChip from '@/components/UI/Chip/CategoryChip';
 import SymbolChip from '@/components/UI/Chip/SymbolChip';
+import FitPage from '@/components/Layout/FitPage';
+import MuiSpinner from '@/components/UI/Spinner/MuiSpinner';
 import InfinityNewsList, { genLinkHashId } from './InfinityNewsList';
+import InterestNewsPageTimeout from '@/components/ErrorBoundary/ErrorFallback/InterestNews/Timeout';
 import { useLikes } from '@/hooks/useLikes';
 
 function InterestNewsPage() {
   const { likedSymbols, likedCatgories, loginRequired, status } = useLikes();
+  const isFetching = useIsFetching(['likedSymbolList']);
 
   const linkIconRef = useRef<HTMLDivElement>(null);
   const linkWrapperRef = useRef<HTMLDivElement>(null);
 
-  if (loginRequired) {
-    redirect('/login');
+  if (status === 'loading' || isFetching) {
+    return (
+      <FitPage>
+        <div className="box-border flex h-full w-full items-center justify-center px-4">
+          <MuiSpinner />
+        </div>
+      </FitPage>
+    );
   }
 
-  if (status === 'loading') {
-    return <></>;
+  if (status === 'error') {
+    if (loginRequired) {
+      redirect('/login');
+    }
+  }
+
+  if (status === 'timeout') {
+    return <InterestNewsPageTimeout />;
   }
 
   return (
@@ -37,7 +54,6 @@ function InterestNewsPage() {
               <FiExternalLink className="shrink-0" />
             </div>
             <div className="flex items-center gap-1">
-              {status === 'timeout' ? <div>관심 목록을 불러올 수 없습니다</div> : null}
               {likedCatgories
                 ? likedCatgories.inAllCategory.map((category) => (
                     <button

@@ -1,14 +1,16 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { NotificationIcons } from '@/components/Notification/NotificationIcons';
-import FitPage from '@/components/Layout/FitPage';
 import Button from '@/components/Button/Button';
-import { HistoryNotificationTemplate } from '@/constants/notification';
+import FitPage from '@/components/Layout/FitPage';
+import { NotificationIcons } from '@/components/Notification/NotificationIcons';
 
-function HistoryUnauthorized() {
-  const { content, linkURL, buttonText } = HistoryNotificationTemplate.LoginRequired;
+function MyPageUnauthorized() {
+  const content = `
+    마이페이지를 보시려면
+    로그인을 해주세요
+  `;
 
   return (
     <FitPage>
@@ -23,9 +25,9 @@ function HistoryUnauthorized() {
               __html: content.trim().replaceAll('\n', '<br />'),
             }}
           />
-          <Link href={linkURL} className="w-full">
+          <Link href={'/login?continueURL=/mypage'} className="w-full">
             <Button bgColorTheme="orange" textColorTheme="white" fullWidth>
-              {buttonText}
+              로그인 하러가기
             </Button>
           </Link>
         </div>
@@ -34,4 +36,4 @@ function HistoryUnauthorized() {
   );
 }
 
-export default HistoryUnauthorized;
+export default MyPageUnauthorized;

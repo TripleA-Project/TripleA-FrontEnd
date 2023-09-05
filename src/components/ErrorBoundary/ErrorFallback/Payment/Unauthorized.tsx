@@ -3,21 +3,21 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useParams, useSearchParams } from 'next/navigation';
 import { NotificationIcons } from '@/components/Notification/NotificationIcons';
 import FitPage from '@/components/Layout/FitPage';
 import Button from '@/components/Button/Button';
-import { NewsDetailNotificationTemplate } from '@/constants/notification';
 
-function Unauthorized() {
+function PaymentUnauthorized() {
   const router = useRouter();
-  const params = useParams();
-  const searchParams = useSearchParams();
 
-  const newsId = Number(params?.id);
-  const symbolName = searchParams?.get('symbol');
+  const title = `
+    인증되지 않은 사용자입니다.
+  `;
 
-  const { title, content, buttonText } = NewsDetailNotificationTemplate.NewsDetailLoginRequired;
+  const content = `
+    로그인 후 구독 진행이
+    가능합니다.
+  `;
 
   useEffect(() => {
     return () => {
@@ -44,9 +44,9 @@ function Unauthorized() {
               __html: content.trim().replaceAll('\n', '<br />'),
             }}
           />
-          <Link href={`/login?continueURL=/detail/${newsId}${symbolName ? `?symbol=${symbolName}` : ''}`}>
+          <Link href={`/`}>
             <Button bgColorTheme="orange" textColorTheme="white">
-              {buttonText}
+              로그인 하러가기
             </Button>
           </Link>
         </div>
@@ -55,4 +55,4 @@ function Unauthorized() {
   );
 }
 
-export default Unauthorized;
+export default PaymentUnauthorized;

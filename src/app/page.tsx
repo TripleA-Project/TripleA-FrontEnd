@@ -6,6 +6,7 @@ import InterestNewsPage from '@/components/News/InterestNews/InterestNewsPage';
 import NotFound from '@/components/NotFound';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 interface HomeProps {
   searchParams: {

@@ -1,19 +1,30 @@
 'use client';
 
 import React, { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { AxiosResponse } from 'axios';
+import { InfiniteData, QueryObserverResult, RefetchOptions, RefetchQueryFilters } from '@tanstack/react-query';
 import FitPage from '@/components/Layout/FitPage';
+import Button from '@/components/Button/Button';
 import { NotificationIcons } from '@/components/Notification/NotificationIcons';
 import { ServerErrorNotificationTemplate } from '@/constants/notification';
-import Button from '@/components/Button/Button';
-import { useRouter } from 'next/navigation';
+import { LatestNewsResponse } from '@/interfaces/Dto/News';
 
-function InternalServerError() {
+interface LatestNewsInternalServerErrorProps {
+  refetch: <TPageData>(
+    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined,
+  ) => Promise<QueryObserverResult<InfiniteData<AxiosResponse<LatestNewsResponse, any>>, unknown>>;
+}
+
+function LatestNewsInternalServerError({ refetch }: LatestNewsInternalServerErrorProps) {
   const { refresh } = useRouter();
   const { title, content } = ServerErrorNotificationTemplate.InternalServerError;
 
   useEffect(() => {
     return () => {
       refresh();
+
+      refetch();
     };
   }, []); /* eslint-disable-line */
 
@@ -36,6 +47,8 @@ function InternalServerError() {
             textColorTheme="white"
             onClick={() => {
               refresh();
+
+              refetch();
             }}
           >
             새로 고침
@@ -46,4 +59,4 @@ function InternalServerError() {
   );
 }
 
-export default InternalServerError;
+export default LatestNewsInternalServerError;

@@ -43,7 +43,7 @@ function createErrorMeta({
         title: '구독제 회원만',
         content: `
           구독 후
-          AI 분석을 확인 할 수 있어요
+          AI 분석을 확인 할 수 있어요.
         `,
         button: (
           <Link href="/mypage/membership" className="w-full">
@@ -56,6 +56,8 @@ function createErrorMeta({
     }
 
     if (response?.data.status === HttpStatusCode.Conflict) {
+      // 409 에러
+
       return {
         icon: <NotificationIcons.Error className="text-4xl" />,
         title: `잠시만 기다려주세요`,
@@ -63,6 +65,33 @@ function createErrorMeta({
           서버에 요청중입니다.
           잠시만 기다려주세요.
         `,
+      };
+    }
+
+    if (response?.data.status === HttpStatusCode.TooManyRequests) {
+      // 429에러
+
+      return {
+        icon: <NotificationIcons.Error className="text-4xl" />,
+        title: '다시 시도해주세요',
+        content: `
+          사용량이 많아 중단되었습니다.
+          잠시 후 다시 요청해주세요.
+        `,
+        button: (
+          <Button
+            bgColorTheme="orange"
+            textColorTheme="white"
+            fullWidth
+            onClick={() => {
+              queryClient.refetchQueries(['news', 'analysis']);
+
+              resetErrorBoundary();
+            }}
+          >
+            다시 시도하기
+          </Button>
+        ),
       };
     }
   }

@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ToastContainer } from 'react-toastify';
 import NewsDetailTitle from './NewsDetailTitle';
 import NewsDetailMeta from './NewsDetailMeta';
@@ -16,6 +17,7 @@ import OtherNews from './OtherNews';
 import { AddCategoryForm, AddSymbolForm } from './Form';
 import TopScrollButton from './TopScrollButton';
 import BenefitBar from './BenefitBar';
+import { syncCookie } from '@/util/cookies';
 import { type NewsDetailPayload, type NewsDetailSymbol, type UserPayload } from '@/interfaces/Dto/News';
 import { ProfilePayload } from '@/interfaces/Dto/User';
 
@@ -26,7 +28,20 @@ interface DetailProps {
 }
 
 function Detail({ newsDetailPayload, requestSymbol, user }: DetailProps) {
+  const router = useRouter();
   const [isTransition, setIsTransition] = useState(!!newsDetailPayload?.kor.title);
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+    });
+
+    syncCookie(user!.email);
+
+    return () => {
+      router.refresh();
+    };
+  }, []); /* eslint-disable-line */
 
   if (!newsDetailPayload) return null;
 

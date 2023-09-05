@@ -3,12 +3,12 @@
 import { useLayoutEffect, useState } from 'react';
 import { getProfile } from '@/service/user';
 import { useQuery } from '@tanstack/react-query';
-import { type AxiosError } from 'axios';
+import { useRouter } from 'next/navigation';
+import { HttpStatusCode, type AxiosError } from 'axios';
 import Button from '../Button/Button';
 import { ErrorNotification } from '../Notification';
-import { type APIResponse } from '@/interfaces/Dto/Core';
 import { subscribe } from '@/service/subscribe';
-import { useRouter } from 'next/navigation';
+import { type APIResponse } from '@/interfaces/Dto/Core';
 
 interface SubscribeButtonProps {
   subscribeRedirectURL?: string;
@@ -25,7 +25,7 @@ function SubscribeButtonLoading() {
 }
 
 function SubscribeButton({ subscribeRedirectURL }: SubscribeButtonProps) {
-  const { push } = useRouter();
+  const { push, refresh } = useRouter();
 
   const {
     data: membership,
@@ -53,7 +53,7 @@ function SubscribeButton({ subscribeRedirectURL }: SubscribeButtonProps) {
                 url: subscribeRedirectURL || `${process.env.NEXT_PUBLIC_SITE_URL}/payment`,
               });
 
-              if (status === 200) {
+              if (status === HttpStatusCode.Ok) {
                 push(response.data!.payment);
               }
             }}

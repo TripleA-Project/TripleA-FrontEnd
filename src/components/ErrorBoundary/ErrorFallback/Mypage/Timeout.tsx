@@ -1,18 +1,23 @@
 'use client';
 
 import React, { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import FitPage from '@/components/Layout/FitPage';
+import Button from '@/components/Button/Button';
 import { NotificationIcons } from '@/components/Notification/NotificationIcons';
 import { ServerErrorNotificationTemplate } from '@/constants/notification';
-import Button from '@/components/Button/Button';
-import { useRouter } from 'next/navigation';
 
-function InternalServerError() {
+function MypageTimeout() {
+  const queryClient = useQueryClient();
   const { refresh } = useRouter();
-  const { title, content } = ServerErrorNotificationTemplate.InternalServerError;
+
+  const { title, content } = ServerErrorNotificationTemplate.Timeout;
 
   useEffect(() => {
     return () => {
+      queryClient.refetchQueries(['profile']);
+
       refresh();
     };
   }, []); /* eslint-disable-line */
@@ -35,6 +40,8 @@ function InternalServerError() {
             bgColorTheme="orange"
             textColorTheme="white"
             onClick={() => {
+              queryClient.refetchQueries(['profile']);
+
               refresh();
             }}
           >
@@ -46,4 +53,4 @@ function InternalServerError() {
   );
 }
 
-export default InternalServerError;
+export default MypageTimeout;

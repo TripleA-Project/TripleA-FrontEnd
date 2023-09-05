@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { CalenderDate } from '../Calendar/MuiCalendar';
 import dayjs from 'dayjs';
 import { ToastContainer } from 'react-toastify';
@@ -13,6 +13,7 @@ import HistoryNotification from './Notification/HistoryNotification';
 import HistoryNewsListLoading from './Loading/HistoryNewsListLoading';
 import SelectedDateText from './SelectedDateText';
 import HistoryNewsList, { type HistoryNewsFilter } from '../News/HistoryNews/HistoryNewsList';
+import { syncCookie } from '@/util/cookies';
 
 interface TestPageProps {
   user?: ProfilePayload;
@@ -29,6 +30,10 @@ function HistoryPage({ user, history }: TestPageProps) {
   const [filter, setFilter] = useState<HistoryNewsFilter>({ order: 'descending', bookmark: false });
 
   const disabled = !user || user.membership === 'BASIC';
+
+  useEffect(() => {
+    syncCookie(user!.email);
+  }, []); /* eslint-disable-line */
 
   return (
     <>
