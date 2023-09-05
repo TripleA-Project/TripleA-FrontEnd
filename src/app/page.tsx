@@ -6,6 +6,7 @@ import InterestNewsPage from '@/components/News/InterestNews/InterestNewsPage';
 import NotFound from '@/components/NotFound';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 interface HomeProps {
   searchParams: {
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
   description: 'Triple A 뉴스',
 };
 
-async function Home({ searchParams }: HomeProps) {
+function Home({ searchParams }: HomeProps) {
   return (
     <>
       <div className="box-border bg-white px-4">
