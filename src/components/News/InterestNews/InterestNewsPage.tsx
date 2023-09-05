@@ -3,7 +3,6 @@
 import { useRef } from 'react';
 import { redirect } from 'next/navigation';
 import { ToastContainer } from 'react-toastify';
-import { useIsFetching } from '@tanstack/react-query';
 import { FiExternalLink } from 'react-icons/fi';
 import CategoryChip from '@/components/UI/Chip/CategoryChip';
 import SymbolChip from '@/components/UI/Chip/SymbolChip';
@@ -12,9 +11,11 @@ import MuiSpinner from '@/components/UI/Spinner/MuiSpinner';
 import InfinityNewsList, { genLinkHashId } from './InfinityNewsList';
 import InterestNewsPageTimeout from '@/components/ErrorBoundary/ErrorFallback/InterestNews/Timeout';
 import { useLikes } from '@/hooks/useLikes';
+import { useIsFetching } from '@tanstack/react-query';
 
 function InterestNewsPage() {
   const { likedSymbols, likedCatgories, loginRequired, status } = useLikes();
+
   const isFetching = useIsFetching(['likedSymbolList']);
 
   const linkIconRef = useRef<HTMLDivElement>(null);

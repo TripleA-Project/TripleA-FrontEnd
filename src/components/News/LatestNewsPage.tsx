@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { useInfiniteQuery, useIsFetching, useQueryClient } from '@tanstack/react-query';
-import { AxiosError, HttpStatusCode, isAxiosError } from 'axios';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
+import { AxiosError, HttpStatusCode } from 'axios';
 import { ToastContainer } from 'react-toastify';
 import { useNewsListFilter } from '@/redux/slice/newsListFilterSlice';
 import { LatestNewsHeader, LatestNewsList, LatestNewsListLoading } from './LatestNews';
@@ -19,7 +19,6 @@ import { APIResponse } from '@/interfaces/Dto/Core';
 
 function LatestNewsPage() {
   const queryClient = useQueryClient();
-  const isFetching = useIsFetching();
 
   const { filter } = useNewsListFilter();
 
@@ -30,6 +29,7 @@ function LatestNewsPage() {
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
+    isFetching,
     refetch,
     error,
   } = useInfiniteQuery(['news', 'latest'], ({ pageParam = 0 }) => latestNews({ page: pageParam }), {
@@ -66,7 +66,7 @@ function LatestNewsPage() {
     <>
       <section className="mb-6 mt-[18px]">
         <TrendNewsHeader />
-        {isLoading || isFetching || !latestNewsPageResponse?.pages[0]?.data.data?.news ? (
+        {isLoading || !latestNewsPageResponse?.pages[0]?.data.data?.news ? (
           <TrendNewsCardLoading />
         ) : (
           <Link

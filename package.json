@@ -29,7 +29,7 @@
     "eslint-config-next": "13.4.3",
     "lightweight-charts": "^4.0.1",
     "lodash": "^4.17.21",
-    "next": "^13.4.12",
+    "next": "^13.4.19",
     "postcss": "8.4.23",
     "react": "18.2.0",
     "react-device-detect": "^2.2.3",

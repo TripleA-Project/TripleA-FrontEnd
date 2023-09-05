@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useIsFetching, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { HttpStatusCode, isAxiosError } from 'axios';
 import Profile from '../Profile';
 import MembershipInfo from '../Membership/MembershipInfo';
@@ -26,9 +26,7 @@ function MypageHome() {
     },
   });
 
-  const isFetching = useIsFetching(['profile']);
-
-  if (profileStatus === 'loading' || isFetching) return <MyPageHomeLoading />;
+  if (profileStatus === 'loading') return <MyPageHomeLoading />;
 
   if (profileStatus === 'error') {
     if (isAxiosError(profileError)) {
