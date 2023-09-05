@@ -66,7 +66,7 @@ function LatestNewsPage() {
     <>
       <section className="mb-6 mt-[18px]">
         <TrendNewsHeader />
-        {isLoading || !latestNewsPageResponse?.pages[0]?.data.data?.news ? (
+        {isLoading || isFetching || !latestNewsPageResponse?.pages[0]?.data.data?.news ? (
           <TrendNewsCardLoading />
         ) : (
           <Link
