@@ -6,7 +6,6 @@ import { Noto_Sans } from 'next/font/google';
 import Page from '@/components/Layout/Page';
 import Navbar from '@/components/Layout/Navbar';
 import Footer from '@/components/Layout/Footer';
-import { ServerUserTokenCookies } from '@/util/serverCookies';
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -31,8 +30,6 @@ export const metadata: Metadata = {
   },
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'),
 };
-
-export const serverUserTokenCookies = new ServerUserTokenCookies();
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (

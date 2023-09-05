@@ -1,7 +1,7 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import { serverUserTokenCookies } from '@/app/layout';
+import { ServerUserTokenCookies } from './serverCookies';
 import { type ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies';
 
 interface SetCookieOption extends ResponseCookie {}
@@ -41,7 +41,7 @@ export async function deleteCookie(name: string) {
 
 export async function syncCookie(email: string) {
   const existAccessToken = await getCookie('accessToken');
-  const existServerUserTokenCookie = serverUserTokenCookies.get(email);
+  const existServerUserTokenCookie = ServerUserTokenCookies.get(email);
 
   if (!existAccessToken && existServerUserTokenCookie) {
     const { value, ...options } = existServerUserTokenCookie.accessToken!;
@@ -62,6 +62,6 @@ export async function syncCookie(email: string) {
         쿠키 정보를 담고있는 임시 데이터
       )
     */
-    serverUserTokenCookies.delete(email);
+    ServerUserTokenCookies.delete(email);
   }
 }

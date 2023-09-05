@@ -3,6 +3,7 @@ import { getCookie, getCookies, setCookie } from '@/util/cookies';
 import { requestAccessToken } from './auth';
 import { APIResponse } from '@/interfaces/Dto/Core';
 import { ProfileResponse } from '@/interfaces/Dto/User';
+import { ServerUserTokenCookies } from '@/util/serverCookies';
 
 export const TIMEOUT_CODE = 'ECONNABORTED';
 
@@ -75,11 +76,7 @@ function createAxiosInstance() {
 
                     console.log('[user]', profileResponse.data);
 
-                    const serverUserTokenCookies = await import('@/app/layout').then(
-                      (mod) => mod.serverUserTokenCookies,
-                    );
-
-                    serverUserTokenCookies.set({
+                    ServerUserTokenCookies.set({
                       email: profileResponse.data!.email,
                       cookieName: 'accessToken',
                       cookieValue: (accessToken as string).replace('Bearer ', ''),

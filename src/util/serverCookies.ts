@@ -12,27 +12,27 @@ interface UserTokenCookie {
 }
 
 export class ServerUserTokenCookies {
-  readonly cookies: Map<string, UserTokenCookie> = new Map<string, UserTokenCookie>();
+  static readonly cookies: Map<string, UserTokenCookie> = new Map<string, UserTokenCookie>();
 
-  get(email: string) {
+  static get(email: string) {
     this.update();
 
     return this.cookies.get(email);
   }
 
-  getAll() {
+  static getAll() {
     this.update();
 
-    const cookies = {} as Cookies;
+    const cookiesResult = {} as Cookies;
 
     Array.from(this.cookies.entries()).forEach(([email, cookie]) => {
-      cookies[email] = { ...cookie };
+      cookiesResult[email] = { ...cookie };
     });
 
-    return Object.keys(cookies).length ? cookies : null;
+    return Object.keys(cookiesResult).length ? cookiesResult : null;
   }
 
-  set({
+  static set({
     email,
     cookieName,
     cookieValue,
@@ -57,15 +57,15 @@ export class ServerUserTokenCookies {
     });
   }
 
-  delete(email: string) {
+  static delete(email: string) {
     this.cookies.delete(email);
   }
 
-  clear() {
+  static clear() {
     this.cookies.clear();
   }
 
-  update() {
+  static update() {
     this.cookies.forEach((userTokenCookie, email) => {
       const currentDate = dayjs();
 
@@ -78,7 +78,7 @@ export class ServerUserTokenCookies {
     });
   }
 
-  getExipiresDateFromMaxAge(maxAge?: number) {
+  static getExipiresDateFromMaxAge(maxAge?: number) {
     if (!maxAge) return null;
 
     const currentDate = dayjs();
