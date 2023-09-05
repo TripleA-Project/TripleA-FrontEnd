@@ -15,6 +15,7 @@ export default function Logout() {
     retry: 0,
     onSuccess: async () => {
       await deleteCookie('accessToken');
+      await deleteCookie('refreshToken');
       await deleteCookie('autoLogin');
 
       queryClient.removeQueries();
