@@ -1,7 +1,6 @@
 import axios, { AxiosError, HttpStatusCode, isAxiosError } from 'axios';
 import { getCookie, getCookies, setCookie } from '@/util/cookies';
 import { requestAccessToken } from './auth';
-import { serverUserTokenCookies } from '@/app/layout';
 import { APIResponse } from '@/interfaces/Dto/Core';
 import { ProfileResponse } from '@/interfaces/Dto/User';
 
@@ -75,6 +74,10 @@ function createAxiosInstance() {
                     });
 
                     console.log('[user]', profileResponse.data);
+
+                    const serverUserTokenCookies = await import('@/app/layout').then(
+                      (mod) => mod.serverUserTokenCookies,
+                    );
 
                     serverUserTokenCookies.set({
                       email: profileResponse.data!.email,
