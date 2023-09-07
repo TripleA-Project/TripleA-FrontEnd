@@ -28,6 +28,8 @@ async function Payment({ searchParams }: PageProps) {
   const orderCode = searchParams ? searchParams['order_code'] : '';
   const status = searchParams ? searchParams['status'] : '';
 
+  console.log('[page params]', { orderCode, status });
+
   // if (status === 'success') {
   //   const res = await successSubscribe({ order_code: orderCode });
 
