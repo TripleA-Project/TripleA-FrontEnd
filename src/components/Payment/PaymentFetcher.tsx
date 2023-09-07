@@ -13,6 +13,12 @@ interface PaymentFetcherProps {
 async function PaymentFetcher({ order_code, children }: PaymentFetcherProps) {
   console.log('[paymentFetcher Props]', { order_code });
 
+  await new Promise((resolve) => {
+    setTimeout(() => {
+      resolve('done');
+    }, 1000);
+  });
+
   const paymentResponse = await successSubscribe({ order_code }).catch((err) => {
     return err as AxiosError;
   });
