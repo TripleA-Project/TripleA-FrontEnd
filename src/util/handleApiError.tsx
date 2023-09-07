@@ -34,8 +34,12 @@ export function checkNewsDetailApiError(apiResponse: AxiosResponse<NewsDetailRes
 }
 
 export function checkPaymentApiError(apiResponse: AxiosResponse<SuccessSubscribeResponse> | AxiosError) {
+  console.log('is paymentError: ', apiResponse instanceof AxiosError);
+
   if (apiResponse instanceof AxiosError) {
     const { code, response } = apiResponse as AxiosError<APIResponse>;
+
+    console.log('error: ', response?.data);
 
     if (response?.data.status === HttpStatusCode.Unauthorized) {
       return <PaymentUnauthorized />;

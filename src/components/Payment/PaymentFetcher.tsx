@@ -22,6 +22,7 @@ async function PaymentFetcher({ order_code, children }: PaymentFetcherProps) {
     return err as AxiosError;
   });
   if (profileResponse instanceof AxiosError) {
+    console.log('profileError: ', profileResponse);
     return <InternalServerError />;
   }
 
