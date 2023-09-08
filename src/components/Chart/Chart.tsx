@@ -17,7 +17,7 @@ import TimeoutNotification from '../Notification/TimeoutNotification';
 import { type SentimentData, createChartData } from '@/service/chart';
 import { getSymbolStock } from '@/service/stock';
 import { searchSymbolNews } from '@/service/news';
-import { DeltaPriceColor, getPriceInfo } from '@/util/chart';
+import { DeltaPriceColor, getChartDate, getPriceInfo } from '@/util/chart';
 import { getSymbolLineChartContainerOptions, getSymbolLineChartSeriesOptions } from './constants/symbolLineChartConfig';
 import {
   getSymbolHistogramChartContainerOptions,
@@ -39,33 +39,6 @@ interface ChartSource {
 interface ChartProps {
   symbol: Symbol;
   resample: ResampleFrequency;
-}
-
-function getChartDate({ resample }: { resample: ResampleFrequency }) {
-  const today = dayjs();
-
-  switch (resample) {
-    case 'daily':
-      return {
-        startDate: today.set('month', today.get('month') - 1).set('date', 1),
-        endDate: today.clone(),
-      };
-    case 'weekly':
-      return {
-        startDate: today.set('month', today.get('month') - 3).set('date', 1),
-        endDate: today.clone(),
-      };
-    case 'monthly':
-      return {
-        startDate: dayjs(`${today.get('year')}-01-01`),
-        endDate: today.clone(),
-      };
-    case 'annually':
-      return {
-        startDate: dayjs(`${today.get('year') - 5}-01-01`),
-        endDate: today.clone(),
-      };
-  }
 }
 
 function Chart({ symbol, resample }: ChartProps) {
