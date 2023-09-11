@@ -21,13 +21,14 @@ function LatestNewsTimeout({ refetch }: LatestNewsTimeoutProps) {
   const { title, content } = ServerErrorNotificationTemplate.Timeout;
 
   useEffect(() => {
-    refresh();
-
-    refetch();
+    return () => {
+      refresh();
+      refetch();
+    };
   }, []); /* eslint-disable-line */
 
   return (
-    <FitPage>
+    <FitPage path="newsHome">
       <div className="box-border flex h-full w-full items-center justify-center p-4">
         <div className="flex w-full flex-col items-center">
           <div className="mb-2 text-4xl">
@@ -45,7 +46,6 @@ function LatestNewsTimeout({ refetch }: LatestNewsTimeoutProps) {
             textColorTheme="white"
             onClick={() => {
               refresh();
-
               refetch();
             }}
           >

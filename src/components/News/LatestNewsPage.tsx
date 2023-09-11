@@ -25,6 +25,7 @@ function LatestNewsPage() {
   const {
     data: latestNewsPageResponse,
     isSuccess,
+    isInitialLoading,
     isLoading,
     hasNextPage,
     fetchNextPage,
@@ -101,9 +102,7 @@ function LatestNewsPage() {
               }}
             />
           ) : null}
-          {(isLoading || isFetchingNextPage || isFetching) && hasNextPage ? (
-            <LatestNewsListLoading view={filter.view} />
-          ) : null}
+          {isLoading || isFetchingNextPage || isFetching ? <LatestNewsListLoading view={filter.view} /> : null}
         </div>
       </section>
       {!isFetchingNextPage && hasNextPage ? (

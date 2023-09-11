@@ -49,7 +49,7 @@ function createAxiosInstance() {
       return res;
     },
     async (error) => {
-      if (isAxiosError(error)) {
+      if (error instanceof AxiosError && isAxiosError(error)) {
         const { config, response } = error;
 
         if (!response) throw error;
@@ -64,8 +64,6 @@ function createAxiosInstance() {
 
                 const accessToken = refreshResponse.headers['authorization'];
 
-                console.log('[success] ', refreshResponse.data);
-
                 if (accessToken) {
                   if (typeof window === 'undefined') {
                     const { data: profileResponse } = await axiosInstance.get<ProfileResponse>('/api/auth/user/me', {
@@ -73,8 +71,6 @@ function createAxiosInstance() {
                         Authorization: `Bearer ${accessToken}`,
                       },
                     });
-
-                    console.log('[user]', profileResponse.data);
 
                     ServerUserTokenCookies.set({
                       email: profileResponse.data!.email,
@@ -99,10 +95,6 @@ function createAxiosInstance() {
               } catch (error) {
                 if (error instanceof AxiosError) {
                   const { response } = error as AxiosError<APIResponse>;
-
-                  console.log(error.message);
-                  console.log('[refreshErrorRequest] ', response?.request['_header']);
-                  console.log('[refreshErrorResponsePayload] ', response?.data);
 
                   if (response) {
                     response.data = {

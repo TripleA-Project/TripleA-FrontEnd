@@ -1,5 +1,5 @@
+import type { Symbol } from '@/interfaces/Symbol';
 import SymbolCard, { SymbolCardLoading } from './SymbolCard';
-import { type Symbol } from '@/interfaces/Symbol';
 
 interface SymbolCardListLoadingProps {
   length?: number;

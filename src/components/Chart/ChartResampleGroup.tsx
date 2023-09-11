@@ -10,6 +10,7 @@ interface ChartResampleGroupProps {
 
 function ChartResampleGroup({ symbol }: ChartResampleGroupProps) {
   const resample = useSearchParams()?.get('resample');
+
   return (
     <div className="box-border flex divide-x-2 divide-white rounded-lg bg-[#F5F7F9] p-1.5">
       <Link href={`/chart/symbol?name=${symbol.toUpperCase()}&resample=monthly`} className={`flex-1`}>

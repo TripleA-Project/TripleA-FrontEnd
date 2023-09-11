@@ -32,7 +32,7 @@ function MypageHome() {
     if (isAxiosError(profileError)) {
       const { code, response } = profileError;
 
-      if (response?.status === HttpStatusCode.Unauthorized) {
+      if (response?.data?.status === HttpStatusCode.Unauthorized) {
         return <MyPageUnauthorized />;
       }
 

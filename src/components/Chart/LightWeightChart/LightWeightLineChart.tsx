@@ -18,10 +18,10 @@ const LightWeightLineSeries = forwardRef<ISeriesApi<'Line'>, LineChartProps>(
     if (lineSeries !== null) {
       if (lineChartData) {
         try {
-          lineSeries?.setData(lineChartData);
+          lineSeries.setData(lineChartData);
           api?.timeScale().fitContent();
         } catch (e) {
-          lineSeries?.setData(lineChartData);
+          lineSeries.setData(lineChartData);
           api?.timeScale().fitContent();
         }
       }

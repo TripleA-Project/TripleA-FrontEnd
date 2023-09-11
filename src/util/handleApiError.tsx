@@ -1,3 +1,4 @@
+import ChartUnauthorized from '@/components/ErrorBoundary/ErrorFallback/Chart/Unauthorized';
 import NewsNotFound from '@/components/ErrorBoundary/ErrorFallback/NewsDetail/NewsNotFound';
 import Unauthorized from '@/components/ErrorBoundary/ErrorFallback/NewsDetail/Unauthorized';
 import PaymentUnauthorized from '@/components/ErrorBoundary/ErrorFallback/Payment/Unauthorized';
@@ -5,7 +6,9 @@ import InternalServerError from '@/components/ErrorBoundary/ErrorFallback/common
 import Timeout from '@/components/ErrorBoundary/ErrorFallback/common/Timeout';
 import { APIResponse } from '@/interfaces/Dto/Core';
 import { NewsDetailResponse } from '@/interfaces/Dto/News';
+import { GetSymbolStockResponse } from '@/interfaces/Dto/Stock';
 import { SuccessSubscribeResponse } from '@/interfaces/Dto/Subscribe';
+import { GetSymbolResponse } from '@/interfaces/Dto/Symbol';
 import { TIMEOUT_CODE } from '@/service/axios';
 import { AxiosError, AxiosResponse, HttpStatusCode } from 'axios';
 
@@ -47,6 +50,26 @@ export function checkPaymentApiError(apiResponse: AxiosResponse<SuccessSubscribe
     }
 
     return <InternalServerError />;
+  }
+
+  return false;
+}
+
+export function checkSymbolChartApiError({
+  apiResponse,
+  loginContinueURL,
+}: {
+  apiResponse: [AxiosResponse<GetSymbolStockResponse>, AxiosResponse<GetSymbolResponse>] | AxiosError;
+  loginContinueURL?: string;
+}) {
+  if (apiResponse instanceof AxiosError) {
+    const { code, response } = apiResponse as AxiosError<APIResponse>;
+
+    console.log('[symbolChartError]', response?.data);
+
+    if (response?.data.status === HttpStatusCode.Unauthorized) {
+      return <ChartUnauthorized continuePath={loginContinueURL || '/chart'} />;
+    }
   }
 
   return false;

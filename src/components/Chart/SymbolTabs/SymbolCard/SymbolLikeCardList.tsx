@@ -1,5 +1,5 @@
+import type { Symbol } from '@/interfaces/Symbol';
 import SymbolLikeCard, { SymbolLikeCardLoading } from './SymbolLikeCard';
-import { type Symbol } from '@/interfaces/Symbol';
 
 interface SymbolLikeCardListProps {
   symbols: Symbol[];

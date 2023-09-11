@@ -1,13 +1,17 @@
+'use client';
+
 import React from 'react';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 import { type SentimentData } from '@/service/chart';
-import { DeltaPriceColor, DeltaPriceType, type PriceInfo } from '@/util/chart';
+import { DeltaPriceColor, DeltaPriceType, getPriceInfo, type PriceInfo } from '@/util/chart';
+import { Symbol } from '@/interfaces/Symbol';
 
 interface ChartHeaderProps {
   priceInfo: PriceInfo;
-  sentimentData: SentimentData[];
+  sentimentData?: SentimentData[];
   symbol: string;
+  symbolPayload?: Symbol;
   companyName?: string;
 }
 
@@ -40,13 +44,18 @@ export function ChartHeaderLoading() {
   );
 }
 
-function ChartHeader({ symbol, companyName, priceInfo, sentimentData }: ChartHeaderProps) {
-  const { delta, close } = priceInfo;
+function ChartHeader({ symbolPayload, symbol, companyName, priceInfo, sentimentData }: ChartHeaderProps) {
+  const { delta, close } = symbolPayload
+    ? getPriceInfo({ today: symbolPayload.price.today, yesterday: symbolPayload.price.yesterday })
+    : { delta: { type: 'NO_CHANGE' as const, value: 0, percent: 0 }, close: 0 };
+  // const { delta, close } = priceInfo;
 
   return (
     <div className="mb-5 flex justify-between">
       <div>
-        <h3 className="text-xl font-semibold text-[#131F3C]">{companyName || symbol}</h3>
+        <h3 className="text-xl font-semibold text-[#131F3C]">
+          {symbolPayload?.companyName || symbolPayload?.symbol.toUpperCase() || ''}
+        </h3>
         <p className="text-3xl text-black">{`${close} USD`}</p>
         <StyledDeltaPrice type={delta.type}>
           <span>
@@ -64,8 +73,8 @@ function ChartHeader({ symbol, companyName, priceInfo, sentimentData }: ChartHea
             cy={50}
             r={50}
             strokeWidth={20}
-            stroke={sentimentData[0]?.color ?? '#cbd5e1'}
-            className="fill-transparent"
+            stroke={sentimentData && sentimentData.length ? sentimentData[sentimentData.length - 1].color : '#cbd5e1'}
+            className="fill-transparent transition-colors duration-300"
           ></circle>
         </svg>
       </div>

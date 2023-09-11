@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { type ChartTabPage } from '.';
+import type { ChartTabPage } from '.';
 
 function Tabs() {
   const searchParams = useSearchParams();
