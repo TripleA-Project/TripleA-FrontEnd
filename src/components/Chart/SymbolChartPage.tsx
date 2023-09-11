@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Suspense, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ToastContainer } from 'react-toastify';
@@ -15,6 +15,7 @@ import { BsArrowRightShort } from 'react-icons/bs';
 import ChartShortNewsClientAPIErrorFallback from '../ErrorBoundary/ErrorFallback/Chart/ChartShortNewsClientAPIFallback';
 import { HorizontalLine } from '../UI/DivideLine';
 import { SentimentData } from '@/service/chart';
+import { syncCookie } from '@/util/cookies';
 import type { Symbol } from '@/interfaces/Symbol';
 import type { ProfilePayload } from '@/interfaces/Dto/User';
 import type { ResampleFrequency } from '@/interfaces/Dto/Stock';
@@ -27,6 +28,10 @@ interface SymbolChartPageProps {
 
 function SymbolChartPage({ user, matchedSymbol, resample }: SymbolChartPageProps) {
   const [sentimentList, setSentimentList] = useState<SentimentData[]>([]);
+
+  useEffect(() => {
+    syncCookie(user!.email);
+  }, []); /* eslint-disable-line */
 
   return (
     <>

@@ -35,7 +35,7 @@ function InternalServerError() {
             bgColorTheme="orange"
             textColorTheme="white"
             onClick={() => {
-              refresh();
+              location.reload();
             }}
           >
             새로 고침

@@ -1,58 +1,28 @@
 'use client';
 
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { HttpStatusCode, isAxiosError } from 'axios';
+import React, { useEffect } from 'react';
 import Profile from '../Profile';
 import MembershipInfo from '../Membership/MembershipInfo';
 import MyPageMenu from './MyPageMenu';
-import MyPageHomeLoading from './MyPageHomeLoading';
-import MyPageUnauthorized from '../ErrorBoundary/ErrorFallback/Mypage/Unauthorized';
-import MypageTimeout from '../ErrorBoundary/ErrorFallback/Mypage/Timeout';
-import MypageInternalServerError from '../ErrorBoundary/ErrorFallback/Mypage/InternalServerError';
-import { getProfile } from '@/service/user';
-import { TIMEOUT_CODE } from '@/service/axios';
+import { syncCookie } from '@/util/cookies';
+import type { ProfilePayload } from '@/interfaces/Dto/User';
 
-function MypageHome() {
-  const {
-    data: profileResponse,
-    status: profileStatus,
-    error: profileError,
-  } = useQuery(['profile'], () => getProfile(), {
-    retry: 0,
-    refetchOnWindowFocus: false,
-    select(response) {
-      return response.data;
-    },
-  });
+interface MypageHomeProps {
+  user?: ProfilePayload;
+}
 
-  if (profileStatus === 'loading') return <MyPageHomeLoading />;
-
-  if (profileStatus === 'error') {
-    if (isAxiosError(profileError)) {
-      const { code, response } = profileError;
-
-      if (response?.data?.status === HttpStatusCode.Unauthorized) {
-        return <MyPageUnauthorized />;
-      }
-
-      if (code === TIMEOUT_CODE) return <MypageTimeout />;
-    }
-
-    return <MypageInternalServerError />;
-  }
-
-  if (profileResponse?.status === HttpStatusCode.Unauthorized) {
-    return <MyPageUnauthorized />;
-  }
+function MypageHome({ user }: MypageHomeProps) {
+  useEffect(() => {
+    syncCookie(user!.email);
+  }, []); /* eslint-disable-line */
 
   return (
     <div className={`mt-[73px] box-border px-4`}>
       <Profile
         userProfile={{
-          email: profileResponse.data?.email ?? '',
-          fullName: profileResponse.data?.fullName ?? '',
-          membership: profileResponse.data?.membership ?? 'BASIC',
+          email: user!.email,
+          fullName: user!.fullName,
+          membership: user!.membership,
         }}
       />
       <MembershipInfo />

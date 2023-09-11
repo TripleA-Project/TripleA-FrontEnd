@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { isAxiosError } from 'axios';
+import { AxiosError, HttpStatusCode } from 'axios';
 import { useFormContext } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ToastContainer } from 'react-toastify';
@@ -15,8 +15,10 @@ import ReadOnlyInput from '@/components/Input/StepFormInput/ReadOnlyInput';
 import { updateUserInfo } from '@/service/user';
 import { validateFullName } from '@/util/validate';
 import { toastNotify } from '@/util/toastNotify';
-import { type UpdateUserInfoResponse } from '@/interfaces/Dto/User';
-import { type EditProfileFormData } from '@/interfaces/FormData';
+import type { EditProfileFormData } from '@/interfaces/FormData';
+import type { APIResponse } from '@/interfaces/Dto/Core';
+import { AppIcons } from '@/components/Icons';
+import { useRouter } from 'next/navigation';
 
 export interface EditProfilesForm {
   fullName: string;
@@ -29,6 +31,7 @@ interface EditProfilesFormProps {
 
 function EditProfilesForm(props: EditProfilesFormProps) {
   const queryClient = useQueryClient();
+  const { refresh } = useRouter();
 
   const {
     register,
@@ -42,7 +45,13 @@ function EditProfilesForm(props: EditProfilesFormProps) {
     done,
   } = useFormContext() as UseStepFormContext<EditProfilesForm>;
 
-  const [isFullNameEdit, setIsFullNameEdit] = useState(false);
+  const [isEditField, setIsEditField] = useState<{ editingField: 'fullName' | null }>({
+    editingField: null,
+  });
+
+  const editingFieldNames = {
+    fullName: '이름',
+  };
 
   const { mutate: updateUserInfoMutate, status: updateUserInfoStatus } = useMutation(
     ({ email, fullName, password }: Required<EditProfileFormData>) =>
@@ -60,16 +69,28 @@ function EditProfilesForm(props: EditProfilesFormProps) {
         queryClient.removeQueries(['auth']);
         queryClient.invalidateQueries(['profile']);
 
+        refresh();
+
         done();
       },
       onError(error) {
-        if (isAxiosError<UpdateUserInfoResponse>(error)) {
-          const { response } = error;
+        if (error instanceof AxiosError) {
+          const { response } = error as AxiosError<APIResponse>;
 
-          if (response) {
-            setError('root', { type: 'validate', message: response.data.data ?? response.data.msg });
+          console.log('[FormError]', { response });
+
+          if (response && response.data.status === HttpStatusCode.BadRequest) {
+            const serverFieldErrorResponse = error as AxiosError<APIResponse<{ key: string; value: string }>>;
+
+            const { key, value } = serverFieldErrorResponse.response!.data.data!;
+
+            setError(key as any, { type: 'validate', message: value });
+
+            return;
           }
         }
+
+        setError('root', { type: 'validate', message: (error as Error)?.message ?? '유효하지 않습니다' });
       },
     },
   );
@@ -85,7 +106,12 @@ function EditProfilesForm(props: EditProfilesFormProps) {
 
     const { password } = getValues() as any;
 
-    updateUserInfoMutate({ email, fullName, password });
+    try {
+      updateUserInfoMutate({ email, fullName, password });
+    } catch (err) {
+      console.log('[editProfileError]', { err });
+      toastNotify('error', '유효하지 않습니다');
+    }
   };
 
   const onInvalid = () => {
@@ -94,21 +120,39 @@ function EditProfilesForm(props: EditProfilesFormProps) {
 
   return (
     <>
-      <form id="editProfile" onSubmit={handleSubmit(onValid, onInvalid)}>
+      <form id="editProfile" onSubmit={handleSubmit(onValid, onInvalid)} className="relative">
+        {isEditField.editingField ? (
+          <div
+            className="absolute -top-14 left-0 flex w-full justify-center"
+            onClick={() =>
+              setIsEditField((prev) => ({
+                ...prev,
+                editingField: null,
+              }))
+            }
+          >
+            <div className="flex cursor-pointer select-none items-center justify-center gap-3 rounded-full border bg-white p-2 shadow-lg">
+              <span className="font-bold text-[#FC954A]">{`${
+                editingFieldNames[isEditField.editingField]
+              } 수정 취소`}</span>
+              <AppIcons.CloseFill.Orange />
+            </div>
+          </div>
+        ) : null}
         <div className="flex items-center">
           <Avatar profileIndex={3} fullName={getValues().fullName} />
           <EditField
-            isEditMode={isFullNameEdit}
+            isEditMode={isEditField.editingField === 'fullName'}
             error={errors.fullName?.message}
             id="fullName"
-            disabled={!isFullNameEdit}
+            disabled={isEditField.editingField !== 'fullName'}
             style={{
               marginLeft: '21px',
               width: '3rem',
             }}
             onLabelClick={() => {
               setFocus('fullName');
-              setIsFullNameEdit(true);
+              setIsEditField((prev) => ({ ...prev, editingField: 'fullName' }));
             }}
             {...register('fullName', {
               required: '이름은 필수 입력 항목입니다',
@@ -133,14 +177,19 @@ function EditProfilesForm(props: EditProfilesFormProps) {
             fontSize: '1rem',
           }}
         />
-        <EditProfileMenu />
-        <div id="submit_wrapper" className="fixed bottom-[64px] left-0 z-[4] flex w-full shrink-0 justify-center">
+        <EditProfileMenu isEditing={!!isEditField.editingField} />
+        <div
+          id="submit_wrapper"
+          className={`fixed bottom-[64px] left-0 z-[11] flex w-full min-w-[390px] shrink-0 justify-center ${
+            isEditField.editingField ? 'visible' : 'invisible'
+          }`}
+        >
           <Button
             type="submit"
             form="editProfile"
             bgColorTheme="orange"
             textColorTheme="white"
-            disabled={updateUserInfoStatus === 'loading'}
+            disabled={!isEditField.editingField || updateUserInfoStatus === 'loading'}
             className="relative !h-[54px] !rounded-md disabled:!bg-slate-300 disabled:!opacity-60"
           >
             {updateUserInfoStatus === 'loading' ? (
