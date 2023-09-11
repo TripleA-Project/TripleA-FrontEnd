@@ -77,8 +77,6 @@ function EditProfilesForm(props: EditProfilesFormProps) {
         if (error instanceof AxiosError) {
           const { response } = error as AxiosError<APIResponse>;
 
-          console.log('[FormError]', { response });
-
           if (response && response.data.status === HttpStatusCode.BadRequest) {
             const serverFieldErrorResponse = error as AxiosError<APIResponse<{ key: string; value: string }>>;
 
@@ -109,7 +107,6 @@ function EditProfilesForm(props: EditProfilesFormProps) {
     try {
       updateUserInfoMutate({ email, fullName, password });
     } catch (err) {
-      console.log('[editProfileError]', { err });
       toastNotify('error', '유효하지 않습니다');
     }
   };

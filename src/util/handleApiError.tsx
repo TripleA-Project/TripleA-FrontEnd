@@ -65,8 +65,6 @@ export function checkSymbolChartApiError({
   if (apiResponse instanceof AxiosError) {
     const { code, response } = apiResponse as AxiosError<APIResponse>;
 
-    console.log('[symbolChartError]', response?.data);
-
     if (response?.data.status === HttpStatusCode.Unauthorized) {
       return <ChartUnauthorized continuePath={loginContinueURL || '/chart'} />;
     }

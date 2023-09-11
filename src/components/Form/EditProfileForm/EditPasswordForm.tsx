@@ -133,8 +133,6 @@ function EditPasswordForm(props: EditProfilesFormProps) {
         newPasswordCheck,
       });
 
-      console.log({ editPasswordResponse });
-
       if (editPasswordResponse.result === 'success') {
         done();
       }

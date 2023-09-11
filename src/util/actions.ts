@@ -18,8 +18,6 @@ export const updateUserData = async (formData: FormData): Promise<{ result: stri
       ...formData,
     });
 
-    console.log('[update Response]', response.data);
-
     return { result: 'success' };
   } catch (err) {
     return { result: 'error', error: err };
