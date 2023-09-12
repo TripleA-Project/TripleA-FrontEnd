@@ -1,5 +1,5 @@
 import axios, { AxiosResponse, HttpStatusCode } from 'axios';
-import { axiosInstance } from './axios';
+import { axiosInstance, moyaAxiosInstance } from './axios';
 import { cloneDeep } from 'lodash';
 import {
   type GetNewsByIdSearchParam,
@@ -235,8 +235,8 @@ export async function getNewsHistory({ year, month }: GetNewsHistorySearchParam)
  * `id` 뉴스 아이디 [**number**]
  */
 export async function getNewsById({ id }: GetNewsByIdSearchParam) {
-  const getNewsByIdResponse = await axios.get<GetNewsByIdResponse>(
-    `https://api.moya.ai/globalnews?id=${id}&token=${process.env.NEXT_PUBLIC_TOKEN}`,
+  const getNewsByIdResponse = await moyaAxiosInstance.get<GetNewsByIdResponse>(
+    `/globalnews?id=${id}&token=${process.env.NEXT_PUBLIC_TOKEN}`,
   );
 
   return getNewsByIdResponse;

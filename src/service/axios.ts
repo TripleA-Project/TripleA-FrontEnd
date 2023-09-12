@@ -7,6 +7,16 @@ import { ServerUserTokenCookies } from '@/util/serverCookies';
 
 export const TIMEOUT_CODE = 'ECONNABORTED';
 
+function createMoyaAxiosInstance() {
+  const moyaAxiosInstance = axios.create({
+    baseURL: process.env.NEXT_PUBLIC_MOYA_SERVER,
+    timeout: 30000,
+    timeoutErrorMessage: '요청을 처리하는 시간이 오래걸려 중단되었습니다. 이용에 불편을 드려 죄송합니다.',
+  });
+
+  return moyaAxiosInstance;
+}
+
 function createAxiosInstance() {
   const axiosInstance = axios.create({
     baseURL: process.env.NEXT_PUBLIC_SERVER,
@@ -123,3 +133,4 @@ function createAxiosInstance() {
 }
 
 export const axiosInstance = createAxiosInstance();
+export const moyaAxiosInstance = createMoyaAxiosInstance();

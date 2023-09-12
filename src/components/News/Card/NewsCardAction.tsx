@@ -10,6 +10,7 @@ import { addNewsBookmark, deleteNewsBookmark } from '@/service/bookmark';
 import { NotificationTemplate } from '@/constants/notification';
 import { toastNotify } from '@/util/toastNotify';
 import { type Bookmark, type NewsData } from '@/interfaces/NewsData';
+import { useRouter } from 'next/navigation';
 
 interface NewsCardActionProps extends Pick<NewsData, 'newsId' | 'bookmark'> {
   symbolName?: string;
@@ -35,6 +36,7 @@ export function NewsCardActionLoading() {
 
 function NewsCardAction({ newsId, symbolName, bookmark, showCount, onBookmark }: NewsCardActionProps) {
   // const queryClient = useQueryClient();
+  const { refresh } = useRouter();
 
   const { status } = useAuth();
 
@@ -66,6 +68,7 @@ function NewsCardAction({ newsId, symbolName, bookmark, showCount, onBookmark }:
       },
       onSettled: () => {
         onBookmark && onBookmark(newsId);
+        refresh();
       },
     },
   );

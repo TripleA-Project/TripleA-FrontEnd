@@ -23,8 +23,6 @@ function LatestNewsInternalServerError({ refetch }: LatestNewsInternalServerErro
   useEffect(() => {
     return () => {
       refresh();
-
-      refetch();
     };
   }, []); /* eslint-disable-line */
 
@@ -46,9 +44,7 @@ function LatestNewsInternalServerError({ refetch }: LatestNewsInternalServerErro
             bgColorTheme="orange"
             textColorTheme="white"
             onClick={() => {
-              refresh();
-
-              refetch();
+              location.reload();
             }}
           >
             새로 고침
