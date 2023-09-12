@@ -28,6 +28,10 @@ function Membership() {
                 <MdCheck className="shrink-0 text-2xl" />
                 <span className="text-sm">차트보기 제공</span>
               </li>
+              <li className="flex items-center gap-2">
+                <MdCheck className="shrink-0 text-2xl" />
+                <span className="text-sm">챗GPT AI 뉴스분석 일 10회 제공</span>
+              </li>
             </ul>
             <p className="my-6 text-center text-lg font-bold">월 {Intl.NumberFormat('ko').format(10000)}원</p>
             <SubscribeButton />
