@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
+import { ToastContainer } from 'react-toastify';
 import Profile from '../Profile';
 import MembershipInfo from '../Membership/MembershipInfo';
 import MyPageMenu from './MyPageMenu';
@@ -25,8 +26,16 @@ function MypageHome({ user }: MypageHomeProps) {
           membership: user!.membership,
         }}
       />
-      <MembershipInfo />
+      <MembershipInfo user={user} />
       <MyPageMenu />
+      <ToastContainer
+        position="bottom-center"
+        autoClose={3000}
+        hideProgressBar
+        newestOnTop={true}
+        pauseOnFocusLoss={false}
+        pauseOnHover={false}
+      />
     </div>
   );
 }
