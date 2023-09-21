@@ -1,11 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { AxiosError, HttpStatusCode } from 'axios';
 import { useFormContext } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ToastContainer } from 'react-toastify';
 import { UseStepFormContext } from '../StepForm';
+import { AppIcons } from '@/components/Icons';
 import MuiSpinner from '@/components/UI/Spinner/MuiSpinner';
 import Avatar from '@/components/Avatar';
 import EditField from '@/components/Profile/EditField';
@@ -17,8 +19,6 @@ import { validateFullName } from '@/util/validate';
 import { toastNotify } from '@/util/toastNotify';
 import type { EditProfileFormData } from '@/interfaces/FormData';
 import type { APIResponse } from '@/interfaces/Dto/Core';
-import { AppIcons } from '@/components/Icons';
-import { useRouter } from 'next/navigation';
 
 export interface EditProfilesForm {
   fullName: string;

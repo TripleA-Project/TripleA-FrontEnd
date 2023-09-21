@@ -23,7 +23,7 @@ function SelectedCategoryHorizonList({
   if (loading) {
     return (
       <div
-        className="flex items-center gap-1 overflow-scroll scrollbar-none"
+        className="animate__animated animate__fadeIn flex items-center gap-1 overflow-scroll scrollbar-none"
         onWheel={(e) => e.currentTarget.scroll({ left: e.currentTarget.scrollLeft + e.deltaY })}
       >
         {Array.from({ length: 4 }).map((_, index) => (
@@ -35,7 +35,7 @@ function SelectedCategoryHorizonList({
 
   return (
     <div
-      className="flex min-h-[36px] items-center gap-1 overflow-scroll scrollbar-none"
+      className="animate__animated animate__fadeIn flex min-h-[36px] items-center gap-1 overflow-scroll scrollbar-none"
       onWheel={(e) => e.currentTarget.scroll({ left: e.currentTarget.scrollLeft + e.deltaY })}
     >
       {categories.length

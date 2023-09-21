@@ -1,16 +1,16 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
 import ClipboardJS from 'clipboard';
 import { ErrorNotification } from '@/components/Notification';
 import { AppIcons } from '@/components/Icons';
-import useAuth from '@/hooks/useAuth';
-import { addNewsBookmark, deleteNewsBookmark } from '@/service/bookmark';
 import { NotificationTemplate } from '@/constants/notification';
+import { addNewsBookmark, deleteNewsBookmark } from '@/service/bookmark';
 import { toastNotify } from '@/util/toastNotify';
-import { type Bookmark, type NewsData } from '@/interfaces/NewsData';
-import { useRouter } from 'next/navigation';
+import { useUser } from '@/hooks/useUser';
+import type { Bookmark, NewsData } from '@/interfaces/NewsData';
 
 interface NewsCardActionProps extends Pick<NewsData, 'newsId' | 'bookmark'> {
   symbolName?: string;
@@ -35,10 +35,9 @@ export function NewsCardActionLoading() {
 }
 
 function NewsCardAction({ newsId, symbolName, bookmark, showCount, onBookmark }: NewsCardActionProps) {
-  // const queryClient = useQueryClient();
   const { refresh } = useRouter();
 
-  const { status } = useAuth();
+  const { user, isLoading: isUserLoading, errorType } = useUser();
 
   const [bookmarkState, setBookmarkState] = useState<Bookmark>({
     isBookmark: bookmark.isBookmark,
@@ -77,19 +76,21 @@ function NewsCardAction({ newsId, symbolName, bookmark, showCount, onBookmark }:
     e.preventDefault();
     e.stopPropagation();
 
-    switch (status) {
-      case 'Pending':
-      case 'Loading':
-        return;
-      case 'AuthUser':
-        bookmarkMutate(bookmarkState.isBookmark ? 'delete' : 'add');
+    if (isUserLoading) {
+      return;
+    }
 
-        return;
-      case 'Guest':
+    if (!user) {
+      if (errorType === 'Unauthorized') {
         setShowNotification(true);
 
         return;
+      }
+
+      return;
     }
+
+    bookmarkMutate(bookmarkState.isBookmark ? 'delete' : 'add');
   }
 
   function shareClickHandler(e: React.MouseEvent<HTMLButtonElement>) {

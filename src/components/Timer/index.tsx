@@ -1,6 +1,7 @@
 'use client';
 
 import { useLayoutEffect, useState } from 'react';
+import { TimerWorkerCommand } from '@/interfaces/TimerWorker';
 
 interface TimerProps extends React.HTMLProps<HTMLTimeElement> {
   minute: number;
@@ -35,15 +36,15 @@ function Timer({ minute, className, ...props }: TimerProps) {
 }
 
 export function timerInit(minute: number) {
-  timerWorkerAPI?.postMessage({ cmd: 'timerInit', payload: minute });
+  timerWorkerAPI?.postMessage({ cmd: TimerWorkerCommand.INIT, payload: minute * 60 });
 }
 
 export function timerStart() {
-  timerWorkerAPI?.postMessage({ cmd: 'timerStart' });
+  timerWorkerAPI?.postMessage({ cmd: TimerWorkerCommand.START });
 }
 
 export function timerReset() {
-  timerWorkerAPI?.postMessage({ cmd: 'timerReset' });
+  timerWorkerAPI?.postMessage({ cmd: TimerWorkerCommand.RESET });
 }
 
 export default Timer;

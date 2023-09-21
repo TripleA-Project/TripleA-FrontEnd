@@ -11,7 +11,7 @@ interface SymbolChartNotificationProps {
 
 function getNotificationType(user?: ProfilePayload): keyof typeof LockNotificationTemplate | undefined {
   if (user?.membership === 'BASIC') {
-    return 'MoreLikeRequiredSubscribe';
+    return 'Chart';
   }
 }
 

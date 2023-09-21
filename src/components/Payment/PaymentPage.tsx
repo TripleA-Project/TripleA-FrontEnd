@@ -24,7 +24,6 @@ function PaymentPage({ user }: PaymentPageProps) {
     }, 1000);
 
     return () => {
-      queryClient.removeQueries({ queryKey: ['auth'] });
       queryClient.invalidateQueries(['profile']);
 
       refresh();

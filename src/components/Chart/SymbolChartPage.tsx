@@ -19,6 +19,7 @@ import { syncCookie } from '@/util/cookies';
 import type { Symbol } from '@/interfaces/Symbol';
 import type { ProfilePayload } from '@/interfaces/Dto/User';
 import type { ResampleFrequency } from '@/interfaces/Dto/Stock';
+import { useRouter } from 'next/navigation';
 
 interface SymbolChartPageProps {
   user?: ProfilePayload;
@@ -27,10 +28,15 @@ interface SymbolChartPageProps {
 }
 
 function SymbolChartPage({ user, matchedSymbol, resample }: SymbolChartPageProps) {
+  const { refresh } = useRouter();
   const [sentimentList, setSentimentList] = useState<SentimentData[]>([]);
 
   useEffect(() => {
     syncCookie(user!.email);
+
+    return () => {
+      refresh();
+    };
   }, []); /* eslint-disable-line */
 
   return (

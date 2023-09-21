@@ -19,7 +19,7 @@ function Tabs() {
   const ref = useRef<HTMLDivElement>(null);
 
   const { push } = useRouter();
-  const { status, empty, loginRequired } = useLikes();
+  const { likedSymbols, likedCategories, status, loginRequired } = useLikes();
 
   const [openSetInterestModal, setOpenSetInterestModal] = useState(false);
   const [notification, setNotification] = useState<{
@@ -56,7 +56,7 @@ function Tabs() {
       return;
     }
 
-    if (status === 'success' && empty) {
+    if (status === 'success' && likedSymbols.empty && likedCategories.empty) {
       setNotification((prev) => ({
         ...prev,
         active: true,

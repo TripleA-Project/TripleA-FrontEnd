@@ -1,41 +1,32 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { HttpStatusCode, isAxiosError } from 'axios';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { AxiosError, HttpStatusCode } from 'axios';
 import { getAllCategory, getLikeCategory } from '@/service/category';
-import { getLikeSymbol } from '@/service/symbol';
-import { type Category } from '@/interfaces/Category';
-import { type Symbol } from '@/interfaces/Symbol';
 import { TIMEOUT_CODE } from '@/service/axios';
+import { getLikeSymbol } from '@/service/symbol';
+import type { Symbol } from '@/interfaces/Symbol';
+import type { Category } from '@/interfaces/Category';
+import type { APIResponse } from '@/interfaces/Dto/Core';
+
+type UseLikesStatus = 'loading' | 'success' | 'error' | 'timeout';
 
 interface LikedSymbols {
-  symbols: Symbol[];
-  indexes: { name: string; index: number }[];
+  symbols: Symbol[] | null;
+  indexes: { name: string; index: number }[] | null;
+  empty: boolean | null;
 }
 
 interface LikedCategories {
-  inAllCategory: Category[];
-  inLikeCategory: Category[];
-}
-
-interface UseLikesResult {
-  likedSymbols: LikedSymbols | null;
-  likedCatgories: LikedCategories | null;
-  empty: boolean;
-  loginRequired: boolean;
-  status: 'loading' | 'success' | 'error' | 'timeout';
+  categories: Category[] | null;
+  allCategories: Category[] | null;
+  empty: boolean | null;
 }
 
 export const useLikes = () => {
-  const [result, setResult] = useState<UseLikesResult>({
-    likedSymbols: null,
-    likedCatgories: null,
-    empty: false,
-    loginRequired: false,
-    status: 'loading',
-  });
+  const queryClient = useQueryClient();
 
+  // useQuery
   const { data: allCategories, status: allCategoriesStatus } = useQuery(['allCategories'], () => getAllCategory(), {
     retry: 0,
     refetchOnWindowFocus: false,
@@ -49,6 +40,7 @@ export const useLikes = () => {
     data: likedCategory,
     status: likedCategoryStatus,
     error: likedCategoryError,
+    isRefetching: isLikedCategoryFetching,
   } = useQuery(['likedCategoryList'], () => getLikeCategory(), {
     retry: 0,
     refetchOnWindowFocus: false,
@@ -61,6 +53,7 @@ export const useLikes = () => {
     data: likedSymbol,
     status: likedSymbolStatus,
     error: likedSymbolError,
+    isRefetching: isLikedSymbolFetching,
   } = useQuery(['likedSymbolList'], () => getLikeSymbol(), {
     retry: 0,
     refetchOnWindowFocus: false,
@@ -69,101 +62,173 @@ export const useLikes = () => {
     },
   });
 
-  useEffect(() => {
-    if (allCategoriesStatus === 'loading' || likedCategoryStatus === 'loading' || likedSymbolStatus === 'loading') {
-      if (result.status !== 'loading') {
-        setResult((prev) => ({
-          ...prev,
-          status: 'loading',
-        }));
-      }
+  // helper
+  const getStatus: () => UseLikesStatus = () => {
+    if (allCategoriesStatus === 'loading' || likedCategoryStatus === 'loading' || likedSymbolStatus === 'loading')
+      return 'loading';
 
-      return;
-    }
-
-    if (allCategoriesStatus === 'error' || likedCategoryStatus === 'error' || likedSymbolStatus === 'error') {
+    if (allCategoriesStatus === 'success' && likedCategoryStatus === 'success' && likedSymbolStatus === 'success') {
       if (
-        isAxiosError<typeof likedCategory>(likedCategoryError) &&
-        isAxiosError<typeof likedSymbol>(likedSymbolError)
-      ) {
-        if (
-          likedCategoryError.response?.data?.status === HttpStatusCode.Unauthorized ||
-          likedSymbolError.response?.data?.status === HttpStatusCode.Unauthorized
-        ) {
-          setResult((prev) => ({
-            ...prev,
-            status: 'error',
-            loginRequired: true,
-          }));
+        allCategories.status === HttpStatusCode.Unauthorized ||
+        likedCategory.status === HttpStatusCode.Unauthorized ||
+        likedSymbol.status === HttpStatusCode.Unauthorized
+      )
+        return 'error';
 
-          return;
-        }
+      return 'success';
+    }
 
-        if (likedCategoryError.code === TIMEOUT_CODE || likedSymbolError.code === TIMEOUT_CODE) {
-          setResult((prev) => ({
-            ...prev,
-            status: 'timeout',
-          }));
+    if (likedSymbolStatus === 'error' || likedCategoryStatus === 'error') {
+      if (likedSymbolError instanceof AxiosError) {
+        const { code } = likedSymbolError as AxiosError;
 
-          return;
-        }
+        if (code === TIMEOUT_CODE) return 'timeout';
 
-        return;
+        return 'error';
       }
 
-      setResult((prev) => ({
-        ...prev,
-        status: 'error',
-      }));
+      if (likedCategoryError instanceof AxiosError) {
+        const { code } = likedCategoryError as AxiosError;
 
-      return;
+        if (code === TIMEOUT_CODE) return 'timeout';
+
+        return 'error';
+      }
+
+      return 'error';
     }
 
-    if (likedCategory.status === HttpStatusCode.Unauthorized || likedSymbol.status === HttpStatusCode.Unauthorized) {
-      setResult((prev) => ({
-        ...prev,
-        status: 'error',
-        loginRequired: true,
-      }));
+    return 'loading';
+  };
 
-      return;
-    }
+  const getLikedSymbols: () => LikedSymbols = () => {
+    const initialLikedSymbols = {
+      symbols: null,
+      indexes: null,
+      empty: null,
+    } as LikedSymbols;
 
-    if (!likedCategory.data?.length && !likedSymbol.data?.length) {
-      setResult((prev) => ({
-        ...prev,
-        status: 'success',
-        likedSymbols: null,
-        likedCatgories: null,
-        empty: true,
-        loginRequired: false,
-      }));
+    if (likedSymbolStatus !== 'success') return initialLikedSymbols;
 
-      return;
-    }
+    if (likedSymbol) {
+      if (likedSymbol.status === HttpStatusCode.Unauthorized) return initialLikedSymbols;
+      if (!likedSymbol?.data) return initialLikedSymbols;
+      if (!likedSymbol.data?.length)
+        return {
+          ...initialLikedSymbols,
+          empty: true,
+        };
 
-    const inAllCategory = allCategories.data!.filter((allCategoryItem) =>
-      likedCategory.data?.find((likedCategory) => likedCategory.category === allCategoryItem.category),
-    );
-    const inLikeCategory = likedCategory.data as Category[];
+      const symbolIndexes = likedSymbol.data.map((likedSymbol) => {
+        return {
+          name: likedSymbol.symbol.toUpperCase(),
+          index: likedSymbol.symbolId,
+        };
+      });
 
-    const symbols = likedSymbol.data as Symbol[];
-    const symbolIndexes = likedSymbol.data?.map((likedSymbol) => {
       return {
-        name: likedSymbol.symbol.toUpperCase(),
-        index: likedSymbol.symbolId,
+        symbols: likedSymbol.data,
+        indexes: symbolIndexes,
+        empty: false,
       };
-    });
+    }
 
-    setResult((prev) => ({
-      ...prev,
-      likedCatgories: likedCategory.data?.length ? { inAllCategory, inLikeCategory } : null,
-      likedSymbols: likedSymbol.data?.length ? { symbols, indexes: symbolIndexes! } : null,
-      status: 'success',
-      empty: false,
+    return initialLikedSymbols;
+  };
+
+  const getCategories: () => LikedCategories = () => {
+    const initialLikedCategories = {
+      allCategories: null,
+      categories: null,
+      empty: null,
+    } as LikedCategories;
+
+    if (allCategoriesStatus !== 'success' || likedCategoryStatus !== 'success') return initialLikedCategories;
+
+    if (allCategories && likedCategory) {
+      if (allCategories.status === HttpStatusCode.Unauthorized || likedCategory.status === HttpStatusCode.Unauthorized)
+        return initialLikedCategories;
+
+      const allCategoriesData = allCategories.data?.length ? allCategories.data : null;
+      const likedCategoryData = likedCategory.data?.length ? likedCategory.data : null;
+
+      return {
+        allCategories: allCategoriesData,
+        categories: likedCategoryData,
+        empty: !likedCategory.data?.length,
+      };
+    }
+
+    return initialLikedCategories;
+  };
+
+  const likedSymbolResult = {
+    likedSymbols: { ...getLikedSymbols() } as LikedSymbols,
+  };
+
+  const categoryResult = {
+    likedCategories: { ...getCategories() },
+  };
+
+  const getLoginRequired: () => { loginRequired: boolean } = () => {
+    if (likedCategoryStatus !== 'error' || likedSymbolStatus !== 'error') {
+      if (likedCategory?.status === HttpStatusCode.Unauthorized || likedSymbol?.status === HttpStatusCode.Unauthorized)
+        return {
+          loginRequired: true,
+        };
+
+      return {
+        loginRequired: false,
+      };
+    }
+
+    if (likedSymbolError instanceof AxiosError) {
+      const { response } = likedSymbolError as AxiosError<APIResponse>;
+
+      if (response?.data.status === HttpStatusCode.Unauthorized)
+        return {
+          loginRequired: true,
+        };
+    }
+
+    if (likedCategoryError instanceof AxiosError) {
+      const { response } = likedCategoryError as AxiosError<APIResponse>;
+
+      if (response?.data.status === HttpStatusCode.Unauthorized)
+        return {
+          loginRequired: true,
+        };
+    }
+
+    return {
       loginRequired: false,
-    }));
-  }, [allCategoriesStatus, likedCategoryStatus, likedSymbolStatus]); /* eslint-disable-line */
+    };
+  };
 
-  return result;
+  // result
+  const results = {
+    ...likedSymbolResult,
+    ...categoryResult,
+    ...getLoginRequired(),
+    status: getStatus(),
+    isFetching: isLikedSymbolFetching || isLikedCategoryFetching,
+    invalidateQuery: {
+      likedSymbol() {
+        return queryClient.invalidateQueries(['likedSymbolList']);
+      },
+      likedCategory() {
+        return queryClient.invalidateQueries(['likedCategoryList']);
+      },
+    },
+    removeQuery: {
+      likedSymbol() {
+        queryClient.removeQueries(['likedSymbolList']);
+      },
+      likedCategory() {
+        queryClient.removeQueries(['likedCategoryList']);
+      },
+    },
+  };
+
+  return results;
 };

@@ -1,8 +1,8 @@
 import React from 'react';
 import CategoryChip, { type CategoryChipProps } from '@/components/UI/Chip/CategoryChip';
 import { selectCategory, unSelectCategory, useCategoryList } from '@/redux/slice/categorySlice';
-import useAuth from '@/hooks/useAuth';
-import { type OnChipChangeResult } from '@/components/UI/Chip/SymbolChip';
+import { useUser } from '@/hooks/useUser';
+import type { OnChipChangeResult } from '@/components/UI/Chip/SymbolChip';
 
 interface DispatchSearchCategoryChipProps extends Omit<CategoryChipProps, 'onChange' | 'onClose' | 'selected'> {
   allowClickDispatch?: boolean;
@@ -18,7 +18,7 @@ function DispatchSearchCategoryChip({
 }: DispatchSearchCategoryChipProps) {
   const { dispatch, selectedCategoryMap, isLike } = useCategoryList();
 
-  const { user } = useAuth();
+  const { user } = useUser();
 
   const handleChange: () => Promise<OnChipChangeResult> = async () => {
     try {

@@ -1,49 +1,70 @@
 'use client';
 
 import { useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { HttpStatusCode, isAxiosError } from 'axios';
+import { useMutation } from '@tanstack/react-query';
+import { AxiosError, HttpStatusCode } from 'axios';
 import SkeletonLike from './SkeletonLike';
 import { AppIcons } from '@/components/Icons';
-import { disLikeSymbol, getLikeSymbol, likeSymbol } from '@/service/symbol';
-import { toastNotify } from '@/util/toastNotify';
 import { LockNotification } from '@/components/Notification';
+import { disLikeSymbol, likeSymbol } from '@/service/symbol';
 import { LockNotificationTemplate } from '@/constants/notification';
-import { type Symbol } from '@/interfaces/Symbol';
-import { type LikeSymbolResponse } from '@/interfaces/Dto/Symbol';
+import { toastNotify } from '@/util/toastNotify';
+import { useLikes } from '@/hooks/useLikes';
+import type { Symbol } from '@/interfaces/Symbol';
+import type { APIResponse } from '@/interfaces/Dto/Core';
+
+type MutationType = 'like' | 'unlike';
+
+interface HandleSuccessArgs {
+  type: MutationType;
+}
+
+interface HandleErrorArgs {
+  type: MutationType;
+  error: unknown;
+}
 
 interface LikeButtonProps {
   symbol?: Symbol;
 }
 
 function LikeButton({ symbol }: LikeButtonProps) {
-  const queryClient = useQueryClient();
+  const { likedSymbols, invalidateQuery, loginRequired, status: likesStatus } = useLikes();
 
   const [showSubscribeNotification, setShowSubscribeNotification] = useState(false);
 
-  const { data: getLikeSymbolResponse, status: getLikeSymbolStatus } = useQuery(
-    ['likedSymbolList'],
-    () => getLikeSymbol(),
-    { retry: false, refetchOnWindowFocus: false },
-  );
+  const handleSuccess = async ({ type }: HandleSuccessArgs) => {
+    await invalidateQuery.likedSymbol();
 
-  const { mutate: likeMutate, status: likeMutateStatus } = useMutation((symbol: string) => likeSymbol({ symbol }), {
-    onSuccess: () => {
-      toastNotify('success', '관심 심볼 생성에 성공했습니다');
-      queryClient.invalidateQueries(['likedSymbolList']);
-    },
-    onError: (error) => {
-      if (isAxiosError<LikeSymbolResponse>(error)) {
-        const { response } = error;
+    toastNotify('success', `관심 심볼 ${type === 'like' ? '생성' : '삭제'}에 성공했습니다`);
+  };
 
-        if (response?.data.status === HttpStatusCode.BadRequest) {
-          setShowSubscribeNotification(true);
+  const handleError = ({ type, error }: HandleErrorArgs) => {
+    if (error instanceof AxiosError) {
+      const { response } = error as AxiosError<APIResponse>;
 
-          return;
-        }
+      if (response?.data.status === HttpStatusCode.BadRequest) {
+        setShowSubscribeNotification(true);
+
+        return;
       }
 
-      toastNotify('error', '관심 심볼 생성에 실패했습니다');
+      if (response?.data.status === HttpStatusCode.Unauthorized) {
+        toastNotify('error', '로그인 후 심볼 추가/삭제가 가능합니다');
+
+        return;
+      }
+    }
+
+    toastNotify('error', `관심 심볼 ${type === 'like' ? '생성' : '삭제'}에 실패했습니다`);
+  };
+
+  const { mutate: likeMutate, status: likeMutateStatus } = useMutation((symbol: string) => likeSymbol({ symbol }), {
+    onSuccess: async () => {
+      await handleSuccess({ type: 'like' });
+    },
+    onError: (error) => {
+      handleError({ type: 'like', error });
     },
   });
 
@@ -53,39 +74,40 @@ function LikeButton({ symbol }: LikeButtonProps) {
         id: unlikeTargetId,
       }),
     {
-      onSuccess: () => {
-        toastNotify('success', '관심 심볼 삭제에 성공했습니다');
-        queryClient.invalidateQueries(['likedSymbolList']);
+      onSuccess: async () => {
+        await handleSuccess({ type: 'unlike' });
       },
-      onError: () => {
-        toastNotify('error', '관심 심볼 삭제에 실패했습니다');
+      onError: (error) => {
+        handleError({ type: 'unlike', error });
       },
     },
   );
 
   function isLike(symbol: Symbol) {
-    if (getLikeSymbolStatus !== 'success') return false;
-    if (getLikeSymbolResponse && !getLikeSymbolResponse.data.data?.length) return false;
+    if (likedSymbols.empty) return false;
 
-    const isLikeSymbol = getLikeSymbolResponse.data.data!.find(
+    return !!likedSymbols.symbols!.find(
       (likedSymbol) => likedSymbol.symbol.toUpperCase() === symbol.symbol.toUpperCase(),
     );
-
-    return !!isLikeSymbol;
   }
 
-  function LikeHandler(symbol: Symbol) {
-    if (getLikeSymbolStatus !== 'success') return;
+  function LikeHandler(symbol?: Symbol) {
+    if (!symbol) return;
+    if (likesStatus !== 'success') return;
     if (likeMutateStatus === 'loading' || unLikeMutateStatus === 'loading') return;
 
+    if (loginRequired) {
+      toastNotify('error', '로그인 후 심볼추가/삭제가 가능합니다');
+
+      return;
+    }
+
     if (isLike(symbol)) {
-      const unlikeTarget = getLikeSymbolResponse.data.data?.find(
-        (likeSymbol) => likeSymbol.symbol.toUpperCase() === symbol.symbol.toUpperCase(),
-      );
+      const unlikeId = likedSymbols.symbols!.find(
+        (likedSymbol) => likedSymbol.symbol.toUpperCase() === symbol.symbol.toUpperCase(),
+      )!.symbolId;
 
-      if (!unlikeTarget) return;
-
-      unLikeMutate(unlikeTarget.symbolId);
+      unLikeMutate(unlikeId);
 
       return;
     }
@@ -93,15 +115,15 @@ function LikeButton({ symbol }: LikeButtonProps) {
     likeMutate(symbol.symbol.toUpperCase());
   }
 
+  if (likesStatus === 'loading') {
+    return <SkeletonLike />;
+  }
+
   return (
     <>
-      {getLikeSymbolStatus === 'loading' ? (
-        <SkeletonLike />
-      ) : (
-        <button onClick={symbol ? () => LikeHandler(symbol) : () => toastNotify('error', '잘못된 요청입니다')}>
-          {symbol && isLike(symbol) ? <AppIcons.Heart.Fill.Orange /> : <AppIcons.Heart.Fill.Gray />}
-        </button>
-      )}
+      <button onClick={() => LikeHandler(symbol)}>
+        {symbol && isLike(symbol) ? <AppIcons.Heart.Fill.Orange /> : <AppIcons.Heart.Fill.Gray />}
+      </button>
       <LockNotification
         active={showSubscribeNotification}
         closeOnClick

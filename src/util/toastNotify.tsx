@@ -1,23 +1,22 @@
+import { AppLogos } from '@/components/Icons';
 import { toast, cssTransition, type ToastOptions } from 'react-toastify';
 
 export function toastNotify(type: ToastOptions['type'], message: string, containerId?: string) {
-  const getTypeColor = (type: ToastOptions['type']) => {
-    switch (type) {
-      case 'success':
-        return '#3be38f';
-      case 'error':
-        return '#e3493b';
-      default:
-        return '';
-    }
-  };
-
   return toast(message, {
     type,
     style: {
-      borderTop: `4px solid ${getTypeColor(type)}`,
-      margin: '0 auto 83px',
-      maxWidth: '90vw',
+      margin: '0 16px 120px',
+      background: 'rgba(0,0,0,.8)',
+      color: '#fff',
+      overflow: 'hidden',
+      borderRadius: '50px',
+    },
+    icon(props) {
+      return (
+        <div className="flex h-fit w-fit items-center justify-center rounded-[4px] bg-white p-1">
+          <AppLogos.Orange className="h-4 w-4 shrink-0" />
+        </div>
+      );
     },
     transition: cssTransition({
       enter: 'animate__animated animate__fadeInUp',

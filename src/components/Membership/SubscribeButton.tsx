@@ -1,14 +1,14 @@
 'use client';
 
-import { useLayoutEffect, useState } from 'react';
-import { getProfile } from '@/service/user';
-import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { HttpStatusCode, type AxiosError } from 'axios';
+import { HttpStatusCode } from 'axios';
 import Button from '../Button/Button';
 import { ErrorNotification } from '../Notification';
 import { subscribe } from '@/service/subscribe';
-import { type APIResponse } from '@/interfaces/Dto/Core';
+import { useUser } from '@/hooks/useUser';
+import MuiSpinner from '../UI/Spinner/MuiSpinner';
+import { toastNotify } from '@/util/toastNotify';
 
 interface SubscribeButtonProps {
   subscribeRedirectURL?: string;
@@ -25,39 +25,51 @@ function SubscribeButtonLoading() {
 }
 
 function SubscribeButton({ subscribeRedirectURL }: SubscribeButtonProps) {
-  const { push, refresh } = useRouter();
+  const { push } = useRouter();
 
-  const {
-    data: membership,
-    status,
-    error,
-  } = useQuery(['profile'], () => getProfile(), {
-    refetchOnWindowFocus: false,
-    retry: 0,
-    select: (response) => response.data.data?.membership,
-  });
+  const { user, isLoading: isUserLoading, errorType } = useUser();
 
-  const [isGuest, setIsGuest] = useState(false);
+  const [isFetchingSubscription, setIsFetchingSubscription] = useState(false);
+
   const [showNotification, setShowNotification] = useState(false);
 
   const RenderSubscribeButton = () => {
-    switch (membership) {
+    switch (user?.membership) {
       case 'BASIC':
         return (
           <Button
             bgColorTheme="orange"
             textColorTheme="white"
             fullWidth
+            className="relative disabled:!bg-[#f9b380]"
+            disabled={isFetchingSubscription}
             onClick={async () => {
-              const { data: response, status } = await subscribe({
-                url: subscribeRedirectURL || `${process.env.NEXT_PUBLIC_SITE_URL}/payment`,
-              });
+              try {
+                setIsFetchingSubscription((prev) => true);
 
-              if (status === HttpStatusCode.Ok) {
-                push(response.data!.payment);
+                const { data: response, status } = await subscribe({
+                  url: subscribeRedirectURL || `${process.env.NEXT_PUBLIC_SITE_URL}/payment`,
+                });
+
+                setIsFetchingSubscription((prev) => false);
+
+                if (status === HttpStatusCode.Ok) {
+                  push(response.data!.payment);
+                }
+              } catch (err) {
+                setIsFetchingSubscription((prev) => false);
+
+                toastNotify('error', '결제 진행에 실패했습니다');
               }
             }}
           >
+            {isFetchingSubscription ? (
+              <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center">
+                <div className="translate-y-[3.4px]">
+                  <MuiSpinner />
+                </div>
+              </div>
+            ) : null}
             구독하기
           </Button>
         );
@@ -74,13 +86,16 @@ function SubscribeButton({ subscribeRedirectURL }: SubscribeButtonProps) {
           </Button>
         );
       default:
-        return (
+        return isUserLoading ? (
+          <SubscribeButtonLoading />
+        ) : (
           <Button
             bgColorTheme="orange"
             textColorTheme="white"
             fullWidth
+            disabled={isFetchingSubscription}
             onClick={() => {
-              if (isGuest) {
+              if (errorType === 'Unauthorized') {
                 setShowNotification(true);
               }
             }}
@@ -90,26 +105,6 @@ function SubscribeButton({ subscribeRedirectURL }: SubscribeButtonProps) {
         );
     }
   };
-
-  useLayoutEffect(() => {
-    if (status === 'success' && !error) {
-      setIsGuest(false);
-
-      return;
-    }
-
-    if (status === 'error') {
-      const errorPayload = (error as AxiosError<APIResponse>).response?.data;
-
-      if (errorPayload?.status === 401) {
-        setIsGuest(true);
-      }
-
-      return;
-    }
-  }, [status]); /* eslint-disable-line */
-
-  if (status === 'loading') return <SubscribeButtonLoading />;
 
   return (
     <>

@@ -3,8 +3,8 @@
 import React from 'react';
 import { selectSymbol, unSelectSymbol, useSymbolList } from '@/redux/slice/symbolSlice';
 import SymbolChip, { type OnChipChangeResult, type SymbolChipProps } from '@/components/UI/Chip/SymbolChip';
-import useAuth from '@/hooks/useAuth';
-import { type SearchedSymbol } from '@/interfaces/Symbol';
+import { useUser } from '@/hooks/useUser';
+import type { SearchedSymbol } from '@/interfaces/Symbol';
 
 interface DispatchSearchSymbolChipProps
   extends Omit<SymbolChipProps, 'symbol' | 'showPrice' | 'onChange' | 'onClose' | 'selected'> {
@@ -22,7 +22,7 @@ function DispatchSearchSymbolChip({
 }: DispatchSearchSymbolChipProps) {
   const { dispatch, selectedSymbolMap, isLike } = useSymbolList();
 
-  const { user } = useAuth();
+  const { user } = useUser();
 
   const handleChange: () => Promise<OnChipChangeResult> = async () => {
     try {
