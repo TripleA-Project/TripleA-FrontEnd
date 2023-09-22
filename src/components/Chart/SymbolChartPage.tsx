@@ -19,16 +19,22 @@ import { syncCookie } from '@/util/cookies';
 import type { Symbol } from '@/interfaces/Symbol';
 import type { ProfilePayload } from '@/interfaces/Dto/User';
 import type { ResampleFrequency } from '@/interfaces/Dto/Stock';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface SymbolChartPageProps {
   user?: ProfilePayload;
-  matchedSymbol?: Symbol;
+  matchedSymbol?: Symbol | null;
   resample: ResampleFrequency;
 }
 
 function SymbolChartPage({ user, matchedSymbol, resample }: SymbolChartPageProps) {
   const { refresh } = useRouter();
+
+  const searchParams = useSearchParams();
+  const symbolName = searchParams.get('name');
+  const requestSymbolName = matchedSymbol?.symbol?.toUpperCase() ?? (symbolName ? symbolName.toUpperCase() : '');
+
+  const [chartIsEmpty, setChartIsEmpty] = useState(false);
   const [sentimentList, setSentimentList] = useState<SentimentData[]>([]);
 
   useEffect(() => {
@@ -41,37 +47,46 @@ function SymbolChartPage({ user, matchedSymbol, resample }: SymbolChartPageProps
 
   return (
     <>
-      <SymbolLikeHeader symbol={matchedSymbol} />
+      <SymbolLikeHeader symbolName={symbolName} />
       <div className="relative box-border min-h-[calc(100vh-147px)] px-4">
         <SymbolChartNotification user={user} />
         <section className="mt-4">
           <ChartHeader symbolPayload={matchedSymbol} priceInfo={{} as any} symbol={''} sentimentData={sentimentList} />
-          <Chart
-            matchedSymbol={matchedSymbol!}
-            resample={resample}
-            onDataFetched={(source) => {
-              if (!source) return;
+          {chartIsEmpty ? (
+            <div className="flex h-[322px] items-center justify-center">차트 데이터가 없습니다</div>
+          ) : (
+            <>
+              <Chart
+                matchedSymbol={matchedSymbol!}
+                resample={resample}
+                onDataFetched={(source, error) => {
+                  if (error) {
+                    setChartIsEmpty(true);
+                    return;
+                  }
 
-              setSentimentList(source.sentimentData ?? []);
-            }}
-          />
-          <ChartResampleGroup symbol={matchedSymbol?.symbol ?? ''} />
+                  if (!source) {
+                    setChartIsEmpty(true);
+                    return;
+                  }
+
+                  setSentimentList(source.sentimentData ?? []);
+                }}
+              />
+              <ChartResampleGroup symbol={requestSymbolName} />
+            </>
+          )}
           <HorizontalLine style={{ marginTop: '1.25rem' }} />
           <section className="mb-11 mt-5">
-            <h3 className="mb-4 font-bold text-black">{matchedSymbol?.symbol} 관련 뉴스</h3>
+            <h3 className="mb-4 font-bold text-black">{requestSymbolName} 관련 뉴스</h3>
             <ErrorBoundary
-              fallbackRender={(props) => (
-                <ChartShortNewsClientAPIErrorFallback symbol={matchedSymbol?.symbol ?? ''} {...props} />
-              )}
+              fallbackRender={(props) => <ChartShortNewsClientAPIErrorFallback symbol={requestSymbolName} {...props} />}
             >
               <Suspense fallback={<NewsListLoading length={3} />}>
-                <SymbolShortNews symbol={matchedSymbol?.symbol ?? ''} />
+                <SymbolShortNews symbol={requestSymbolName} />
               </Suspense>
             </ErrorBoundary>
-            <Link
-              href={`/chart/symbol/news/${matchedSymbol?.symbol.toUpperCase()}`}
-              className="mt-5 flex items-center justify-center"
-            >
+            <Link href={`/chart/symbol/news/${requestSymbolName}`} className="mt-5 flex items-center justify-center">
               <button className="box-border flex h-10 w-[311px] items-center justify-center rounded-3xl border-2 border-[#E2E6ED] px-4 py-3">
                 <p className="font-bold">뉴스 전체보기</p>
                 <BsArrowRightShort className="ml-[18px] shrink-0 text-2xl" />

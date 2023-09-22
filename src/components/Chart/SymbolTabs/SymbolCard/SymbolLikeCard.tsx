@@ -59,7 +59,7 @@ function SymbolLikeCard({ symbol }: SymbolLikeCardProps) {
               }
             }}
           >
-            <LikeButton symbol={symbol} />
+            <LikeButton symbolName={symbol.symbol} />
           </div>
         </div>
       </div>

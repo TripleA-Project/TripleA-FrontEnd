@@ -49,6 +49,7 @@ function createErrorMeta({
             bgColorTheme="orange"
             textColorTheme="white"
             fullWidth
+            className="h-fit w-fit !px-2 !py-1"
             onClick={() => {
               resetQuery();
             }}
@@ -72,6 +73,7 @@ function createErrorMeta({
         bgColorTheme="orange"
         textColorTheme="white"
         fullWidth
+        className="h-fit w-fit !px-2 !py-1"
         onClick={() => {
           resetQuery();
         }}

@@ -11,7 +11,7 @@ interface ChartHeaderProps {
   priceInfo: PriceInfo;
   sentimentData?: SentimentData[];
   symbol: string;
-  symbolPayload?: Symbol;
+  symbolPayload?: Symbol | null;
   companyName?: string;
 }
 

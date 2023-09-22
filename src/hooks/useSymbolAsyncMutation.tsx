@@ -8,6 +8,13 @@ import { AxiosError, HttpStatusCode } from 'axios';
 import type { APIResponse } from '@/interfaces/Dto/Core';
 import type { SearchedSymbol, Symbol } from '@/interfaces/Symbol';
 
+/* 
+  심볼 form의 mutate function hook 
+  
+  회원가입-심볼 설정(단계별 폼),
+  심볼 설정 페이지에서의 form 공통 mutate 로직
+*/
+
 interface SymbolLikeMutationArg {
   symbol: SearchedSymbol;
 }

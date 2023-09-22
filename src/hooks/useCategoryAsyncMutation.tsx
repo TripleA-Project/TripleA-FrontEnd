@@ -8,6 +8,13 @@ import { disLikeCategory, likeCategory } from '@/service/category';
 import { APIResponse } from '@/interfaces/Dto/Core';
 import { Category } from '@/interfaces/Category';
 
+/* 
+  카테고리 form의 mutate function hook 
+  
+  회원가입-카테고리 설정(단계별 폼),
+  카테고리 설정 페이지에서의 form 공통 mutate 로직
+*/
+
 interface CategoryMutationArg {
   requestId: number;
   category: Category;

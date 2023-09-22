@@ -15,6 +15,7 @@ import {
 } from './constants/symbolHistogramConfig';
 import { Symbol } from '@/interfaces/Symbol';
 import ChartLoading from './ChartLoding';
+import { useSearchParams } from 'next/navigation';
 
 interface ChartSource {
   lineData?: LineData[];
@@ -23,23 +24,29 @@ interface ChartSource {
 }
 
 interface TestChartProps {
-  matchedSymbol: Symbol;
+  matchedSymbol?: Symbol | null;
   resample: ResampleFrequency;
-  onDataFetched: (source: ChartSource | null) => void;
+  onDataFetched: (source: ChartSource | null, error?: unknown) => void;
 }
 
 function Chart({ matchedSymbol, resample, onDataFetched }: TestChartProps) {
+  const searchParams = useSearchParams();
+  const symbolName = searchParams.get('name');
+
   const { startDate, endDate } = getChartDate({ resample });
+  const requestSymbolName = matchedSymbol?.symbol?.toUpperCase() ?? (symbolName ? symbolName.toUpperCase() : '');
 
   const {
     data: chartDataPayload,
     isLoading,
     isFetching,
+    status,
+    error,
   } = useQuery(
-    ['symbolChart', matchedSymbol.symbol.toUpperCase(), resample],
+    ['symbolChart', requestSymbolName, resample],
     () =>
       getSymbolStock({
-        symbol: matchedSymbol.symbol.toUpperCase(),
+        symbol: requestSymbolName,
         startDate: startDate.format('YYYY-MM-DD'),
         endDate: endDate.format('YYYY-MM-DD'),
         resampleFreq: resample,
@@ -61,10 +68,18 @@ function Chart({ matchedSymbol, resample, onDataFetched }: TestChartProps) {
   const symbolHistogramChartRef = useRef<ISeriesApi<'Histogram'>>(null);
 
   useEffect(() => {
+    if (isLoading || isFetching) return;
+
     const source = createChartData(chartDataPayload?.data);
 
+    if (error) {
+      onDataFetched(source, error);
+
+      return;
+    }
+
     onDataFetched(source);
-  }, [chartDataPayload]); /* eslint-disable-line */
+  }, [chartDataPayload, status]); /* eslint-disable-line */
 
   if (isLoading || isFetching) {
     return (
@@ -78,7 +93,10 @@ function Chart({ matchedSymbol, resample, onDataFetched }: TestChartProps) {
 
   const source = createChartData(chartDataPayload.data);
 
-  const priceInfo = getPriceInfo({ today: matchedSymbol.price.today, yesterday: matchedSymbol.price.yesterday });
+  const priceInfo = getPriceInfo({
+    today: matchedSymbol?.price.today ?? ({ close: 0 } as any),
+    yesterday: matchedSymbol?.price.yesterday ?? ({ close: 0 } as any),
+  });
 
   const charts = {
     payload: [] as IChartApi[],

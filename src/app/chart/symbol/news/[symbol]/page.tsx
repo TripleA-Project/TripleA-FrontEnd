@@ -24,15 +24,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 async function SymbolNews({ params }: PageProps) {
-  const { data: matchedSymbolResponse, status } = await getSymbol({ symbol: params.symbol });
-
-  return (
-    <>
-      {status !== HttpStatusCode.Ok ? null : (
-        <SymbolNewsPage symbol={matchedSymbolResponse.data ? matchedSymbolResponse.data[0] : undefined} />
-      )}
-    </>
-  );
+  return <SymbolNewsPage symbolName={params.symbol} />;
 }
 
 export default SymbolNews;

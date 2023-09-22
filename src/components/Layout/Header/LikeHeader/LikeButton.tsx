@@ -10,7 +10,6 @@ import { disLikeSymbol, likeSymbol } from '@/service/symbol';
 import { LockNotificationTemplate } from '@/constants/notification';
 import { toastNotify } from '@/util/toastNotify';
 import { useLikes } from '@/hooks/useLikes';
-import type { Symbol } from '@/interfaces/Symbol';
 import type { APIResponse } from '@/interfaces/Dto/Core';
 
 type MutationType = 'like' | 'unlike';
@@ -25,10 +24,10 @@ interface HandleErrorArgs {
 }
 
 interface LikeButtonProps {
-  symbol?: Symbol;
+  symbolName?: string | null;
 }
 
-function LikeButton({ symbol }: LikeButtonProps) {
+function LikeButton({ symbolName }: LikeButtonProps) {
   const { likedSymbols, invalidateQuery, loginRequired, status: likesStatus } = useLikes();
 
   const [showSubscribeNotification, setShowSubscribeNotification] = useState(false);
@@ -44,7 +43,13 @@ function LikeButton({ symbol }: LikeButtonProps) {
       const { response } = error as AxiosError<APIResponse>;
 
       if (response?.data.status === HttpStatusCode.BadRequest) {
-        setShowSubscribeNotification(true);
+        if (type === 'like') {
+          setShowSubscribeNotification(true);
+
+          return;
+        }
+
+        toastNotify('error', '관심 심볼 삭제에 실패했습니다');
 
         return;
       }
@@ -83,36 +88,39 @@ function LikeButton({ symbol }: LikeButtonProps) {
     },
   );
 
-  function isLike(symbol: Symbol) {
+  function isLike(symbolName?: string | null) {
+    if (!symbolName) return false;
     if (likedSymbols.empty) return false;
 
-    return !!likedSymbols.symbols!.find(
-      (likedSymbol) => likedSymbol.symbol.toUpperCase() === symbol.symbol.toUpperCase(),
+    return !!likedSymbols.symbols?.find(
+      (likedSymbol) => likedSymbol.symbol.toUpperCase() === symbolName?.toUpperCase(),
     );
   }
 
-  function LikeHandler(symbol?: Symbol) {
-    if (!symbol) return;
-    if (likesStatus !== 'success') return;
+  function LikeHandler(symbolName?: string | null) {
     if (likeMutateStatus === 'loading' || unLikeMutateStatus === 'loading') return;
 
     if (loginRequired) {
-      toastNotify('error', '로그인 후 심볼추가/삭제가 가능합니다');
+      toastNotify('error', '로그인 후 심볼 추가/삭제가 가능합니다');
 
       return;
     }
 
-    if (isLike(symbol)) {
-      const unlikeId = likedSymbols.symbols!.find(
-        (likedSymbol) => likedSymbol.symbol.toUpperCase() === symbol.symbol.toUpperCase(),
-      )!.symbolId;
+    if (likesStatus !== 'success') {
+      toastNotify('error', '잠시 후 다시 시도해주세요');
+    }
+
+    if (isLike(symbolName)) {
+      const unlikeId =
+        likedSymbols.symbols?.find((likedSymbol) => likedSymbol.symbol.toUpperCase() === symbolName?.toUpperCase())
+          ?.symbolId ?? -1;
 
       unLikeMutate(unlikeId);
 
       return;
     }
 
-    likeMutate(symbol.symbol.toUpperCase());
+    likeMutate(symbolName?.toUpperCase() ?? 'undefinedSymbol');
   }
 
   if (likesStatus === 'loading') {
@@ -121,8 +129,8 @@ function LikeButton({ symbol }: LikeButtonProps) {
 
   return (
     <>
-      <button onClick={() => LikeHandler(symbol)}>
-        {symbol && isLike(symbol) ? <AppIcons.Heart.Fill.Orange /> : <AppIcons.Heart.Fill.Gray />}
+      <button onClick={() => LikeHandler(symbolName)}>
+        {isLike(symbolName) ? <AppIcons.Heart.Fill.Orange /> : <AppIcons.Heart.Fill.Gray />}
       </button>
       <LockNotification
         active={showSubscribeNotification}

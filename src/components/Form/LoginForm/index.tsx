@@ -77,6 +77,11 @@ function LoginForm({ continueURL }: LoginFormProps) {
         }
       }
 
+      queryClient.removeQueries({
+        predicate(query) {
+          return !query.queryHash.includes('profile');
+        },
+      });
       queryClient.invalidateQueries(['profile']);
 
       refresh();

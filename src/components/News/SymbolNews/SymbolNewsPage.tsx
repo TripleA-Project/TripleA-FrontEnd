@@ -2,19 +2,21 @@
 
 import { HttpStatusCode } from 'axios';
 import SymbolLikeHeader from '@/components/Layout/Header/LikeHeader/SymbolLikeHeader';
-import { Symbol } from '@/interfaces/Symbol';
 import { searchSymbolNews } from '@/service/news';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { ToastContainer } from 'react-toastify';
 import NewsList, { NewsListLoading } from '../NewsList';
 import InfiniteTrigger from '../InfiniteTrigger';
 import { NewsData } from '@/interfaces/NewsData';
+import FitPage from '@/components/Layout/FitPage';
+import { AppIcons } from '@/components/Icons';
+import SymbolNewsEmpty from './SymbolNewsEmpty';
 
 interface SymbolNewsPageProps {
-  symbol?: Symbol;
+  symbolName?: string;
 }
 
-function SymbolNewsPage({ symbol }: SymbolNewsPageProps) {
+function SymbolNewsPage({ symbolName }: SymbolNewsPageProps) {
   const queryClient = useQueryClient();
 
   const {
@@ -25,12 +27,12 @@ function SymbolNewsPage({ symbol }: SymbolNewsPageProps) {
     fetchNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery(
-    ['news', 'symbol', symbol?.symbol.toUpperCase()],
-    ({ pageParam = 0 }) => searchSymbolNews({ symbol: symbol!.symbol, page: pageParam }),
+    ['news', 'symbol', symbolName?.toUpperCase()],
+    ({ pageParam = 0 }) => searchSymbolNews({ symbol: symbolName ?? '', page: pageParam }),
     {
       retry: false,
       refetchOnWindowFocus: false,
-      enabled: !!symbol,
+      enabled: !!symbolName,
       getNextPageParam: (lastPage) => {
         const { data: LastPageResponse, status } = lastPage;
 
@@ -41,24 +43,36 @@ function SymbolNewsPage({ symbol }: SymbolNewsPageProps) {
     },
   );
 
+  const RenderNewsList = () => {
+    if (isSuccess) {
+      if (!symbolNewsPageResponse.pages[0].data.data?.news?.length) {
+        return <SymbolNewsEmpty />;
+      }
+
+      return (
+        <NewsList
+          newsList={symbolNewsPageResponse.pages.flatMap((page) =>
+            page.data.data?.news ? (page.data.data.news as NewsData[]) : [],
+          )}
+          onBookmark={() => {
+            queryClient.invalidateQueries(['news', 'symbol', symbolName?.toUpperCase()]);
+          }}
+        />
+      );
+    }
+
+    return null;
+  };
+
   return (
     <div className="box-border px-4">
       <section className="mb-4 mt-6">
-        <SymbolLikeHeader symbol={symbol} />
-        <h4 className="font-semibold">{`${symbol?.symbol.toUpperCase()} 관련 뉴스` ?? ''}</h4>
+        <SymbolLikeHeader symbolName={symbolName} />
+        <h4 className="font-semibold">{`${symbolName?.toUpperCase()} 관련 뉴스` ?? ''}</h4>
       </section>
       <section className="space-y-4">
-        {isSuccess ? (
-          <NewsList
-            newsList={symbolNewsPageResponse.pages.flatMap((page) =>
-              page.data.data?.news ? (page.data.data.news as NewsData[]) : [],
-            )}
-            onBookmark={() => {
-              queryClient.invalidateQueries(['news', 'symbol', symbol?.symbol.toUpperCase()]);
-            }}
-          />
-        ) : null}
-        {(isLoading || isFetchingNextPage) && hasNextPage ? <NewsListLoading /> : null}
+        <RenderNewsList />
+        {isLoading || (isFetchingNextPage && hasNextPage) ? <NewsListLoading /> : null}
       </section>
       {!isFetchingNextPage && hasNextPage ? (
         <InfiniteTrigger onTrigger={fetchNextPage} isFetching={isFetchingNextPage} hasNextPage={hasNextPage} />

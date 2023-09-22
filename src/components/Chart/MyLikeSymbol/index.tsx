@@ -7,7 +7,7 @@ import { SymbolCardList } from '../SymbolTabs/SymbolCard';
 
 function MyLikeSymbol() {
   const { data: likeSymbolPayload } = useQuery(['likedSymbolList'], () => getLikeSymbol(), {
-    retry: false,
+    retry: 0,
     refetchOnWindowFocus: false,
     select(response) {
       return response.data;
@@ -15,7 +15,7 @@ function MyLikeSymbol() {
     suspense: true,
   });
 
-  if (likeSymbolPayload?.data && !likeSymbolPayload.data?.length) {
+  if (likeSymbolPayload?.data && !likeSymbolPayload.data.length) {
     return (
       <div className="mb-3 mt-5 box-border space-y-4">
         <NoMySymbol />
@@ -25,7 +25,7 @@ function MyLikeSymbol() {
 
   return (
     <div className="mb-3 mt-5 box-border space-y-4">
-      <SymbolCardList symbols={likeSymbolPayload!.data!} />
+      <SymbolCardList symbols={likeSymbolPayload?.data!} />
     </div>
   );
 }

@@ -3,8 +3,6 @@ import { AxiosError, AxiosResponse, HttpStatusCode } from 'axios';
 import ChartUnauthorized from '../ErrorBoundary/ErrorFallback/Chart/Unauthorized';
 import ChartTimeout from '../ErrorBoundary/ErrorFallback/Chart/Timeout';
 import ChartInternalServerError from '../ErrorBoundary/ErrorFallback/Chart/InternalServerError';
-import NotFound from '../NotFound';
-import BackButtonHeader from '../Layout/Header/BackButtonHeader';
 import { TIMEOUT_CODE } from '@/service/axios';
 import { getProfile } from '@/service/user';
 import { getSymbol } from '@/service/symbol';
@@ -55,18 +53,20 @@ async function SymbolChartFetcher({ symbol, resample, children }: SymbolChartFet
   const profilePayload = (profileResponse as AxiosResponse<ProfileResponse>).data.data;
   const matchedSymbolPayload = (matchedSymbolResponse as AxiosResponse<GetSymbolResponse>).data.data;
 
-  if (!matchedSymbolPayload?.length) {
-    return (
-      <>
-        <BackButtonHeader />
-        <NotFound />
-      </>
-    );
-  }
+  // 추후 api 검색 개선될 경우
+  // 적용 예정
+  // if (!matchedSymbolPayload?.length) {
+  //   return (
+  //     <>
+  //       <BackButtonHeader />
+  //       <NotFound />
+  //     </>
+  //   );
+  // }
 
   const childComponent = cloneElement(children, {
     user: profilePayload,
-    matchedSymbol: matchedSymbolPayload[0],
+    matchedSymbol: matchedSymbolPayload ? matchedSymbolPayload[0] : null,
   });
 
   return <>{childComponent}</>;
