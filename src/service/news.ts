@@ -235,9 +235,7 @@ export async function getNewsHistory({ year, month }: GetNewsHistorySearchParam)
  * `id` 뉴스 아이디 [**number**]
  */
 export async function getNewsById({ id }: GetNewsByIdSearchParam) {
-  const getNewsByIdResponse = await moyaAxiosInstance.get<GetNewsByIdResponse>(
-    `/globalnews?id=${id}&token=${process.env.NEXT_PUBLIC_TOKEN}`,
-  );
+  const getNewsByIdResponse = await moyaAxiosInstance.get<GetNewsByIdResponse>(`/globalnews/${id}`);
 
   return getNewsByIdResponse;
 }
