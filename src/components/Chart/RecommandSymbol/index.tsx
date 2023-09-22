@@ -21,19 +21,9 @@ function RecommandSymbol() {
   }
 
   return (
-    <>
-      <div className="mb-3 mt-5 box-border space-y-4">
-        <SymbolLikeCardList symbols={recommandSymbolPayload!.data!} />
-      </div>
-      <ToastContainer
-        position="bottom-center"
-        autoClose={3000}
-        hideProgressBar
-        newestOnTop={true}
-        pauseOnFocusLoss={false}
-        pauseOnHover={false}
-      />
-    </>
+    <div className="mb-3 mt-5 box-border space-y-4">
+      <SymbolLikeCardList symbols={recommandSymbolPayload!.data!} />
+    </div>
   );
 }
 

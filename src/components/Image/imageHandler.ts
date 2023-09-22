@@ -49,8 +49,6 @@ export class ImageHandler {
     Card: {
       Load(e: React.SyntheticEvent<HTMLImageElement, Event>) {
         ImageHandler.removeLoadingClassName(e);
-
-        e.currentTarget.parentElement!.classList.add('!bg-[#FFF0E4]');
       },
       Error(e: React.SyntheticEvent<HTMLImageElement, Event>) {
         ImageHandler.setErrorDefaultSrc(e, '/LogoGray.svg');

@@ -39,12 +39,7 @@ function createMatchSymbolElement({
         className="box-border flex items-center gap-4 p-4"
         onClick={handleClick}
       >
-        <SymbolLogoImage
-          symbol={symbol.symbol}
-          src={symbol.logo}
-          type="Card"
-          style={{ wrapper: { backgroundColor: '#fff' } }}
-        />
+        <SymbolLogoImage symbol={symbol.symbol} src={symbol.logo} type="Card" />
         <div className="max-w-[calc(100%-64px)] flex-1 truncate mobile:max-w-[calc(100vw-64px)] pc:max-w-[calc(100%-64px)]">
           <div>
             <span className="font-semibold text-[#131F3C]">{symbol.symbol}</span>
@@ -66,12 +61,7 @@ function createMatchSymbolElement({
       className="box-border flex items-center gap-4 p-4"
       onClick={handleClick}
     >
-      <SymbolLogoImage
-        symbol={symbol.symbol}
-        src={symbol.logo}
-        type="Card"
-        style={{ wrapper: { backgroundColor: '#fff' } }}
-      />
+      <SymbolLogoImage symbol={symbol.symbol} src={symbol.logo} type="Card" />
       <div className="max-w-[calc(100%-64px)] flex-1 truncate mobile:max-w-[calc(100vw-64px)] pc:max-w-[calc(100%-64px)]">
         <div>
           {beforeHighlightText ? <span className="font-semibold text-[#131F3C]">{beforeHighlightText}</span> : null}

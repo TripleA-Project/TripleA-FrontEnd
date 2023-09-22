@@ -7,6 +7,7 @@ interface SymbolCardListLoadingProps {
 
 interface SymbolCardListProps {
   symbols: Symbol[];
+  logoBgColor?: string;
 }
 
 export function SymbolCardListLoading({ length = 3 }: SymbolCardListLoadingProps) {
@@ -19,11 +20,11 @@ export function SymbolCardListLoading({ length = 3 }: SymbolCardListLoadingProps
   );
 }
 
-function SymbolCardList({ symbols }: SymbolCardListProps) {
+function SymbolCardList({ symbols, logoBgColor }: SymbolCardListProps) {
   return (
     <>
       {symbols.map((symbol, index) => (
-        <SymbolCard key={`${symbol.symbol}-${symbol.symbolId}-${index}`} symbol={symbol} />
+        <SymbolCard key={`${symbol.symbol}-${symbol.symbolId}-${index}`} symbol={symbol} logoBgColor={logoBgColor} />
       ))}
     </>
   );

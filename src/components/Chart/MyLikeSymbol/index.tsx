@@ -3,7 +3,7 @@
 import { getLikeSymbol } from '@/service/symbol';
 import { useQuery } from '@tanstack/react-query';
 import NoMySymbol from './NoMySymbol';
-import { SymbolCardList } from '../SymbolTabs/SymbolCard';
+import { SymbolLikeCardList } from '../SymbolTabs/SymbolCard';
 
 function MyLikeSymbol() {
   const { data: likeSymbolPayload } = useQuery(['likedSymbolList'], () => getLikeSymbol(), {
@@ -25,7 +25,7 @@ function MyLikeSymbol() {
 
   return (
     <div className="mb-3 mt-5 box-border space-y-4">
-      <SymbolCardList symbols={likeSymbolPayload?.data!} />
+      <SymbolLikeCardList symbols={likeSymbolPayload?.data!} />
     </div>
   );
 }

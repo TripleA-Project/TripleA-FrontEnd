@@ -5,11 +5,12 @@ import ChartHomeHeader from '../Layout/Header/ChartHomeHeader';
 import SymbolTab from './SymbolTabs';
 import RecommandSymbol from './RecommandSymbol';
 import MyLikeSymbol from './MyLikeSymbol';
-import { SymbolCardListLoading, SymbolLikeCardListLoading } from './SymbolTabs/SymbolCard';
+import { SymbolLikeCardListLoading } from './SymbolTabs/SymbolCard';
 import { syncCookie } from '@/util/cookies';
 import type { ProfilePayload } from '@/interfaces/Dto/User';
 import { ErrorBoundary } from 'react-error-boundary';
 import ChartHomeClientAPIErrorFallback from '../ErrorBoundary/ErrorFallback/Chart/ChartHomeClientAPIFallback';
+import { ToastContainer } from 'react-toastify';
 
 export type ChartHomeTab = 'recommandSymbol' | 'likeSymbol';
 
@@ -22,7 +23,7 @@ function ChartPageHome({ tab, user }: ChartPageHomeProps) {
   const Loading = () => {
     switch (tab) {
       case 'likeSymbol':
-        return <SymbolCardListLoading />;
+        return <SymbolLikeCardListLoading />;
       case 'recommandSymbol':
         return <SymbolLikeCardListLoading />;
     }
@@ -58,6 +59,14 @@ function ChartPageHome({ tab, user }: ChartPageHomeProps) {
           </Suspense>
         </ErrorBoundary>
       </div>
+      <ToastContainer
+        position="bottom-center"
+        autoClose={3000}
+        hideProgressBar
+        newestOnTop={true}
+        pauseOnFocusLoss={false}
+        pauseOnHover={false}
+      />
     </>
   );
 }
