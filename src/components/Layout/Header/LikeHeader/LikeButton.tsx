@@ -7,9 +7,9 @@ import SkeletonLike from './SkeletonLike';
 import { AppIcons } from '@/components/Icons';
 import { LockNotification } from '@/components/Notification';
 import { disLikeSymbol, likeSymbol } from '@/service/symbol';
+import { useLikedSymbols } from '@/hooks/useLikedSymbols';
 import { LockNotificationTemplate } from '@/constants/notification';
 import { toastNotify } from '@/util/toastNotify';
-import { useLikes } from '@/hooks/useLikes';
 import type { APIResponse } from '@/interfaces/Dto/Core';
 
 type MutationType = 'like' | 'unlike';
@@ -25,15 +25,27 @@ interface HandleErrorArgs {
 
 interface LikeButtonProps {
   symbolName?: string | null;
+  suspense?: boolean;
+  useErrorBoundary?: boolean;
 }
 
-function LikeButton({ symbolName }: LikeButtonProps) {
-  const { likedSymbols, invalidateQuery, loginRequired, status: likesStatus } = useLikes();
+/**
+ * symbol의 like 버튼
+ *
+ * @param symbolName 심볼이름
+ */
+function LikeButton({ symbolName, suspense, useErrorBoundary }: LikeButtonProps) {
+  const {
+    likedSymbols,
+    invalidateQuery,
+    loginRequired,
+    status: likedSymbolsStatus,
+  } = useLikedSymbols({ suspense, useErrorBoundary });
 
   const [showSubscribeNotification, setShowSubscribeNotification] = useState(false);
 
   const handleSuccess = async ({ type }: HandleSuccessArgs) => {
-    await invalidateQuery.likedSymbol();
+    await invalidateQuery.likedSymbols();
 
     toastNotify('success', `관심 심볼 ${type === 'like' ? '생성' : '삭제'}에 성공했습니다`);
   };
@@ -99,6 +111,7 @@ function LikeButton({ symbolName }: LikeButtonProps) {
 
   function LikeHandler(symbolName?: string | null) {
     if (likeMutateStatus === 'loading' || unLikeMutateStatus === 'loading') return;
+    if (likedSymbolsStatus === 'fetching') return;
 
     if (loginRequired) {
       toastNotify('error', '로그인 후 심볼 추가/삭제가 가능합니다');
@@ -106,7 +119,7 @@ function LikeButton({ symbolName }: LikeButtonProps) {
       return;
     }
 
-    if (likesStatus !== 'success') {
+    if (likedSymbolsStatus !== 'success') {
       toastNotify('error', '잠시 후 다시 시도해주세요');
     }
 
@@ -123,7 +136,7 @@ function LikeButton({ symbolName }: LikeButtonProps) {
     likeMutate(symbolName?.toUpperCase() ?? 'undefinedSymbol');
   }
 
-  if (likesStatus === 'loading') {
+  if (likedSymbolsStatus === 'loading') {
     return <SkeletonLike />;
   }
 

@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { getProfile } from '@/service/user';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosError, HttpStatusCode } from 'axios';
-import { APIResponse } from '@/interfaces/Dto/Core';
+import { getProfile } from '@/service/user';
 import { TIMEOUT_CODE } from '@/service/axios';
+import { ReactQueryHashKeys } from '@/constants/queryHashKeys';
+import type { APIResponse } from '@/interfaces/Dto/Core';
 
 type ErrorType = 'Unauthorized' | 'Timeout' | 'InternalServerError';
 
@@ -18,7 +19,7 @@ export function useUser() {
     isFetching,
     error,
     refetch,
-  } = useQuery(['profile'], () => getProfile(), {
+  } = useQuery(ReactQueryHashKeys.getProfile, () => getProfile(), {
     retry: 0,
     refetchOnWindowFocus: false,
     select(response) {
@@ -54,10 +55,10 @@ export function useUser() {
     errorType,
     refetchUser: refetch,
     invalidateQuery() {
-      return queryClient.invalidateQueries(['profile']);
+      return queryClient.invalidateQueries(ReactQueryHashKeys.getProfile);
     },
     removeQuery() {
-      queryClient.removeQueries(['profile']);
+      queryClient.removeQueries(ReactQueryHashKeys.getProfile);
     },
   };
 }

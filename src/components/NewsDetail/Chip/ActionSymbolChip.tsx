@@ -8,21 +8,21 @@ import { disLikeSymbol, likeSymbol } from '@/service/symbol';
 import { toastNotify } from '@/util/toastNotify';
 import GuardBox from '@/components/UI/GuardBox';
 import MuiSpinner from '@/components/UI/Spinner/MuiSpinner';
-import { useLikes } from '@/hooks/useLikes';
-import { type APIResponse } from '@/interfaces/Dto/Core';
-import { type NewsDetailSymbol } from '@/interfaces/Dto/News';
+import { useLikedSymbols } from '@/hooks/useLikedSymbols';
+import type { APIResponse } from '@/interfaces/Dto/Core';
+import type { NewsDetailSymbol } from '@/interfaces/Dto/News';
 
 interface ActionSymbolChipProps {
   symbol: NewsDetailSymbol;
 }
 
 function ActionSymbolChip({ symbol }: ActionSymbolChipProps) {
-  const { likedSymbols, loginRequired, invalidateQuery, status: likesStatus, isFetching: isLikesFetching } = useLikes();
+  const { likedSymbols, loginRequired, invalidateQuery, status: likedSymbolsStatus } = useLikedSymbols();
 
   const [isMutationFetching, setIsMutationFetching] = useState(false);
 
   function isLike() {
-    if (likesStatus === 'loading' || isLikesFetching) return false;
+    if (likedSymbolsStatus === 'loading' || likedSymbolsStatus === 'fetching') return false;
     if (loginRequired) return false;
 
     return !!likedSymbols.symbols?.find(
@@ -32,7 +32,7 @@ function ActionSymbolChip({ symbol }: ActionSymbolChipProps) {
 
   const { mutateAsync: like } = useMutation((symbol: string) => likeSymbol({ symbol }), {
     onSuccess() {
-      invalidateQuery.likedSymbol();
+      invalidateQuery.likedSymbols();
 
       toastNotify('success', '관심 심볼 생성 성공');
     },
@@ -62,7 +62,7 @@ function ActionSymbolChip({ symbol }: ActionSymbolChipProps) {
 
   const { mutateAsync: unlike } = useMutation((id: number) => disLikeSymbol({ id }), {
     onSuccess() {
-      invalidateQuery.likedSymbol();
+      invalidateQuery.likedSymbols();
 
       toastNotify('success', '관심 심볼 삭제 성공');
     },
@@ -79,16 +79,14 @@ function ActionSymbolChip({ symbol }: ActionSymbolChipProps) {
       return { type: 'api', status: 'loading' };
     }
 
-    setIsMutationFetching((prev) => true);
-
-    if (likesStatus === 'loading' || isLikesFetching) {
-      setIsMutationFetching((prev) => false);
-
+    if (likedSymbolsStatus === 'loading' || likedSymbolsStatus === 'fetching') {
       return {
         type: 'api',
         status: 'loading',
       };
     }
+
+    setIsMutationFetching((prev) => true);
 
     const liked = isLike();
 
@@ -140,9 +138,9 @@ function ActionSymbolChip({ symbol }: ActionSymbolChipProps) {
           </div>
         </div>
       ) : null}
-      <GuardBox activeGuard={isLikesFetching} />
+      <GuardBox activeGuard={likedSymbolsStatus === 'fetching'} />
       <SymbolChip
-        loading={likesStatus === 'loading'}
+        loading={likedSymbolsStatus === 'loading'}
         symbol={symbol as any}
         selected={isLike()}
         onChange={handleChange}

@@ -15,7 +15,7 @@ import { LockNotification } from '@/components/Notification';
 import { LockNotificationTemplate } from '@/constants/notification';
 import CategoryFormUnauthorized from '@/components/ErrorBoundary/ErrorFallback/CategoryForm/Unauthorized';
 import CategoryEditResultModal, { CategoryEditResultModalProps } from './ResultModal/Modal';
-import { useLikes } from '@/hooks/useLikes';
+import { useLikedCategories } from '@/hooks/useLikedCategories';
 import useCategoryAsyncMutation from '@/hooks/useCategoryAsyncMutation';
 import type { UseStepFormContext } from '../StepForm';
 import type { Category } from '@/interfaces/Category';
@@ -68,9 +68,8 @@ function CategoryForm({ buttonText = '선택 완료' }: CategoryFormProps) {
     invalidateQuery,
     removeQuery,
     loginRequired,
-    status: likedCategoryStatus,
-    isFetching: isLikesFetching,
-  } = useLikes();
+    status: likedCategoriesStatus,
+  } = useLikedCategories();
 
   const { dispatch, requestLikeCategoryMap, requestUnLikeCategoryMap, selectedCategoryMap } = useCategoryList();
   const [searchedCategories, setSearchedCategories] = useState<Category[]>([]);
@@ -134,40 +133,35 @@ function CategoryForm({ buttonText = '선택 완료' }: CategoryFormProps) {
     e.preventDefault();
 
     if (Object.keys(requestUnLikeCategoryMap).length) {
-      if (!likedCategories.categories) return;
-
       /*
         unlike : 관심카테고리 응답에서의 id로 요청해야 함
       */
       await Promise.allSettled([
         ...Object.values(requestUnLikeCategoryMap).map((requestCategory) => {
-          // const unlikeTarget = likedCategories.categories!.find(
-          //   (likedCategory) => likedCategory.category === categoryName,
-          // );
-
           return unlike({ requestId: requestCategory.categoryId, category: requestCategory });
         }),
       ]);
     }
 
     if (Object.keys(requestLikeCategoryMap).length) {
-      if (!likedCategories.allCategories) return;
-
       /*
         like : 전체 카테고리 id로 요청해야 함
       */
       await Promise.allSettled([
         ...Object.keys(requestLikeCategoryMap).map((categoryName) => {
-          const likeTarget = likedCategories.allCategories!.find(
+          const likeTarget = likedCategories.allCategories?.find(
             (likedCategory) => likedCategory.category === categoryName,
           );
 
-          return like({ requestId: likeTarget!.categoryId, category: likeTarget! });
+          return like({
+            requestId: likeTarget?.categoryId ?? -1,
+            category: likeTarget ?? { categoryId: -1, category: categoryName },
+          });
         }),
       ]);
     }
 
-    invalidateQuery.likedCategory();
+    invalidateQuery.likedCategories();
 
     setIsSubmit(true);
   };
@@ -184,15 +178,14 @@ function CategoryForm({ buttonText = '선택 완료' }: CategoryFormProps) {
 
       window.removeEventListener('resize', resizeThrottle);
 
-      removeQuery.likedSymbol();
-      removeQuery.likedCategory();
+      removeQuery.all();
 
       syncCategories();
     };
   }, []); /* eslint-disable-line */
 
   useEffect(() => {
-    if (!isLikesFetching && likedCategoryStatus === 'success') {
+    if (likedCategoriesStatus === 'success') {
       syncCategories();
     }
 
@@ -204,7 +197,7 @@ function CategoryForm({ buttonText = '선택 완료' }: CategoryFormProps) {
       const { success, fail } = getResultList();
 
       if (pathName?.startsWith('/signup')) {
-        await invalidateQuery.likedCategory();
+        await invalidateQuery.likedCategories();
 
         formContext.done();
 
@@ -242,7 +235,7 @@ function CategoryForm({ buttonText = '선택 완료' }: CategoryFormProps) {
 
       setIsSubmit(false);
     })();
-  }, [isSubmit, likedCategoryStatus, isLikesFetching]); /* eslint-disable-line */
+  }, [isSubmit, likedCategoriesStatus]); /* eslint-disable-line */
 
   if (loginRequired || isUnauthorizedMutation) {
     return <CategoryFormUnauthorized />;
@@ -263,10 +256,10 @@ function CategoryForm({ buttonText = '선택 완료' }: CategoryFormProps) {
         <SearchCategory
           submitWrapper={submitWrapperRef.current}
           onSearch={(categories) => setSearchedCategories(categories)}
-          disabled={likedCategoryStatus === 'loading' || isLikesFetching}
+          disabled={likedCategoriesStatus === 'loading' || likedCategoriesStatus === 'fetching'}
         />
         <SearchCategoryResult
-          isSyncing={isLikesFetching}
+          isSyncing={likedCategoriesStatus === 'fetching'}
           categories={searchedCategories}
           onDispatch={(requiredSubscribe) => {
             if (requiredSubscribe) {
@@ -276,7 +269,7 @@ function CategoryForm({ buttonText = '선택 완료' }: CategoryFormProps) {
         />
         <div ref={submitWrapperRef} className={`fixed_inner fixed bottom-12 `}>
           <SelectedCategoryHorizonList
-            loading={likedCategoryStatus === 'loading' || isLikesFetching}
+            loading={likedCategoriesStatus === 'loading' || likedCategoriesStatus === 'fetching'}
             shadowEffect
             closeButton
             categories={selectedCategories}
@@ -284,7 +277,12 @@ function CategoryForm({ buttonText = '선택 완료' }: CategoryFormProps) {
           <div className="mx-auto mt-4 w-full">
             <Button
               type="submit"
-              disabled={likedCategoryStatus === 'loading' || hasNotRequest || isFetching || isLikesFetching}
+              disabled={
+                likedCategoriesStatus === 'loading' ||
+                hasNotRequest ||
+                isFetching ||
+                likedCategoriesStatus === 'fetching'
+              }
               bgColorTheme="orange"
               textColorTheme="white"
               fullWidth

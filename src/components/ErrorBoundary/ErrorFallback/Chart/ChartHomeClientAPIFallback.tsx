@@ -1,7 +1,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { AxiosError } from 'axios';
+import { AxiosError, HttpStatusCode } from 'axios';
 import { QueryClient, useQueryClient } from '@tanstack/react-query';
 import Button from '@/components/Button/Button';
 import { NotificationIcons } from '@/components/Notification/NotificationIcons';
@@ -9,6 +9,7 @@ import { TIMEOUT_CODE } from '@/service/axios';
 import { type FallbackProps } from 'react-error-boundary';
 import { type APIResponse } from '@/interfaces/Dto/Core';
 import FitPage from '@/components/Layout/FitPage';
+import { ReactQueryHashKeys } from '@/constants/queryHashKeys';
 
 interface ErrorMeta {
   icon?: React.ReactNode;
@@ -23,11 +24,16 @@ function createErrorMeta({
   queryClient,
   tab,
 }: FallbackProps & { queryClient: QueryClient; tab: string | null }): ErrorMeta {
+  const retryQuery = () => {
+    queryClient.refetchQueries(ReactQueryHashKeys.getLikedSymbols);
+    queryClient.refetchQueries(ReactQueryHashKeys.getRecommandSymbols);
+
+    resetErrorBoundary();
+  };
+
   const resetQuery = () => {
-    queryClient.refetchQueries(['likedSymbolList']);
-    if (tab === 'recommandSymbol') {
-      queryClient.refetchQueries(['symbol', 'recommand']);
-    }
+    queryClient.removeQueries(ReactQueryHashKeys.getLikedSymbols);
+    queryClient.removeQueries(ReactQueryHashKeys.getRecommandSymbols);
 
     resetErrorBoundary();
   };
@@ -37,24 +43,46 @@ function createErrorMeta({
 
     if (code === TIMEOUT_CODE) {
       return {
-        icon: <NotificationIcons.Error />,
+        icon: <NotificationIcons.Error className="text-4xl" />,
         title: '요청 만료',
         content: `
           요청을 처리하는 시간이 오래걸려
           중단되었습니다.
-          이용에 붎편을 드려 죄송합니다.
+          이용에 불편을 드려 죄송합니다.
         `,
         button: (
           <Button
             bgColorTheme="orange"
             textColorTheme="white"
-            fullWidth
-            className="h-fit w-fit !px-2 !py-1"
+            className="h-fit w-fit px-2 py-1"
+            onClick={() => {
+              retryQuery();
+            }}
+          >
+            다시 시도하기
+          </Button>
+        ),
+      };
+    }
+
+    if (response?.data.status === HttpStatusCode.Unauthorized) {
+      return {
+        icon: <NotificationIcons.VeryDissatisfied className="text-4xl" />,
+        title: '로그인',
+        content: `
+          로그인 후
+          차트 페이지를 볼 수 있습니다
+        `,
+        button: (
+          <Button
+            bgColorTheme="orange"
+            textColorTheme="white"
+            className="h-fit w-fit px-2 py-1"
             onClick={() => {
               resetQuery();
             }}
           >
-            다시 시도하기
+            로그인
           </Button>
         ),
       };
@@ -72,10 +100,9 @@ function createErrorMeta({
       <Button
         bgColorTheme="orange"
         textColorTheme="white"
-        fullWidth
-        className="h-fit w-fit !px-2 !py-1"
+        className="h-fit w-fit px-2 py-1"
         onClick={() => {
-          resetQuery();
+          retryQuery();
         }}
       >
         다시 시도하기
@@ -97,7 +124,7 @@ function ChartHomeClientAPIErrorFallback({ error, resetErrorBoundary }: Fallback
         {icon}
         <h3 className="mb-2.5 text-2xl font-bold text-[#FD954A]">{title}</h3>
         <p
-          className="text-center text-[#4E525D]"
+          className="mb-2 text-center text-[#4E525D]"
           dangerouslySetInnerHTML={{ __html: content.trim().replaceAll('\n', '<br />') }}
         />
         {button ?? null}

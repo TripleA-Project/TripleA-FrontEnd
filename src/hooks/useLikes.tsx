@@ -5,6 +5,7 @@ import { AxiosError, HttpStatusCode } from 'axios';
 import { getAllCategory, getLikeCategory } from '@/service/category';
 import { TIMEOUT_CODE } from '@/service/axios';
 import { getLikeSymbol } from '@/service/symbol';
+import { ReactQueryHashKeys } from '@/constants/queryHashKeys';
 import type { Symbol } from '@/interfaces/Symbol';
 import type { Category } from '@/interfaces/Category';
 import type { APIResponse } from '@/interfaces/Dto/Core';
@@ -27,21 +28,25 @@ export const useLikes = () => {
   const queryClient = useQueryClient();
 
   // useQuery
-  const { data: allCategories, status: allCategoriesStatus } = useQuery(['allCategories'], () => getAllCategory(), {
-    retry: 0,
-    refetchOnWindowFocus: false,
-    select(response) {
-      return response.data;
+  const { data: allCategories, status: allCategoriesStatus } = useQuery(
+    ReactQueryHashKeys.getAllCategories,
+    () => getAllCategory(),
+    {
+      retry: 0,
+      refetchOnWindowFocus: false,
+      select(response) {
+        return response.data;
+      },
+      cacheTime: Infinity,
     },
-    cacheTime: Infinity,
-  });
+  );
 
   const {
     data: likedCategory,
     status: likedCategoryStatus,
     error: likedCategoryError,
     isRefetching: isLikedCategoryFetching,
-  } = useQuery(['likedCategoryList'], () => getLikeCategory(), {
+  } = useQuery(ReactQueryHashKeys.getLikedCategories, () => getLikeCategory(), {
     retry: 0,
     refetchOnWindowFocus: false,
     select(response) {
@@ -54,7 +59,7 @@ export const useLikes = () => {
     status: likedSymbolStatus,
     error: likedSymbolError,
     isRefetching: isLikedSymbolFetching,
-  } = useQuery(['likedSymbolList'], () => getLikeSymbol(), {
+  } = useQuery(ReactQueryHashKeys.getLikedSymbols, () => getLikeSymbol(), {
     retry: 0,
     refetchOnWindowFocus: false,
     select(response) {
@@ -214,18 +219,18 @@ export const useLikes = () => {
     isFetching: isLikedSymbolFetching || isLikedCategoryFetching,
     invalidateQuery: {
       likedSymbol() {
-        return queryClient.invalidateQueries(['likedSymbolList']);
+        return queryClient.invalidateQueries(ReactQueryHashKeys.getLikedSymbols);
       },
       likedCategory() {
-        return queryClient.invalidateQueries(['likedCategoryList']);
+        return queryClient.invalidateQueries(ReactQueryHashKeys.getLikedCategories);
       },
     },
     removeQuery: {
       likedSymbol() {
-        queryClient.removeQueries(['likedSymbolList']);
+        queryClient.removeQueries(ReactQueryHashKeys.getLikedSymbols);
       },
       likedCategory() {
-        queryClient.removeQueries(['likedCategoryList']);
+        queryClient.removeQueries(ReactQueryHashKeys.getLikedCategories);
       },
     },
   };

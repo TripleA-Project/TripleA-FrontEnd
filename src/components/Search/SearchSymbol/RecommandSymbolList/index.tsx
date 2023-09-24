@@ -1,10 +1,9 @@
 'use client';
 
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
 import DispatchSearchSymbolChip from '../DispatchSearchSymbolChip';
 import GuardBox from '@/components/UI/GuardBox';
-import { getRecommandSymbol } from '@/service/symbol';
+import useRecommandSymbols from '@/hooks/useRecommandSymbols';
 
 interface RecommandSymbolListProps {
   isSyncing?: boolean;
@@ -12,19 +11,9 @@ interface RecommandSymbolListProps {
 }
 
 function RecommandSymbolList({ onDispatch, isSyncing }: RecommandSymbolListProps) {
-  const { data: recommandSymbolPayload, error } = useQuery(['symbol', 'recommand'], () => getRecommandSymbol(), {
-    retry: 0,
-    refetchOnWindowFocus: false,
-    select(response) {
-      return response.data;
-    },
-    suspense: true,
-    useErrorBoundary: false,
-  });
+  const { recommandSymbols } = useRecommandSymbols({ suspense: true });
 
-  if (!recommandSymbolPayload) return null;
-
-  if (!recommandSymbolPayload?.data?.length || error) {
+  if (recommandSymbols.empty) {
     return <p className="text-[#9AA2A9]">요즘 뜨는 종목을 제공할 수 없습니다.</p>;
   }
 
@@ -32,7 +21,7 @@ function RecommandSymbolList({ onDispatch, isSyncing }: RecommandSymbolListProps
     <div className="h-[160px] w-max overflow-auto scrollbar-thin scrollbar-thumb-[#DBDEE1] scrollbar-thumb-rounded-lg">
       <div className="relative flex flex-col gap-3">
         <GuardBox activeGuard={isSyncing} />
-        {recommandSymbolPayload.data.map((symbol, idx) => (
+        {recommandSymbols.symbols!.map((symbol, idx) => (
           <DispatchSearchSymbolChip
             key={`recommand-${symbol.symbol.toUpperCase()}-${idx}`}
             symbol={symbol}

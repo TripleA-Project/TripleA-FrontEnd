@@ -10,6 +10,7 @@ import { GrCircleAlert } from 'react-icons/gr';
 import { BsFillEyeFill, BsFillEyeSlashFill } from 'react-icons/bs';
 import { AppLogos } from '@/components/Icons';
 import Button from '@/components/Button/Button';
+import { ReactQueryHashKeys } from '@/constants/queryHashKeys';
 import { login } from '@/service/auth';
 import { validateEmail } from '@/util/validate';
 import { deleteCookie, getCookie, setCookie } from '@/util/cookies';
@@ -82,7 +83,7 @@ function LoginForm({ continueURL }: LoginFormProps) {
           return !query.queryHash.includes('profile');
         },
       });
-      queryClient.invalidateQueries(['profile']);
+      queryClient.invalidateQueries(ReactQueryHashKeys.getProfile);
 
       refresh();
 

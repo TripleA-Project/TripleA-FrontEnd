@@ -5,7 +5,6 @@ export function toastNotify(type: ToastOptions['type'], message: string, contain
   return toast(message, {
     type,
     style: {
-      margin: '0 16px 120px',
       background: 'rgba(0,0,0,.8)',
       color: '#fff',
       overflow: 'hidden',

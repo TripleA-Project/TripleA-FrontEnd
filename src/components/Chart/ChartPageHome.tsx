@@ -1,39 +1,40 @@
 'use client';
 
 import React, { Suspense, useEffect } from 'react';
-import ChartHomeHeader from '../Layout/Header/ChartHomeHeader';
+import { ErrorBoundary } from 'react-error-boundary';
+import { usePageTab } from '@/redux/slice/pageTabSlice';
 import SymbolTab from './SymbolTabs';
 import RecommandSymbol from './RecommandSymbol';
 import MyLikeSymbol from './MyLikeSymbol';
+import { ToastContainer } from 'react-toastify';
 import { SymbolLikeCardListLoading } from './SymbolTabs/SymbolCard';
+import ChartHomeClientAPIErrorFallback from '../ErrorBoundary/ErrorFallback/Chart/ChartHomeClientAPIFallback';
 import { syncCookie } from '@/util/cookies';
 import type { ProfilePayload } from '@/interfaces/Dto/User';
-import { ErrorBoundary } from 'react-error-boundary';
-import ChartHomeClientAPIErrorFallback from '../ErrorBoundary/ErrorFallback/Chart/ChartHomeClientAPIFallback';
-import { ToastContainer } from 'react-toastify';
 
-export type ChartHomeTab = 'recommandSymbol' | 'likeSymbol';
+export type ChartHomeTab = 'likedSymbols' | 'recommandSymbols';
 
 export interface ChartPageHomeProps {
-  tab: ChartHomeTab;
   user?: ProfilePayload;
 }
 
-function ChartPageHome({ tab, user }: ChartPageHomeProps) {
+function ChartPageHome({ user }: ChartPageHomeProps) {
+  const { pageTabs } = usePageTab();
+
   const Loading = () => {
-    switch (tab) {
-      case 'likeSymbol':
+    switch (pageTabs.chartPageHomeTab) {
+      case 'likedSymbols':
         return <SymbolLikeCardListLoading />;
-      case 'recommandSymbol':
+      case 'recommandSymbols':
         return <SymbolLikeCardListLoading />;
     }
   };
 
   const RenderTabComponent = () => {
-    switch (tab) {
-      case 'likeSymbol':
+    switch (pageTabs.chartPageHomeTab) {
+      case 'likedSymbols':
         return <MyLikeSymbol />;
-      case 'recommandSymbol':
+      case 'recommandSymbols':
         return <RecommandSymbol />;
     }
   };
@@ -43,22 +44,19 @@ function ChartPageHome({ tab, user }: ChartPageHomeProps) {
   }, []); /* eslint-disable-line */
 
   return (
-    <>
-      <ChartHomeHeader />
-      <div className={`box-border px-4`}>
-        <SymbolTab />
-        <ErrorBoundary FallbackComponent={ChartHomeClientAPIErrorFallback}>
-          <Suspense
-            fallback={
-              <div className="mt-5">
-                <Loading />
-              </div>
-            }
-          >
-            <RenderTabComponent />
-          </Suspense>
-        </ErrorBoundary>
-      </div>
+    <div className="box-border px-4">
+      <SymbolTab />
+      <ErrorBoundary FallbackComponent={ChartHomeClientAPIErrorFallback}>
+        <Suspense
+          fallback={
+            <div className="mb-3 mt-5 box-border space-y-4">
+              <Loading />
+            </div>
+          }
+        >
+          <RenderTabComponent />
+        </Suspense>
+      </ErrorBoundary>
       <ToastContainer
         position="bottom-center"
         autoClose={3000}
@@ -67,7 +65,7 @@ function ChartPageHome({ tab, user }: ChartPageHomeProps) {
         pauseOnFocusLoss={false}
         pauseOnHover={false}
       />
-    </>
+    </div>
   );
 }
 

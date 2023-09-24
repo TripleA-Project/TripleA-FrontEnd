@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import type { ChartHomeTab } from '@/components/Chart/ChartPageHome';
 import ChartHomeHeader from '@/components/Layout/Header/ChartHomeHeader';
 import ChartHomeGuard from '@/components/Chart/ChartHomeGuard';
 import ChartPageHome from '@/components/Chart/ChartPageHome';
@@ -20,10 +19,10 @@ export const metadata: Metadata = {
   description: 'Triple A 차트',
 };
 
-const ChartHomeTabs = ['likeSymbol', 'recommandSymbol'];
+const ChartHomeTabs = ['likedSymbols', 'recommandSymbols'];
 
 function ChartHome({ searchParams }: ChartHomeProps) {
-  const tab = searchParams.tab || 'likeSymbol';
+  const tab = searchParams.tab || 'likedSymbols';
 
   if (!ChartHomeTabs.includes(tab)) {
     return (
@@ -36,9 +35,10 @@ function ChartHome({ searchParams }: ChartHomeProps) {
 
   return (
     <>
+      <ChartHomeHeader />
       {/* @ts-expect-error server component */}
       <ChartHomeGuard>
-        <ChartPageHome tab={tab as ChartHomeTab} />
+        <ChartPageHome />
       </ChartHomeGuard>
     </>
   );

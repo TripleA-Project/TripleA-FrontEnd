@@ -1,25 +1,14 @@
 'use client';
 
 import React from 'react';
-import { getLikeCategory } from '@/service/category';
-import { useQuery } from '@tanstack/react-query';
 import Accordion from '..';
 import Link from 'next/link';
 import { AppIcons } from '@/components/Icons';
 import CategoryChip from '@/components/UI/Chip/CategoryChip';
+import { useLikedCategories } from '@/hooks/useLikedCategories';
 
 function CategoryAccordion() {
-  const { data: likedCategory, status: likedCategoryStatus } = useQuery(
-    ['likedCategoryList'],
-    () => getLikeCategory(),
-    {
-      retry: 0,
-      refetchOnWindowFocus: false,
-      select(payload) {
-        return payload.data;
-      },
-    },
-  );
+  const { likedCategories, status } = useLikedCategories();
 
   return (
     <Accordion
@@ -33,16 +22,16 @@ function CategoryAccordion() {
       }
       detail={
         <div className="flex max-h-[252px] w-max flex-col gap-3 overflow-auto scrollbar-none">
-          {likedCategoryStatus === 'loading' ? (
+          {status === 'loading' ? (
             <>
               {Array.from({ length: 3 }).map((_, idx) => (
                 <CategoryChip key={idx} loading />
               ))}
             </>
           ) : null}
-          {likedCategory?.data ? (
+          {likedCategories?.categories ? (
             <>
-              {likedCategory.data.map((category, idx) => {
+              {likedCategories.categories.map((category, idx) => {
                 return <CategoryChip key={`${category.category}${idx}`} category={category} selected />;
               })}
             </>

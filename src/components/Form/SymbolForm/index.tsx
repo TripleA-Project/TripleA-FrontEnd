@@ -15,8 +15,8 @@ import { LockNotification } from '@/components/Notification';
 import { LockNotificationTemplate } from '@/constants/notification';
 import SymbolFormUnauthorized from '@/components/ErrorBoundary/ErrorFallback/SymbolForm/Unauthorized';
 import SymbolEditResultModal, { SymbolEditResultModalProps } from './ResultModal/Modal';
+import { useLikedSymbols } from '@/hooks/useLikedSymbols';
 import { useSymbolAsyncMutation } from '@/hooks/useSymbolAsyncMutation';
-import { useLikes } from '@/hooks/useLikes';
 import type { UseStepFormContext } from '../StepForm';
 import type { SearchedSymbol } from '@/interfaces/Symbol';
 
@@ -67,14 +67,7 @@ function SymbolForm({ buttonText = '선택 완료' }: SymbolFormProps) {
     isFetching,
   } = useSymbolAsyncMutation();
 
-  const {
-    likedSymbols,
-    invalidateQuery,
-    removeQuery,
-    loginRequired,
-    status: likedSymbolStatus,
-    isFetching: isLikesFetching,
-  } = useLikes();
+  const { likedSymbols, invalidateQuery, removeQuery, loginRequired, status: likedSymbolsStatus } = useLikedSymbols();
 
   const { dispatch, requestLikeSymbolMap, requestUnLikeSymbolMap, selectedSymbolMap } = useSymbolList();
   const [searchedSymbols, setSearchedSymbols] = useState<SearchedSymbol[]>([]);
@@ -156,7 +149,7 @@ function SymbolForm({ buttonText = '선택 완료' }: SymbolFormProps) {
       ]);
     }
 
-    invalidateQuery.likedSymbol();
+    invalidateQuery.likedSymbols();
 
     setIsSubmit(true);
   };
@@ -173,15 +166,14 @@ function SymbolForm({ buttonText = '선택 완료' }: SymbolFormProps) {
 
       window.removeEventListener('resize', resizeThrottle);
 
-      removeQuery.likedSymbol();
-      removeQuery.likedCategory();
+      removeQuery.likedSymbols();
 
       syncSymbols();
     };
   }, []); /* eslint-disable-line */
 
   useEffect(() => {
-    if (!isLikesFetching && likedSymbolStatus === 'success') {
+    if (likedSymbolsStatus === 'success') {
       syncSymbols();
     }
 
@@ -193,7 +185,7 @@ function SymbolForm({ buttonText = '선택 완료' }: SymbolFormProps) {
       const { success, fail } = getResultList();
 
       if (pathName?.startsWith('/signup')) {
-        await invalidateQuery.likedSymbol();
+        await invalidateQuery.likedSymbols();
 
         formContext.done();
 
@@ -231,7 +223,7 @@ function SymbolForm({ buttonText = '선택 완료' }: SymbolFormProps) {
 
       setIsSubmit(false);
     })();
-  }, [isSubmit, likedSymbolStatus, isLikesFetching]); /* eslint-disable-line */
+  }, [isSubmit, likedSymbolsStatus]); /* eslint-disable-line */
 
   if (loginRequired || isUnauthorizedMutation) {
     return <SymbolFormUnauthorized />;
@@ -252,10 +244,10 @@ function SymbolForm({ buttonText = '선택 완료' }: SymbolFormProps) {
         <SearchSymbol
           submitWrapper={submitWrapperRef.current}
           onSearch={(symbols) => setSearchedSymbols(symbols)}
-          disabled={likedSymbolStatus === 'loading' || isLikesFetching}
+          disabled={likedSymbolsStatus === 'loading' || likedSymbolsStatus === 'fetching'}
         />
         <SearchSymbolResult
-          isSyncing={likedSymbolStatus === 'loading' || isLikesFetching}
+          isSyncing={likedSymbolsStatus === 'loading' || likedSymbolsStatus === 'fetching'}
           symbols={searchedSymbols}
           onDispatch={(requiredSubscribe) => {
             if (requiredSubscribe) setShowSubScribeNotification(true);
@@ -263,7 +255,7 @@ function SymbolForm({ buttonText = '선택 완료' }: SymbolFormProps) {
         />
         <div ref={submitWrapperRef} className="fixed_inner fixed bottom-12">
           <SelectedSymbolHorizonList
-            loading={likedSymbolStatus === 'loading' || isLikesFetching}
+            loading={likedSymbolsStatus === 'loading' || likedSymbolsStatus === 'fetching'}
             symbols={selectedSymbols}
             shadowEffect
             closeButton
@@ -271,7 +263,9 @@ function SymbolForm({ buttonText = '선택 완료' }: SymbolFormProps) {
           <div className="mx-auto mt-4 box-border w-full">
             <Button
               type="submit"
-              disabled={likedSymbolStatus === 'loading' || hasNotRequest || isFetching || isLikesFetching}
+              disabled={
+                likedSymbolsStatus === 'loading' || hasNotRequest || isFetching || likedSymbolsStatus === 'fetching'
+              }
               bgColorTheme="orange"
               textColorTheme="white"
               fullWidth

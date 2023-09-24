@@ -82,16 +82,6 @@ function CategoryChip({
     );
   }
 
-  /*
-    className={`box-border inline-flex h-9 w-max ${
-        showHashTagIcon ? 'min-w-[84px]' : ''
-      } max-w-sm shrink-0 cursor-pointer select-none items-center justify-between rounded-full border px-3.5 py-2 align-top transition-transform ${
-        selected ? 'border-[#FC954A] bg-[#FFF0E4]' : 'border-[#E5E7EC] bg-white'
-      } ${shadowEffect ? 'my-2.5 ml-[9px]' : 'm-0'} ${
-        selected && shadowEffect ? 'shadow-[0_0_15px_0_rgba(252,149,74,0.3)]' : 'shadow-none'
-      }`}
-  */
-
   return category && isRender ? (
     <div className={wrapperClassNames} onClick={handleClick}>
       <div className="flex items-center gap-1.5">
