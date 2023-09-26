@@ -1,5 +1,5 @@
 import axios, { AxiosResponse, HttpStatusCode } from 'axios';
-import { axiosInstance } from './axios';
+import { axiosInstance, moyaAxiosInstance } from './axios';
 import { cloneDeep } from 'lodash';
 import {
   type GetNewsByIdSearchParam,
@@ -235,9 +235,7 @@ export async function getNewsHistory({ year, month }: GetNewsHistorySearchParam)
  * `id` 뉴스 아이디 [**number**]
  */
 export async function getNewsById({ id }: GetNewsByIdSearchParam) {
-  const getNewsByIdResponse = await axios.get<GetNewsByIdResponse>(
-    `https://api.moya.ai/globalnews?id=${id}&token=${process.env.NEXT_PUBLIC_TOKEN}`,
-  );
+  const getNewsByIdResponse = await moyaAxiosInstance.get<GetNewsByIdResponse>(`/globalnews/${id}`);
 
   return getNewsByIdResponse;
 }
@@ -261,7 +259,7 @@ export async function getAINewsAnalysis({ id, summary }: AINewsAnalysisParam & A
   return getAINewsAnalysisResponse;
 }
 
-export async function getAINewsAnalysisDemo({ id }: AINewsAnalysisParam) {
+export async function getAINewsAnalysisDemo({ id, summary }: AINewsAnalysisParam & AINewsAnalysisRequest) {
   const getAINewsAnalysisDemoResponse = await axios.get<AINewsAnalysisDemoResponse>(
     process.env.NEXT_PUBLIC_WISE_AI_URL!,
     {
@@ -271,6 +269,7 @@ export async function getAINewsAnalysisDemo({ id }: AINewsAnalysisParam) {
       params: {
         openai_api_key: process.env.NEXT_PUBLIC_OPENAI_KEY,
         id,
+        article: summary,
       } as AINewsAnalysisDemoRequest,
     },
   );

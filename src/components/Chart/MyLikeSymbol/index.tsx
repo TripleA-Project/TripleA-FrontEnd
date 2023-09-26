@@ -1,28 +1,23 @@
 'use client';
 
-import { getLikeSymbol } from '@/service/symbol';
-import { useQuery } from '@tanstack/react-query';
 import NoMySymbol from './NoMySymbol';
-import { SymbolCardList, SymbolCardListLoading } from '../SymbolTabs/SymbolCard';
+import { SymbolLikeCardList } from '../SymbolTabs/SymbolCard';
+import { useLikedSymbols } from '@/hooks/useLikedSymbols';
 
 function MyLikeSymbol() {
-  const { data: likeSymbolPayload, status: likeSymbolStatus } = useQuery(['likedSymbolList'], () => getLikeSymbol(), {
-    retry: false,
-    refetchOnWindowFocus: false,
-    select(response) {
-      return response.data;
-    },
-  });
+  const { likedSymbols } = useLikedSymbols({ suspense: true });
+
+  if (likedSymbols.empty) {
+    return (
+      <div className="mb-3 mt-5 box-border space-y-4">
+        <NoMySymbol />
+      </div>
+    );
+  }
 
   return (
     <div className="mb-3 mt-5 box-border space-y-4">
-      {likeSymbolStatus !== 'success' ? (
-        <SymbolCardListLoading />
-      ) : likeSymbolPayload?.data && likeSymbolPayload.data.length ? (
-        <SymbolCardList symbols={likeSymbolPayload.data} />
-      ) : (
-        <NoMySymbol />
-      )}
+      <SymbolLikeCardList symbols={likedSymbols.symbols!} />
     </div>
   );
 }

@@ -1,9 +1,21 @@
 import axios, { AxiosError, HttpStatusCode, isAxiosError } from 'axios';
-import { getCookie, setCookie } from '@/util/cookies';
+import { getCookie, getCookies, setCookie } from '@/util/cookies';
 import { requestAccessToken } from './auth';
 import { APIResponse } from '@/interfaces/Dto/Core';
+import { ProfileResponse } from '@/interfaces/Dto/User';
+import { ServerUserTokenCookies } from '@/util/serverCookies';
 
 export const TIMEOUT_CODE = 'ECONNABORTED';
+
+function createMoyaAxiosInstance() {
+  const moyaAxiosInstance = axios.create({
+    baseURL: `${process.env.NEXT_PUBLIC_SITE_URL}/moya/api`,
+    timeout: 30000,
+    timeoutErrorMessage: '요청을 처리하는 시간이 오래걸려 중단되었습니다. 이용에 불편을 드려 죄송합니다.',
+  });
+
+  return moyaAxiosInstance;
+}
 
 function createAxiosInstance() {
   const axiosInstance = axios.create({
@@ -15,6 +27,20 @@ function createAxiosInstance() {
 
   axiosInstance.interceptors.request.use(
     async (req) => {
+      if (typeof window === 'undefined') {
+        const cookies = await getCookies();
+
+        console.log({ cookies });
+
+        const cookie = cookies.length
+          ? cookies
+              .map(({ name, value }, idx, arr) => `${name}=${idx === arr.length - 1 ? value : `${value} `}`)
+              .join(';')
+          : '';
+
+        req.headers.Cookie = cookie;
+      }
+
       const accessToken = await getCookie('accessToken');
 
       if (accessToken) {
@@ -33,7 +59,7 @@ function createAxiosInstance() {
       return res;
     },
     async (error) => {
-      if (isAxiosError(error)) {
+      if (error instanceof AxiosError && isAxiosError(error)) {
         const { config, response } = error;
 
         if (!response) throw error;
@@ -48,23 +74,37 @@ function createAxiosInstance() {
 
                 const accessToken = refreshResponse.headers['authorization'];
 
-                console.log('[success] refreshResponse: ', refreshResponse);
-
                 if (accessToken) {
-                  console.log('refresh AccessToken: ', accessToken);
-                  await setCookie('accessToken', (accessToken as string).replace('Bearer ', ''), {
-                    maxAge: 60 * 60,
-                    path: '/',
-                  });
+                  if (typeof window === 'undefined') {
+                    const { data: profileResponse } = await axiosInstance.get<ProfileResponse>('/api/auth/user/me', {
+                      headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                      },
+                    });
+
+                    ServerUserTokenCookies.set({
+                      email: profileResponse.data!.email,
+                      cookieName: 'accessToken',
+                      cookieValue: (accessToken as string).replace('Bearer ', ''),
+                      cookieOptions: {
+                        path: '/',
+                        maxAge: Number(process.env.NEXT_PUBLIC_ACCESS_TOKEN_MAXAGE),
+                      },
+                    });
+
+                    config!.headers.Authorization = `Bearer ${accessToken}`;
+                  } else {
+                    await setCookie('accessToken', (accessToken as string).replace('Bearer ', ''), {
+                      maxAge: Number(process.env.NEXT_PUBLIC_ACCESS_TOKEN_MAXAGE),
+                      path: '/',
+                    });
+                  }
                 }
 
                 return axiosInstance(config!);
               } catch (error) {
                 if (error instanceof AxiosError) {
                   const { response } = error as AxiosError<APIResponse>;
-
-                  console.log('[refreshErrorRequest] ', response?.request['_header']);
-                  console.log('[refreshErrorResponsePayload] ', response?.data);
 
                   if (response) {
                     response.data = {
@@ -93,3 +133,4 @@ function createAxiosInstance() {
 }
 
 export const axiosInstance = createAxiosInstance();
+export const moyaAxiosInstance = createMoyaAxiosInstance();

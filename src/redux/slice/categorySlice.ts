@@ -35,7 +35,17 @@ export const categorySlice = createSlice({
   initialState,
   reducers: {
     initLikedCategoryMap: (state: CategoryState, action: PayloadAction<InitLikedCategoryPayload>) => {
-      if (!action.payload?.categories || !action.payload.categories?.length) return;
+      if (!action.payload?.categories) {
+        state.likedCategoryMap = { ...initialState.likedCategoryMap };
+
+        return;
+      }
+
+      if (!Array.isArray(action.payload.categories) || !action.payload.categories.length) {
+        state.likedCategoryMap = { ...initialState.likedCategoryMap };
+
+        return;
+      }
 
       for (const categoryPayload of action.payload.categories) {
         const { categoryId, category } = categoryPayload;

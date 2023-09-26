@@ -1,14 +1,19 @@
+'use client';
+
 import React from 'react';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 import { type SentimentData } from '@/service/chart';
-import { DeltaPriceColor, DeltaPriceType, type PriceInfo } from '@/util/chart';
+import { DeltaPriceColor, DeltaPriceType, getPriceInfo, type PriceInfo } from '@/util/chart';
+import { Symbol } from '@/interfaces/Symbol';
+import { useChartSource } from '@/redux/slice/chartSourceSlice';
 
 interface ChartHeaderProps {
-  priceInfo: PriceInfo;
-  sentimentData: SentimentData[];
-  symbol: string;
+  symbolPayload?: Symbol | null;
+  symbolName: string;
   companyName?: string;
+  sentimentData?: SentimentData[];
+  priceInfo: PriceInfo;
 }
 
 const StyledDeltaPrice = styled.p<{ type: keyof typeof DeltaPriceType }>`
@@ -40,13 +45,21 @@ export function ChartHeaderLoading() {
   );
 }
 
-function ChartHeader({ symbol, companyName, priceInfo, sentimentData }: ChartHeaderProps) {
-  const { delta, close } = priceInfo;
+function ChartHeader({ symbolPayload, symbolName, companyName, priceInfo, sentimentData }: ChartHeaderProps) {
+  const { source } = useChartSource();
+
+  const { delta, close } = symbolPayload
+    ? getPriceInfo({ today: symbolPayload.price.today, yesterday: symbolPayload.price.yesterday })
+    : { delta: { type: 'NO_CHANGE' as const, value: 0, percent: 0 }, close: 0 };
 
   return (
     <div className="mb-5 flex justify-between">
       <div>
-        <h3 className="text-xl font-semibold text-[#131F3C]">{companyName || symbol}</h3>
+        {/* companyName */}
+        <h3 className="text-xl font-semibold text-[#131F3C]">
+          {symbolPayload?.companyName || symbolName?.toUpperCase()}
+        </h3>
+        {/* close price */}
         <p className="text-3xl text-black">{`${close} USD`}</p>
         <StyledDeltaPrice type={delta.type}>
           <span>
@@ -58,14 +71,19 @@ function ChartHeader({ symbol, companyName, priceInfo, sentimentData }: ChartHea
         </StyledDeltaPrice>
       </div>
       <div className="flex items-center justify-center">
+        {/* sentiment */}
         <svg className="w-10 overflow-visible" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
           <circle
             cx={50}
             cy={50}
             r={50}
             strokeWidth={20}
-            stroke={sentimentData[0]?.color ?? '#cbd5e1'}
-            className="fill-transparent"
+            stroke={
+              source?.sentimentData && source.sentimentData.length
+                ? source.sentimentData[source.sentimentData.length - 1].color
+                : '#cbd5e1'
+            }
+            className="fill-transparent transition-colors duration-300"
           ></circle>
         </svg>
       </div>

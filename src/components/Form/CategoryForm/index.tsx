@@ -1,197 +1,251 @@
 'use client';
 
-import { useLayoutEffect, useState, useRef } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useLayoutEffect, useState, useRef, useEffect } from 'react';
+import { flushSync } from 'react-dom';
+import { usePathname } from 'next/navigation';
 import { useFormContext } from 'react-hook-form';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { throttle } from 'lodash';
 import { ToastContainer } from 'react-toastify';
 import { initLikedCategoryMap, initSelectedCategoryMap, reset, useCategoryList } from '@/redux/slice/categorySlice';
+import FormTitleHighLightText from '../FormTitleHighLightText';
 import MuiSpinner from '@/components/UI/Spinner/MuiSpinner';
 import { SearchCategory, SearchCategoryResult, SelectedCategoryHorizonList } from '@/components/Search/SearchCategory';
 import Button from '@/components/Button/Button';
 import { LockNotification } from '@/components/Notification';
-import { disLikeCategory, getLikeCategory, likeCategory } from '@/service/category';
-import { getProfile } from '@/service/user';
 import { LockNotificationTemplate } from '@/constants/notification';
-import { toastNotify } from '@/util/toastNotify';
-import { type Category } from '@/interfaces/Category';
-import { type UseStepFormContext } from '../StepForm';
-import { HttpStatusCode } from 'axios';
+import CategoryFormUnauthorized from '@/components/ErrorBoundary/ErrorFallback/CategoryForm/Unauthorized';
+import CategoryEditResultModal, { CategoryEditResultModalProps } from './ResultModal/Modal';
+import { useLikedCategories } from '@/hooks/useLikedCategories';
+import useCategoryAsyncMutation from '@/hooks/useCategoryAsyncMutation';
+import type { UseStepFormContext } from '../StepForm';
+import type { Category } from '@/interfaces/Category';
 
 interface CategoryFormProps {
   buttonText?: string;
   skipable?: boolean;
 }
 
-function CategoryForm({ buttonText = '선택 완료' }: CategoryFormProps) {
-  const queryClient = useQueryClient();
-
-  const pathName = usePathname();
-  const { push } = useRouter();
-
-  const isSuccessRef = useRef(true);
-
-  const formContext = useFormContext() as UseStepFormContext;
-
-  const handleView = () => {
-    if (window.innerHeight < 700) {
-      formWrapperRef.current!.style.marginTop = '-40px';
-
-      return;
+function handleView(formWrapper: HTMLDivElement | null) {
+  if (window.innerHeight < 700) {
+    if (formWrapper) {
+      formWrapper.style.marginTop = '-40px';
     }
 
-    formWrapperRef.current!.style.removeProperty('margin-top');
-  };
+    return;
+  }
+}
 
-  const resizeThrottle = throttle((e: UIEvent) => {
-    handleView();
-  }, 300);
+function cleanUp(formWrapper: HTMLDivElement | null) {
+  if (formWrapper) {
+    formWrapper.style.removeProperty('margin-top');
+  }
+}
 
-  const cleanUp = () => {
-    formWrapperRef.current?.style.removeProperty('margin-top');
-  };
+// categoryForm
+function CategoryForm({ buttonText = '선택 완료' }: CategoryFormProps) {
+  const pathName = usePathname();
 
-  const { data: profileResponse, status: profileStatus } = useQuery(['profile'], () => getProfile(), {
-    retry: 0,
-    refetchOnWindowFocus: false,
-    select(response) {
-      return response.data;
-    },
-  });
-
-  const { data: likedCategoryListResponse, status: likedCategoryStatus } = useQuery(
-    ['likedCategoryList'],
-    () => getLikeCategory(),
-    {
-      retry: 0,
-      refetchOnWindowFocus: false,
-      select(payload) {
-        return payload.data;
-      },
-    },
-  );
+  const formContext = useFormContext() as UseStepFormContext;
 
   const formWrapperRef = useRef<HTMLDivElement>(null);
   const submitWrapperRef = useRef<HTMLDivElement>(null);
 
-  const { mutateAsync: like, status: likeStatus } = useMutation((id: number) => likeCategory({ id }), {
-    retry: 0,
-    onError: () => {
-      if (isSuccessRef.current === true) {
-        isSuccessRef.current = false;
-      }
-    },
-  });
-  const { mutateAsync: unlike, status: unlikeStatus } = useMutation((id: number) => disLikeCategory({ id }), {
-    retry: 0,
-    onError: () => {
-      if (isSuccessRef.current === true) {
-        isSuccessRef.current = false;
-      }
-    },
-  });
+  const [isSubmit, setIsSubmit] = useState(false);
 
-  const isSubmittingRef = useRef(false);
+  const {
+    like,
+    unlike,
+    getResultList,
+    resetResultList,
+    isSuccessLikes,
+    isSuccessUnlikes,
+    isUnauthorizedMutation,
+    isFetching,
+  } = useCategoryAsyncMutation();
 
-  const [showSubscribeNotification, setShowSubScribeNotification] = useState(false);
+  const {
+    likedCategories,
+    invalidateQuery,
+    removeQuery,
+    loginRequired,
+    status: likedCategoriesStatus,
+  } = useLikedCategories();
 
-  const [searchedCategories, setSearchedCategories] = useState<Category[]>([]);
   const { dispatch, requestLikeCategoryMap, requestUnLikeCategoryMap, selectedCategoryMap } = useCategoryList();
+  const [searchedCategories, setSearchedCategories] = useState<Category[]>([]);
   const selectedCategories = [
     ...Array.from(Object.values(selectedCategoryMap)).map((category) => ({ ...category } as Category)),
   ];
 
+  const hasNotRequest = !Object.keys(requestLikeCategoryMap).length && !Object.keys(requestUnLikeCategoryMap).length;
+
+  const syncCategories = () => {
+    dispatch(reset());
+
+    dispatch(
+      initLikedCategoryMap({
+        categories: likedCategories?.categories ?? [],
+      }),
+    );
+
+    dispatch(initSelectedCategoryMap());
+  };
+
+  const resizeThrottle = throttle((e: UIEvent) => {
+    handleView(formWrapperRef.current);
+  }, 300);
+
+  const [showSubscribeNotification, setShowSubScribeNotification] = useState(false);
+
+  const [resultModal, setResultModal] = useState<CategoryEditResultModalProps>({
+    open: false,
+    result: 'success',
+    categoryResults: {
+      success: {
+        like: [],
+        unlike: [],
+      },
+      fail: {
+        like: [],
+        unlike: [],
+      },
+    },
+    onClose() {
+      setResultModal((prev) => ({
+        ...prev,
+        open: false,
+        result: 'success',
+        symbolResults: {
+          success: {
+            like: [],
+            unlike: [],
+          },
+          fail: {
+            like: [],
+            unlike: [],
+          },
+        },
+      }));
+    },
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (isSubmittingRef.current === true) return;
-
-    isSubmittingRef.current = true;
-
-    for (const category in requestUnLikeCategoryMap) {
-      await unlike(requestUnLikeCategoryMap[category].categoryId);
+    if (Object.keys(requestUnLikeCategoryMap).length) {
+      /*
+        unlike : 관심카테고리 응답에서의 id로 요청해야 함
+      */
+      await Promise.allSettled([
+        ...Object.values(requestUnLikeCategoryMap).map((requestCategory) => {
+          return unlike({ requestId: requestCategory.categoryId, category: requestCategory });
+        }),
+      ]);
     }
 
-    for (const category in requestLikeCategoryMap) {
-      await like(requestLikeCategoryMap[category].categoryId);
+    if (Object.keys(requestLikeCategoryMap).length) {
+      /*
+        like : 전체 카테고리 id로 요청해야 함
+      */
+      await Promise.allSettled([
+        ...Object.keys(requestLikeCategoryMap).map((categoryName) => {
+          const likeTarget = likedCategories.allCategories?.find(
+            (likedCategory) => likedCategory.category === categoryName,
+          );
+
+          return like({
+            requestId: likeTarget?.categoryId ?? -1,
+            category: likeTarget ?? { categoryId: -1, category: categoryName },
+          });
+        }),
+      ]);
     }
 
-    isSubmittingRef.current = false;
+    invalidateQuery.likedCategories();
 
-    if (isSuccessRef.current === true) {
-      if (pathName.startsWith('/signup')) {
-        queryClient.invalidateQueries(['likedCategoryList']);
+    setIsSubmit(true);
+  };
+
+  useLayoutEffect(() => {
+    const formWrapperRefClone = formWrapperRef.current;
+
+    window.addEventListener('resize', resizeThrottle);
+
+    handleView(formWrapperRef.current);
+
+    return () => {
+      cleanUp(formWrapperRefClone);
+
+      window.removeEventListener('resize', resizeThrottle);
+
+      removeQuery.all();
+
+      syncCategories();
+    };
+  }, []); /* eslint-disable-line */
+
+  useEffect(() => {
+    if (likedCategoriesStatus === 'success') {
+      syncCategories();
+    }
+
+    (async () => {
+      if (!isSubmit) return;
+
+      if (isUnauthorizedMutation) return;
+
+      const { success, fail } = getResultList();
+
+      if (pathName?.startsWith('/signup')) {
+        await invalidateQuery.likedCategories();
 
         formContext.done();
 
         return;
       }
 
-      toastNotify('success', '관심 카테고리 처리 성공');
-    }
+      if (isSuccessLikes && isSuccessUnlikes) {
+        setResultModal((prev) => ({
+          ...prev,
+          open: true,
+          result: 'success',
+          categoryResults: {
+            success,
+            fail,
+          },
+        }));
+      }
 
-    if (isSuccessRef.current === false) {
-      toastNotify('error', '관심 카테고리 처리 실패');
-    }
+      if (!isSuccessLikes || !isSuccessUnlikes) {
+        flushSync(() => {
+          setResultModal((prev) => ({
+            ...prev,
+            open: true,
+            result: 'fail',
+            categoryResults: {
+              success,
+              fail,
+            },
+          }));
+        });
+      }
 
-    // reset
+      // reset
+      resetResultList();
 
-    queryClient.invalidateQueries(['likedCategoryList']);
+      setIsSubmit(false);
+    })();
+  }, [isSubmit, likedCategoriesStatus]); /* eslint-disable-line */
 
-    dispatch(reset());
-    dispatch(
-      initLikedCategoryMap({
-        categories: likedCategoryListResponse?.data?.length ? likedCategoryListResponse.data : [],
-      }),
-    );
-    dispatch(initSelectedCategoryMap());
-
-    isSuccessRef.current = true;
-  };
-
-  useLayoutEffect(() => {
-    if (profileStatus === 'loading' || likedCategoryStatus === 'loading') return;
-
-    if (
-      profileStatus === 'error' ||
-      likedCategoryStatus === 'error' ||
-      likedCategoryListResponse.status !== HttpStatusCode.Ok
-    ) {
-      push('/login?continueURL=/mypage/edit/category');
-
-      return;
-    }
-
-    if (likedCategoryListResponse) {
-      dispatch(reset());
-    }
-
-    dispatch(initLikedCategoryMap({ categories: likedCategoryListResponse.data ?? [] }));
-    dispatch(initSelectedCategoryMap());
-  }, [profileStatus, likedCategoryStatus, likedCategoryListResponse]); /* eslint-disable-line */
-
-  useLayoutEffect(() => {
-    window.addEventListener('resize', resizeThrottle);
-
-    handleView();
-
-    return () => {
-      cleanUp();
-
-      window.removeEventListener('resize', resizeThrottle);
-    };
-  }, []); /* eslint-disable-line */
+  if (loginRequired || isUnauthorizedMutation) {
+    return <CategoryFormUnauthorized />;
+  }
 
   return (
     <div ref={formWrapperRef} className="relative">
       <div className="my-11 space-y-3">
         <h3 className="flex items-center justify-center text-xl font-bold">
-          <span className="relative inline-block align-top">
-            관심카테고리
-            <div className="absolute bottom-0 left-0 -z-[1] h-2 w-full bg-[#FFB682]" />
-          </span>
-          를 설정해주세요
+          <FormTitleHighLightText content={'관심카테고리'} />를 설정해주세요
         </h3>
         <h4 className="flex flex-col items-center justify-center text-sm font-semibold">
           <span>선택한 카테고리에 해당하는</span>
@@ -202,10 +256,10 @@ function CategoryForm({ buttonText = '선택 완료' }: CategoryFormProps) {
         <SearchCategory
           submitWrapper={submitWrapperRef.current}
           onSearch={(categories) => setSearchedCategories(categories)}
-          disabled={profileStatus === 'loading' || likedCategoryStatus !== 'success'}
+          disabled={likedCategoriesStatus === 'loading' || likedCategoriesStatus === 'fetching'}
         />
         <SearchCategoryResult
-          loading={profileStatus === 'loading' || likedCategoryStatus !== 'success'}
+          isSyncing={likedCategoriesStatus === 'fetching'}
           categories={searchedCategories}
           onDispatch={(requiredSubscribe) => {
             if (requiredSubscribe) {
@@ -215,7 +269,7 @@ function CategoryForm({ buttonText = '선택 완료' }: CategoryFormProps) {
         />
         <div ref={submitWrapperRef} className={`fixed_inner fixed bottom-12 `}>
           <SelectedCategoryHorizonList
-            loading={profileStatus === 'loading' || likedCategoryStatus !== 'success'}
+            loading={likedCategoriesStatus === 'loading' || likedCategoriesStatus === 'fetching'}
             shadowEffect
             closeButton
             categories={selectedCategories}
@@ -223,13 +277,18 @@ function CategoryForm({ buttonText = '선택 완료' }: CategoryFormProps) {
           <div className="mx-auto mt-4 w-full">
             <Button
               type="submit"
-              disabled={likeStatus === 'loading' || unlikeStatus === 'loading'}
+              disabled={
+                likedCategoriesStatus === 'loading' ||
+                hasNotRequest ||
+                isFetching ||
+                likedCategoriesStatus === 'fetching'
+              }
               bgColorTheme="orange"
               textColorTheme="white"
               fullWidth
               className="relative disabled:!cursor-progress disabled:!bg-slate-300 disabled:!opacity-60"
             >
-              {likeStatus === 'loading' || unlikeStatus === 'loading' ? (
+              {isFetching ? (
                 <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center">
                   <div className="translate-y-[3.4px]">
                     <MuiSpinner />
@@ -259,6 +318,12 @@ function CategoryForm({ buttonText = '선택 완료' }: CategoryFormProps) {
         onClose={() => {
           setShowSubScribeNotification(false);
         }}
+      />
+      <CategoryEditResultModal
+        open={resultModal.open}
+        result={resultModal.result}
+        onClose={resultModal.onClose}
+        categoryResults={resultModal.categoryResults}
       />
     </div>
   );

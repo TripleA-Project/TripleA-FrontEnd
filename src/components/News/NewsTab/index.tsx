@@ -1,7 +1,7 @@
 import React from 'react';
 import Tabs from './Tabs';
 
-export type TabPage = 'latestNews' | 'likeNews';
+export type MainPageNewsTab = 'latestNews' | 'interestNews';
 
 function NewsTab() {
   return (

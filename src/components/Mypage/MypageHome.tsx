@@ -1,56 +1,41 @@
 'use client';
 
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { HttpStatusCode, isAxiosError } from 'axios';
-import { redirect } from 'next/navigation';
+import React, { useEffect } from 'react';
+import { ToastContainer } from 'react-toastify';
 import Profile from '../Profile';
 import MembershipInfo from '../Membership/MembershipInfo';
 import MyPageMenu from './MyPageMenu';
-import { getProfile } from '@/service/user';
+import { syncCookie } from '@/util/cookies';
+import type { ProfilePayload } from '@/interfaces/Dto/User';
 
-function MypageHome() {
-  const {
-    data: profileResponse,
-    status: profileStatus,
-    error: profileError,
-  } = useQuery(['profile'], () => getProfile(), {
-    retry: 0,
-    refetchOnWindowFocus: false,
-    select(response) {
-      return response.data;
-    },
-  });
+interface MypageHomeProps {
+  user?: ProfilePayload;
+}
 
-  if (profileStatus === 'loading') return null;
-
-  if (profileStatus === 'error') {
-    if (isAxiosError(profileError)) {
-      const { response } = profileError;
-
-      if (response?.status === HttpStatusCode.Unauthorized) {
-        redirect('/login?continueURL=/mypage');
-      }
-    }
-
-    return null;
-  }
-
-  if (profileResponse?.status === HttpStatusCode.Unauthorized) {
-    redirect('/login?continueURL=/mypage');
-  }
+function MypageHome({ user }: MypageHomeProps) {
+  useEffect(() => {
+    syncCookie(user!.email);
+  }, []); /* eslint-disable-line */
 
   return (
     <div className={`mt-[73px] box-border px-4`}>
       <Profile
         userProfile={{
-          email: profileResponse.data?.email ?? '',
-          fullName: profileResponse.data?.fullName ?? '',
-          membership: profileResponse.data?.membership ?? 'BASIC',
+          email: user!.email,
+          fullName: user!.fullName,
+          membership: user!.membership,
         }}
       />
-      <MembershipInfo />
+      <MembershipInfo user={user} />
       <MyPageMenu />
+      <ToastContainer
+        position="bottom-center"
+        autoClose={3000}
+        hideProgressBar
+        newestOnTop={true}
+        pauseOnFocusLoss={false}
+        pauseOnHover={false}
+      />
     </div>
   );
 }

@@ -9,7 +9,8 @@ self.addEventListener('message', (e) => {
 
   switch (cmd) {
     case 'timerInit':
-      initTime = payload * 60;
+      initTime = payload;
+
       time = initTime;
 
       return;
@@ -17,6 +18,10 @@ self.addEventListener('message', (e) => {
       if (interval) clearInterval(interval);
 
       self.postMessage({ currentTime: time });
+
+      if (time === 0) {
+        return;
+      }
 
       interval = setInterval(() => {
         time -= 1;
@@ -27,8 +32,14 @@ self.addEventListener('message', (e) => {
       }, 1000);
 
       return;
+    case 'timerStop':
+      if (interval) clearInterval(interval);
+
+      return;
     case 'timerReset':
       time = initTime;
+
+      self.postMessage({ currentTime: time });
 
       return;
     default:

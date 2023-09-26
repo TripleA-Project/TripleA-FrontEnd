@@ -10,6 +10,7 @@ import { GrCircleAlert } from 'react-icons/gr';
 import { BsFillEyeFill, BsFillEyeSlashFill } from 'react-icons/bs';
 import { AppLogos } from '@/components/Icons';
 import Button from '@/components/Button/Button';
+import { ReactQueryHashKeys } from '@/constants/queryHashKeys';
 import { login } from '@/service/auth';
 import { validateEmail } from '@/util/validate';
 import { deleteCookie, getCookie, setCookie } from '@/util/cookies';
@@ -62,7 +63,10 @@ function LoginForm({ continueURL }: LoginFormProps) {
       const autoLogin = await getCookie('autoLogin');
 
       if (accessToken) {
-        await setCookie('accessToken', accessToken.replace('Bearer ', ''), { path: '/', maxAge: 60 * 60 });
+        await setCookie('accessToken', accessToken.replace('Bearer ', ''), {
+          path: '/',
+          maxAge: Number(process.env.NEXT_PUBLIC_ACCESS_TOKEN_MAXAGE),
+        });
       }
 
       if (autoLoginRef?.current) {
@@ -74,8 +78,12 @@ function LoginForm({ continueURL }: LoginFormProps) {
         }
       }
 
-      queryClient.removeQueries({ queryKey: ['auth'] });
-      queryClient.invalidateQueries(['profile']);
+      queryClient.removeQueries({
+        predicate(query) {
+          return !query.queryHash.includes('profile');
+        },
+      });
+      queryClient.invalidateQueries(ReactQueryHashKeys.getProfile);
 
       refresh();
 

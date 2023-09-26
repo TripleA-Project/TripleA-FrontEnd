@@ -1,8 +1,9 @@
+import type { Symbol } from '@/interfaces/Symbol';
 import SymbolLikeCard, { SymbolLikeCardLoading } from './SymbolLikeCard';
-import { type Symbol } from '@/interfaces/Symbol';
 
 interface SymbolLikeCardListProps {
   symbols: Symbol[];
+  logoBgColor?: string;
 }
 
 interface SymbolLikeCardListLoadingProps {
@@ -19,11 +20,15 @@ export function SymbolLikeCardListLoading({ length = 3 }: SymbolLikeCardListLoad
   );
 }
 
-function SymbolLikeCardList({ symbols }: SymbolLikeCardListProps) {
+function SymbolLikeCardList({ symbols, logoBgColor }: SymbolLikeCardListProps) {
   return (
     <>
       {symbols.map((symbol, index) => (
-        <SymbolLikeCard key={`${symbol.symbol}-${symbol.symbolId}-${index}`} symbol={symbol} />
+        <SymbolLikeCard
+          key={`${symbol.symbol}-${symbol.symbolId}-${index}`}
+          symbol={symbol}
+          logoBgColor={logoBgColor}
+        />
       ))}
     </>
   );

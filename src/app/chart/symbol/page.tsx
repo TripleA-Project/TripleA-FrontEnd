@@ -1,5 +1,9 @@
-import { type Metadata } from 'next';
-import ChartSymbolPage from '@/components/Chart/ChartSymbolPage';
+import type { Metadata } from 'next';
+import SymbolChartPage from '@/components/Chart/SymbolChartPage';
+import SymbolChartFetcher from '@/components/Chart/SymbolChartFetcher';
+import NotFound from '@/components/NotFound';
+import BackButtonHeader from '@/components/Layout/Header/BackButtonHeader';
+import type { ResampleFrequency } from '@/interfaces/Dto/Stock';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -33,8 +37,27 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   };
 }
 
-async function SymbolChart({ searchParams }: PageProps) {
-  return <ChartSymbolPage />;
+function SymbolChart({ searchParams }: PageProps) {
+  const name = searchParams?.name;
+  const resample = searchParams?.resample || 'daily';
+
+  if (!name || !Object.keys(resampleMeta).includes(resample)) {
+    return (
+      <>
+        <BackButtonHeader />
+        <NotFound />
+      </>
+    );
+  }
+
+  return (
+    <>
+      {/* @ts-expect-error server component */}
+      <SymbolChartFetcher symbol={name} resample={resample}>
+        <SymbolChartPage resample={resample as ResampleFrequency} />
+      </SymbolChartFetcher>
+    </>
+  );
 }
 
 export default SymbolChart;

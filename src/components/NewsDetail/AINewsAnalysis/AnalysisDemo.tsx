@@ -24,7 +24,7 @@ function AnalysisDemo({ id, summary }: AnalysisDemoProps) {
     컴포넌트 자체에서 
     isLoading, isFetching 으로 로딩UI 구현할 수도 있음
   */
-  const { data } = useQuery(['news', 'analysis', 'demo', id, summary], () => getAINewsAnalysisDemo({ id }), {
+  const { data } = useQuery(['news', 'analysis', 'demo', id, summary], () => getAINewsAnalysisDemo({ id, summary }), {
     retry: 0,
     refetchOnWindowFocus: false,
     suspense: true,

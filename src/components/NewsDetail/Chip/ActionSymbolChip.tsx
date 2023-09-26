@@ -1,48 +1,39 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { AxiosError, HttpStatusCode } from 'axios';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import SymbolChip, { OnChipChangeResult } from '@/components/UI/Chip/SymbolChip';
-import { disLikeSymbol, getLikeSymbol, likeSymbol } from '@/service/symbol';
+import { disLikeSymbol, likeSymbol } from '@/service/symbol';
 import { toastNotify } from '@/util/toastNotify';
-import { type APIResponse } from '@/interfaces/Dto/Core';
-import { type NewsDetailSymbol } from '@/interfaces/Dto/News';
+import GuardBox from '@/components/UI/GuardBox';
 import MuiSpinner from '@/components/UI/Spinner/MuiSpinner';
+import { useLikedSymbols } from '@/hooks/useLikedSymbols';
+import type { APIResponse } from '@/interfaces/Dto/Core';
+import type { NewsDetailSymbol } from '@/interfaces/Dto/News';
 
 interface ActionSymbolChipProps {
   symbol: NewsDetailSymbol;
 }
 
 function ActionSymbolChip({ symbol }: ActionSymbolChipProps) {
-  const queryClient = useQueryClient();
+  const { likedSymbols, loginRequired, invalidateQuery, status: likedSymbolsStatus } = useLikedSymbols();
 
-  const {
-    data: likedSymbol,
-    status: likedSymbolStatus,
-    fetchStatus: likedSymbolFetchStatus,
-  } = useQuery(['likedSymbolList'], () => getLikeSymbol(), {
-    retry: 0,
-    refetchOnWindowFocus: false,
-    select(response) {
-      return response.data;
-    },
-  });
-
-  const [liked, setLiked] = useState(isLike());
-
-  const isFetchingRef = useRef<boolean>(false);
-
-  function isFetching() {
-    return !!isFetchingRef.current;
-  }
+  const [isMutationFetching, setIsMutationFetching] = useState(false);
 
   function isLike() {
-    return !!likedSymbol?.data?.find((likeSymbol) => likeSymbol.symbol === symbol.name);
+    if (likedSymbolsStatus === 'loading' || likedSymbolsStatus === 'fetching') return false;
+    if (loginRequired) return false;
+
+    return !!likedSymbols.symbols?.find(
+      (likedSymbol) => likedSymbol.symbol.toUpperCase() === symbol.name.toUpperCase(),
+    );
   }
 
   const { mutateAsync: like } = useMutation((symbol: string) => likeSymbol({ symbol }), {
     onSuccess() {
+      invalidateQuery.likedSymbols();
+
       toastNotify('success', '관심 심볼 생성 성공');
     },
     onError(error) {
@@ -65,37 +56,37 @@ function ActionSymbolChip({ symbol }: ActionSymbolChipProps) {
       toastNotify('error', '관심 심볼 생성 실패');
     },
     onSettled() {
-      queryClient.invalidateQueries(['likedSymbolList']);
-
-      isFetchingRef.current = false;
+      setIsMutationFetching((prev) => false);
     },
   });
 
   const { mutateAsync: unlike } = useMutation((id: number) => disLikeSymbol({ id }), {
     onSuccess() {
+      invalidateQuery.likedSymbols();
+
       toastNotify('success', '관심 심볼 삭제 성공');
     },
     onError() {
       toastNotify('error', '관심 심볼 삭제 실패');
     },
     onSettled() {
-      queryClient.invalidateQueries(['likedSymbolList']);
-
-      isFetchingRef.current = false;
+      setIsMutationFetching((prev) => false);
     },
   });
 
   const handleChange: () => Promise<OnChipChangeResult> = async () => {
-    isFetchingRef.current = true;
+    if (isMutationFetching) {
+      return { type: 'api', status: 'loading' };
+    }
 
-    if (likedSymbolStatus === 'loading' || likedSymbolFetchStatus === 'fetching') {
-      isFetchingRef.current = false;
-
+    if (likedSymbolsStatus === 'loading' || likedSymbolsStatus === 'fetching') {
       return {
         type: 'api',
         status: 'loading',
       };
     }
+
+    setIsMutationFetching((prev) => true);
 
     const liked = isLike();
 
@@ -116,7 +107,9 @@ function ActionSymbolChip({ symbol }: ActionSymbolChipProps) {
     }
 
     if (liked) {
-      const unlikeTarget = likedSymbol!.data!.find((likedSymbol) => likedSymbol.symbol === symbol.name);
+      const unlikeTarget = likedSymbols.symbols?.find(
+        (likedSymbol) => likedSymbol.symbol.toUpperCase() === symbol.name.toUpperCase(),
+      );
 
       try {
         await unlike(unlikeTarget ? unlikeTarget.symbolId : -1);
@@ -136,27 +129,20 @@ function ActionSymbolChip({ symbol }: ActionSymbolChipProps) {
     return { type: 'unknown', status: 'error' };
   };
 
-  useEffect(() => {
-    if (likedSymbolStatus !== 'success') return;
-
-    const liked = isLike();
-
-    setLiked(!!liked);
-  }, [likedSymbolStatus, likedSymbol]); /* eslint-disable-line */
-
   return (
     <div className="relative inline-block align-top">
-      {isFetching() ? (
+      {isMutationFetching ? (
         <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center">
           <div className="translate-y-[3.4px]">
             <MuiSpinner size={26} />
           </div>
         </div>
       ) : null}
+      <GuardBox activeGuard={likedSymbolsStatus === 'fetching'} />
       <SymbolChip
-        loading={likedSymbolStatus === 'loading'}
+        loading={likedSymbolsStatus === 'loading'}
         symbol={symbol as any}
-        selected={liked}
+        selected={isLike()}
         onChange={handleChange}
       />
     </div>

@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import SymbolChip from '@/components/UI/Chip/SymbolChip';
 import NewsThumbnail, { NewsThumbnailLoading } from '@/components/Image/NewsThumbnail';
 import Sentiment, { SentimentLoading } from '../Sentiment';
@@ -25,26 +24,6 @@ export function TrendNewsCardLoading() {
             <NewsCardActionLoading />
           </section>
         </section>
-      </section>
-    </article>
-  );
-}
-
-export function TrendNewsCardError({ message }: { message: string }) {
-  return (
-    <article className="mx-auto max-w-2xl">
-      <section className="mb-3.5">
-        <div className="relative mx-auto box-border aspect-[16/10] h-auto w-full max-w-2xl overflow-hidden rounded-lg border border-slate-400 bg-white">
-          <Image
-            src="/LogoOrange.svg"
-            alt="logo image"
-            fill={true}
-            className="scale-down w-full scale-50 object-cover object-top"
-          />
-        </div>
-      </section>
-      <section className="flex h-[120px] items-center justify-center">
-        <h4 className="font-bold text-black">{message}</h4>
       </section>
     </article>
   );

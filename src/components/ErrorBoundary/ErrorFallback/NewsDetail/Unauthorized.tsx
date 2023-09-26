@@ -1,7 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useParams, useSearchParams } from 'next/navigation';
 import { NotificationIcons } from '@/components/Notification/NotificationIcons';
 import FitPage from '@/components/Layout/FitPage';
@@ -9,13 +10,20 @@ import Button from '@/components/Button/Button';
 import { NewsDetailNotificationTemplate } from '@/constants/notification';
 
 function Unauthorized() {
+  const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
 
-  const newsId = Number(params.id);
-  const symbolName = searchParams.get('symbol');
+  const newsId = Number(params?.id);
+  const symbolName = searchParams?.get('symbol');
 
   const { title, content, buttonText } = NewsDetailNotificationTemplate.NewsDetailLoginRequired;
+
+  useEffect(() => {
+    return () => {
+      router.refresh();
+    };
+  }, []); /* eslint-disable-line */
 
   return (
     <FitPage>

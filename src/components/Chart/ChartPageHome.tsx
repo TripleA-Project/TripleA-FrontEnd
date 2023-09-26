@@ -1,58 +1,71 @@
 'use client';
 
-import React from 'react';
-import ChartHomeHeader from '../Layout/Header/ChartHomeHeader';
+import React, { Suspense, useEffect } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import { usePageTab } from '@/redux/slice/pageTabSlice';
 import SymbolTab from './SymbolTabs';
-import { redirect, useSearchParams } from 'next/navigation';
 import RecommandSymbol from './RecommandSymbol';
-import NotFound from '../NotFound';
 import MyLikeSymbol from './MyLikeSymbol';
-import { useQuery } from '@tanstack/react-query';
-import { getProfile } from '@/service/user';
-import { HttpStatusCode, isAxiosError } from 'axios';
+import { ToastContainer } from 'react-toastify';
+import { SymbolLikeCardListLoading } from './SymbolTabs/SymbolCard';
+import ChartHomeClientAPIErrorFallback from '../ErrorBoundary/ErrorFallback/Chart/ChartHomeClientAPIFallback';
+import { syncCookie } from '@/util/cookies';
+import type { ProfilePayload } from '@/interfaces/Dto/User';
 
-function ChartPageHome() {
-  const searchParams = useSearchParams();
-  const tab = searchParams.get('tab');
+export type ChartHomeTab = 'likedSymbols' | 'recommandSymbols';
 
-  const {
-    data: profileResponse,
-    status: profileStatus,
-    error: profileError,
-  } = useQuery(['profile'], () => getProfile(), {
-    retry: 0,
-    refetchOnWindowFocus: false,
-    select(response) {
-      return response.data;
-    },
-  });
+export interface ChartPageHomeProps {
+  user?: ProfilePayload;
+}
 
-  if (profileStatus === 'loading') return null;
+function ChartPageHome({ user }: ChartPageHomeProps) {
+  const { pageTabs } = usePageTab();
 
-  if (profileStatus === 'error') {
-    if (isAxiosError(profileError)) {
-      const { response } = profileError;
-
-      if (response?.status === HttpStatusCode.Unauthorized) {
-        redirect('/login?continueURL=/chart');
-      }
-
-      return null;
+  const Loading = () => {
+    switch (pageTabs.chartPageHomeTab) {
+      case 'likedSymbols':
+        return <SymbolLikeCardListLoading />;
+      case 'recommandSymbols':
+        return <SymbolLikeCardListLoading />;
     }
-  }
+  };
 
-  if (profileResponse?.status === HttpStatusCode.Unauthorized) {
-    redirect('/login?continueURL=/chart');
-  }
+  const RenderTabComponent = () => {
+    switch (pageTabs.chartPageHomeTab) {
+      case 'likedSymbols':
+        return <MyLikeSymbol />;
+      case 'recommandSymbols':
+        return <RecommandSymbol />;
+    }
+  };
+
+  useEffect(() => {
+    syncCookie(user!.email);
+  }, []); /* eslint-disable-line */
 
   return (
-    <>
-      <ChartHomeHeader />
-      <div className={`box-border px-4`}>
-        <SymbolTab />
-        {tab ? tab === 'recommandSymbol' ? <RecommandSymbol /> : <NotFound /> : <MyLikeSymbol />}
-      </div>
-    </>
+    <div className="box-border px-4">
+      <SymbolTab />
+      <ErrorBoundary FallbackComponent={ChartHomeClientAPIErrorFallback}>
+        <Suspense
+          fallback={
+            <div className="mb-3 mt-5 box-border space-y-4">
+              <Loading />
+            </div>
+          }
+        >
+          <RenderTabComponent />
+        </Suspense>
+      </ErrorBoundary>
+      <ToastContainer
+        position="bottom-center"
+        autoClose={3000}
+        hideProgressBar
+        newestOnTop={true}
+        pauseOnFocusLoss={false}
+        pauseOnHover={false}
+      />
+    </div>
   );
 }
 

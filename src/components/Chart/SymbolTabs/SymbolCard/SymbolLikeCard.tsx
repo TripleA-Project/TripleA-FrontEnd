@@ -8,6 +8,7 @@ import SymbolLogoImage from '@/components/Image/SymbolLogoImage';
 
 interface SymbolLikeCardProps {
   symbol: Symbol;
+  logoBgColor?: string;
 }
 
 export function SymbolLikeCardLoading() {
@@ -23,7 +24,7 @@ export function SymbolLikeCardLoading() {
   );
 }
 
-function SymbolLikeCard({ symbol }: SymbolLikeCardProps) {
+function SymbolLikeCard({ symbol, logoBgColor }: SymbolLikeCardProps) {
   const symbolPrice = getPriceInfo({ today: symbol.price.today ?? 0, yesterday: symbol.price.yesterday ?? 0 });
 
   return (
@@ -32,7 +33,7 @@ function SymbolLikeCard({ symbol }: SymbolLikeCardProps) {
       className={`box-border flex w-full border-b border-b-[#EEEEEE] pb-4`}
     >
       <div className="flex w-full shrink-0 items-center gap-4">
-        <SymbolLogoImage type="Card" symbol={symbol.symbol} src={symbol.logo} />
+        <SymbolLogoImage type="Card" symbol={symbol.symbol} src={symbol.logo} bgColor={logoBgColor} />
         <div className="flex flex-1 justify-between">
           <div className="w-[50%] space-y-1">
             <p className="text-sm font-semibold text-black">{symbol.symbol.toUpperCase()}</p>
@@ -59,7 +60,7 @@ function SymbolLikeCard({ symbol }: SymbolLikeCardProps) {
               }
             }}
           >
-            <LikeButton symbol={symbol} />
+            <LikeButton symbolName={symbol.symbol} />
           </div>
         </div>
       </div>

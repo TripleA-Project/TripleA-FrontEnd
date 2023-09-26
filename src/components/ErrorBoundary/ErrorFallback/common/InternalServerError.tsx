@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import FitPage from '@/components/Layout/FitPage';
 import { NotificationIcons } from '@/components/Notification/NotificationIcons';
 import { ServerErrorNotificationTemplate } from '@/constants/notification';
@@ -8,8 +8,14 @@ import Button from '@/components/Button/Button';
 import { useRouter } from 'next/navigation';
 
 function InternalServerError() {
-  const router = useRouter();
+  const { refresh } = useRouter();
   const { title, content } = ServerErrorNotificationTemplate.InternalServerError;
+
+  useEffect(() => {
+    return () => {
+      refresh();
+    };
+  }, []); /* eslint-disable-line */
 
   return (
     <FitPage>
@@ -29,7 +35,7 @@ function InternalServerError() {
             bgColorTheme="orange"
             textColorTheme="white"
             onClick={() => {
-              router.refresh();
+              location.reload();
             }}
           >
             새로 고침

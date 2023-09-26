@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { type HistogramData, type LineData, type Time } from 'lightweight-charts';
 import { type ResampleFrequency } from '@/interfaces/Dto/Stock';
-import { SymbolPrice } from '@/interfaces/Symbol';
+import { type SymbolPrice } from '@/interfaces/Symbol';
 
 export const DeltaPriceType = {
   NO_CHANGE: '--',
@@ -79,4 +79,43 @@ export function getPriceInfo({ today, yesterday }: { today: SymbolPrice; yesterd
     },
     close: todayPrice,
   };
+}
+
+export function getChartDate({ resample }: { resample: ResampleFrequency }) {
+  const today = dayjs();
+
+  switch (resample) {
+    case 'daily':
+      /* 
+        startDate : 1달전
+        endDate : 오늘 
+      */
+      return {
+        startDate: today.set('month', today.get('month') - 1).set('date', 1),
+        endDate: today.clone(),
+      };
+    case 'weekly':
+      /* 
+        startDate : 3달전 1일
+        endDate : 오늘
+      */
+      return {
+        startDate: today.set('month', today.get('month') - 3).set('date', 1),
+        endDate: today.clone(),
+      };
+    case 'monthly':
+      /* 
+        startDate : 현재 년도 1월 1일
+        endDate : 오늘 
+      */
+      return {
+        startDate: dayjs(`${today.get('year')}-01-01`),
+        endDate: today.clone(),
+      };
+    case 'annually':
+      return {
+        startDate: dayjs(`${today.get('year') - 5}-01-01`),
+        endDate: today.clone(),
+      };
+  }
 }

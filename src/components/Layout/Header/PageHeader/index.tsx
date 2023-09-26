@@ -10,13 +10,13 @@ export default function PageHeader() {
 
   const RenderingHeader = () => {
     if (pathName === '/') {
-      const tab = searchParams.get('tab');
+      const tab = searchParams?.get('tab');
       const isInterestTab = !!tab && tab === 'interest';
 
       return <NewsHomeHeader isLikeNewsPage={isInterestTab} />;
     }
 
-    if (pathName.startsWith('/detail')) {
+    if (pathName?.startsWith('/detail')) {
       return <NewsDetailHeader />;
     }
 

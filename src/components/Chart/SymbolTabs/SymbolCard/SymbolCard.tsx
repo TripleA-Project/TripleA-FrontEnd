@@ -6,6 +6,7 @@ import { type Symbol } from '@/interfaces/Symbol';
 interface SymbolCardProps {
   symbol: Symbol;
   hideBorder?: boolean;
+  logoBgColor?: string;
 }
 
 interface SymbolCardLoadingProps {
@@ -32,7 +33,7 @@ export function SymbolCardLoading({ hideBorder }: SymbolCardLoadingProps) {
   );
 }
 
-function SymbolCard({ symbol, hideBorder = false }: SymbolCardProps) {
+function SymbolCard({ symbol, hideBorder = false, logoBgColor }: SymbolCardProps) {
   const symbolPrice = getPriceInfo({ today: symbol.price.today ?? 0, yesterday: symbol.price.yesterday ?? 0 });
 
   return (
@@ -41,7 +42,7 @@ function SymbolCard({ symbol, hideBorder = false }: SymbolCardProps) {
       className={`box-border flex w-full justify-between pb-4 ${hideBorder ? '' : 'border-b border-b-[#EEEEEE]'}`}
     >
       <div className="flex shrink-0 items-center gap-4">
-        <SymbolLogoImage type="Card" symbol={symbol.symbol} src={symbol.logo} />
+        <SymbolLogoImage type="Card" symbol={symbol.symbol} src={symbol.logo} bgColor={logoBgColor} />
         <div className="space-y-1">
           <p className="text-sm font-semibold text-black">{symbol.symbol.toUpperCase()}</p>
           <p className="text-xs text-[#AEAEAE]">{symbol.companyName ?? ''}</p>

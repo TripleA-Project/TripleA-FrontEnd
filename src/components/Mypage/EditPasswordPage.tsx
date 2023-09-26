@@ -1,58 +1,36 @@
 'use client';
 
-import React from 'react';
-import { redirect } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
-import { HttpStatusCode, isAxiosError } from 'axios';
+import React, { useEffect } from 'react';
 import StepForm from '../Form/StepForm';
 import { CompleteEditPassword, EditPasswordForm, ValidatePasswordForm } from '../Form/EditProfileForm';
-import { getProfile } from '@/service/user';
+import { syncCookie } from '@/util/cookies';
+import type { ProfilePayload } from '@/interfaces/Dto/User';
 
-function EditPasswordPage() {
-  const {
-    data: profileResponse,
-    status: profileStatus,
-    error: profileError,
-  } = useQuery(['profile'], () => getProfile(), {
-    retry: 0,
-    refetchOnWindowFocus: false,
-    select(response) {
-      return response.data;
-    },
-  });
+interface EditPasswordPageProps {
+  user?: ProfilePayload;
+}
 
-  if (profileStatus === 'loading') return null;
-
-  if (profileStatus === 'error') {
-    if (isAxiosError(profileError)) {
-      const { response } = profileError;
-
-      if (response?.status === HttpStatusCode.Unauthorized) {
-        redirect('/login?continueURL=/mypage/edit/password');
-      }
-    }
-
-    return null;
-  }
-
-  if (profileResponse?.status === HttpStatusCode.Unauthorized) {
-    redirect('/login?continueURL=/mypage/edit/password');
-  }
+function EditPasswordPage({ user }: EditPasswordPageProps) {
+  useEffect(() => {
+    syncCookie(user!.email);
+  }, []); /* eslint-disable-line */
 
   return (
-    <StepForm
-      headerType="NoBarArrow"
-      headerTitle="비밀번호 변경"
-      renderStepProgressBar={false}
-      defaultValues={{
-        email: profileResponse.data?.email ?? '',
-        fullName: profileResponse.data?.fullName ?? '',
-      }}
-    >
-      <ValidatePasswordForm />
-      <EditPasswordForm />
-      <CompleteEditPassword hideHeader />
-    </StepForm>
+    <div className="mt-[73px] box-border px-4">
+      <StepForm
+        headerType="NoBarArrow"
+        headerTitle="비밀번호 변경"
+        renderStepProgressBar={false}
+        defaultValues={{
+          email: user!.email,
+          fullName: user!.fullName,
+        }}
+      >
+        <ValidatePasswordForm />
+        <EditPasswordForm />
+        <CompleteEditPassword hideHeader />
+      </StepForm>
+    </div>
   );
 }
 

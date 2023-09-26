@@ -48,7 +48,7 @@ export async function getSymbolChartData({
 
   if (symbolStockPayload.status === 401) throw symbolStockPayload;
 
-  const chartData = createChartData(symbolStockPayload.data);
+  const chartData = createChartData(symbolStockPayload.data?.charts);
 
   return {
     membership: symbolStockPayload.data?.membership as keyof typeof MEMBERSHIP,
@@ -58,14 +58,16 @@ export async function getSymbolChartData({
   };
 }
 
-export function createChartData(payload?: GetSymbolStockPayload): Omit<GetChartDataPayload, 'membership'> | null {
+export function createChartData(
+  payload?: GetSymbolStockPayload['charts'] | null,
+): Omit<GetChartDataPayload, 'membership'> | null {
+  if (!payload || payload.length === 0) return null;
+
   const lineData: LineData[] = [];
   const buzzData: HistogramData[] = [];
   const sentimentData: SentimentData[] = [];
 
-  if (!payload?.charts || payload.charts.length === 0) return null;
-
-  payload.charts.forEach(({ date, close, buzz, sentiment }) => {
+  payload.forEach(({ date, close, buzz, sentiment }) => {
     const { label, color } = SentimentGrade[getSentimentGrade(sentiment)!];
 
     const parsedDate = dayjs(date).format('YYYY-MM-DD');

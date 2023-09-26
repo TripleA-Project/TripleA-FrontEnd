@@ -8,11 +8,11 @@ import { isAxiosError } from 'axios';
 import Button from '@/components/Button/Button';
 import PasswordInput from '@/components/Input/StepFormInput/PasswordInput';
 import { CheckList, createCheckList } from '../PasswordForm/CheckList';
-import { updateUserInfo } from '@/service/user';
 import { toastNotify } from '@/util/toastNotify';
 import { validatePassword } from '@/util/validate';
 import { type UseStepFormContext } from '../StepForm';
 import { type APIResponse } from '@/interfaces/Dto/Core';
+import { updateUserData } from '@/util/actions';
 
 interface EditPasswordForm {
   newPassword: string;
@@ -124,7 +124,7 @@ function EditPasswordForm(props: EditProfilesFormProps) {
     const { email, fullName, password } = getValues() as any;
 
     try {
-      await updateUserInfo({
+      const editPasswordResponse = await updateUserData({
         email,
         fullName,
         password,
@@ -133,7 +133,13 @@ function EditPasswordForm(props: EditProfilesFormProps) {
         newPasswordCheck,
       });
 
-      done();
+      if (editPasswordResponse.result === 'success') {
+        done();
+      }
+
+      if (editPasswordResponse.result === 'error') {
+        throw editPasswordResponse.error;
+      }
     } catch (err) {
       if (isAxiosError<APIResponse<{ key: string; value: string }>>(err)) {
         const { response } = err;

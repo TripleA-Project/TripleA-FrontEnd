@@ -1,4 +1,4 @@
-import { type IconBaseProps } from 'react-icons';
+import type { IconBaseProps } from 'react-icons';
 import { SearchIcon } from './SearchIcon';
 import { BackArrowGray, NoBarBackArrowBlack } from './BackArrow';
 import { CloseFillDarkGray, CloseFillGray, CloseFillOrange } from './CloseFill';
@@ -12,9 +12,12 @@ import { EditIcon } from './EditIcon';
 import { TrendNewsIcon } from './TrendNewsIcon';
 import { MessageIcon } from './MessageIcon';
 import { Profile1, Profile2, Profile3, Profile4 } from './Profile';
+import { MdCheck } from 'react-icons/md';
 
 export interface IconProp extends IconBaseProps {}
+
 type Icon = (props: IconProp) => JSX.Element;
+
 interface Icons {
   Search: Icon;
   BackArrow: {
@@ -26,6 +29,7 @@ interface Icons {
     DarkGray: Icon;
     Orange: Icon;
   };
+  Check: Icon;
   Lock: Icon;
   Translation: Icon;
   Share: Icon;
@@ -81,6 +85,7 @@ export const AppIcons: Icons = {
     DarkGray: (props) => <CloseFillDarkGray {...props} />,
     Orange: (props) => <CloseFillOrange {...props} />,
   },
+  Check: (props) => <MdCheck {...props} />,
   Lock: (props) => <LockIcon {...props} />,
   Translation: (props) => <TranslationIcon {...props} />,
   Share: (props) => <ShareIcon {...props} />,

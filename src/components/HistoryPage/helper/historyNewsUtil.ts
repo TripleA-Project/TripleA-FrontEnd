@@ -46,7 +46,12 @@ export function getTargetHistory(historyList: NewsHistory[], targetDate: Calende
 export function getFetchNewsIdList(historyList: NewsHistory[], targetDate: CalenderDate) {
   const targetHistoryList = getTargetHistory(historyList, targetDate);
 
-  return targetHistoryList.flatMap((history) => history.history.news).map(({ id }) => id);
+  const historyNewsIdList = targetHistoryList.flatMap((history) => history.history.news).map(({ id }) => id);
+  const bookmarkNewsIdList = getBookmarks(targetHistoryList).map(({ id }) => id);
+
+  const fetchNewsIdList = Array.from(new Set([...historyNewsIdList, ...bookmarkNewsIdList]));
+
+  return fetchNewsIdList;
 }
 
 export function createHistoryNewsList({
@@ -60,17 +65,20 @@ export function createHistoryNewsList({
 }) {
   const targetHistoryList = getTargetHistory(historyList, targetDate);
 
-  const bookmarks = getBookmarks(historyList);
+  const allBookmarks = getBookmarks(historyList);
 
   const newsListSource = targetHistoryList.map((history) => {
-    const news = history.history.news;
+    const historyNews = history.history.news;
+    const bookmarkNews = history.bookmark.news;
 
-    const newsDataList = news.map(({ id }) => {
+    const mergedNews = uniqBy([...historyNews, ...bookmarkNews], 'id');
+
+    const mergedhistoryNewsDataList = mergedNews.map(({ id }) => {
       const newsQuery = newsListQueries.find(({ data: payload }) => payload?.data.id === id);
 
       if (!newsQuery?.data?.data) return null;
 
-      const { title, description, source, sentiment, publishedDate, symbol, thumbnail } = newsQuery?.data?.data;
+      const { title, description, source, sentiment, publishedDate, symbol, thumbnail } = newsQuery.data.data;
 
       return {
         newsId: id,
@@ -85,14 +93,14 @@ export function createHistoryNewsList({
         thumbnail,
         bookmark: {
           count: 0,
-          isBookmark: bookmarks.some((bookmark) => bookmark.id === id),
+          isBookmark: allBookmarks.some((bookmark) => bookmark.id === id),
         },
       } as NewsData;
     });
 
     return {
       date: history.date,
-      newsList: newsDataList.filter((news) => news !== null),
+      newsList: mergedhistoryNewsDataList.filter((news) => news !== null),
     } as HistoryNews;
   });
 

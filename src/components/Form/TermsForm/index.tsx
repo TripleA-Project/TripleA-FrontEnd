@@ -1,8 +1,9 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { useFormContext } from 'react-hook-form';
-import { AxiosError } from 'axios';
 import { MdOutlineArrowBackIosNew } from 'react-icons/md';
 import { UseStepFormContext } from '../StepForm';
 import FormTitle from '../FormTitle';
@@ -12,8 +13,7 @@ import PrivacyTermModal from './PrivacyTermModal';
 import { login, signup } from '@/service/auth';
 import { deleteCookie, getCookie, setCookie } from '@/util/cookies';
 import { toastNotify } from '@/util/toastNotify';
-import { type FormData } from '@/interfaces/FormData';
-import { useQueryClient } from '@tanstack/react-query';
+import type { FormData } from '@/interfaces/FormData';
 
 export interface TermsFormData {
   newsLetter: boolean;
@@ -27,6 +27,8 @@ function TermsForm() {
     setValue,
     formState: { errors },
   } = useFormContext() as UseStepFormContext<FormData>;
+
+  const { replace } = useRouter();
 
   const queryClient = useQueryClient();
 
@@ -66,9 +68,10 @@ function TermsForm() {
   };
 
   const onValid = async ({ email, emailKey, password, passwordCheck, fullName, newsLetter }: FormData) => {
-    try {
-      // 회원가입 => 저장된 정보로 로그인 => 액세스토큰 설정 => 심볼 , 카테고리 설정 페이지 이동
+    // 회원가입 => 저장된 정보로 로그인 => 액세스토큰 설정 => 심볼 , 카테고리 설정 페이지 이동
 
+    try {
+      // 회원가입
       await signup({
         email: email!,
         password: password!,
@@ -79,37 +82,36 @@ function TermsForm() {
       });
 
       // login
+      try {
+        const hasAccessToken = await getCookie('accessToken');
 
-      const hasAccessToken = await getCookie('accessToken');
+        if (hasAccessToken) {
+          await deleteCookie('accessToken');
+        }
 
-      if (hasAccessToken) {
-        await deleteCookie('accessToken');
-      }
+        const loginResult = await login({ email: email!, password: password! });
 
-      const loginResult = await login({ email: email!, password: password! });
+        const accessToken = loginResult.headers['authorization'];
 
-      const accessToken = loginResult.headers['authorization'];
+        if (accessToken) {
+          await setCookie('accessToken', (accessToken as string).replace('Bearer ', ''), {
+            maxAge: 60 * 60,
+            path: '/',
+          });
+        }
 
-      if (accessToken) {
-        await setCookie('accessToken', (accessToken as string).replace('Bearer ', ''), { maxAge: 60 * 60, path: '/' });
-      }
+        queryClient.invalidateQueries(['profile']);
 
-      queryClient.removeQueries(['auth']);
-      queryClient.invalidateQueries(['profile']);
-
-      setTimeout(() => {
-        done();
-      }, 0);
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        toastNotify('error', '시스템 에러가 발생했습니다. 잠시후 다시 시도해주세요.');
+        setTimeout(() => {
+          done();
+        }, 0);
+      } catch (error) {
+        replace('/');
 
         return;
       }
-
-      toastNotify('error', '시스템 에러가 발생했습니다. 잠시후 다시 시도해주세요.');
-
-      return;
+    } catch (err) {
+      toastNotify('error', '회원가입에 실패했습니다');
     }
   };
 

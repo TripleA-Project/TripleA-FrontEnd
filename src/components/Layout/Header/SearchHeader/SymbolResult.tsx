@@ -55,12 +55,7 @@ function SymbolResult({ keyword }: SymbolResultProps) {
                 href={`/chart/symbol?name=${symbol.symbol.toUpperCase()}&resample=daily`}
                 className="box-border flex items-center gap-4 p-4"
               >
-                <SymbolLogoImage
-                  symbol={symbol.symbol}
-                  src={symbol.logo}
-                  type="Card"
-                  style={{ wrapper: { backgroundColor: '#fff' } }}
-                />
+                <SymbolLogoImage symbol={symbol.symbol} src={symbol.logo} type="Card" />
                 <div className="max-w-[calc(100%-64px)] flex-1 truncate mobile:max-w-[calc(100vw-64px)] pc:max-w-[calc(100%-64px)]">
                   <div>
                     <span className="font-semibold text-[#131F3C]">{symbol.symbol}</span>

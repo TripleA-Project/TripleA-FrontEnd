@@ -24,7 +24,7 @@ function Footer() {
   }, 300);
 
   useEffect(() => {
-    if (!allowedPathList.includes(pathName)) return;
+    if (!allowedPathList.includes(pathName!)) return;
 
     const page = document.getElementById('page_wrapper');
 
@@ -43,7 +43,7 @@ function Footer() {
     };
   }, [pathName]); /* eslint-disable-line */
 
-  return allowedPathList.includes(pathName) ? (
+  return allowedPathList.includes(pathName!) ? (
     <footer ref={footerRef} className="inner mb-[63px] !p-0">
       <div className="box-border flex w-full flex-wrap gap-8 bg-gray-200 px-2 footer:flex-col footer:pb-4">
         <div className="box-border w-[65%] py-4 text-xs not-italic footer:w-full">

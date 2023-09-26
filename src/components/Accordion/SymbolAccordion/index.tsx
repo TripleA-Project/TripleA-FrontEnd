@@ -1,21 +1,14 @@
 'use client';
 
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
 import Accordion from '..';
 import Link from 'next/link';
 import SymbolChip from '@/components/UI/Chip/SymbolChip';
 import { AppIcons } from '@/components/Icons';
-import { getLikeSymbol } from '@/service/symbol';
+import { useLikedSymbols } from '@/hooks/useLikedSymbols';
 
 function SymbolAccordion() {
-  const { data: likedSymbol, status: likedSymbolStatus } = useQuery(['likedSymbolList'], () => getLikeSymbol(), {
-    retry: 0,
-    refetchOnWindowFocus: false,
-    select(payload) {
-      return payload.data;
-    },
-  });
+  const { likedSymbols, status } = useLikedSymbols();
 
   return (
     <Accordion
@@ -29,16 +22,16 @@ function SymbolAccordion() {
       }
       detail={
         <div className="flex max-h-[252px] w-max flex-col gap-3 overflow-auto scrollbar-none">
-          {likedSymbolStatus === 'loading' ? (
+          {status === 'loading' ? (
             <>
               {Array.from({ length: 3 }).map((_, idx) => (
                 <SymbolChip key={idx} loading />
               ))}
             </>
           ) : null}
-          {likedSymbol?.data ? (
+          {likedSymbols?.symbols ? (
             <>
-              {likedSymbol.data.map((symbol, idx) => {
+              {likedSymbols.symbols.map((symbol, idx) => {
                 return <SymbolChip key={`${symbol.symbol}-${symbol.companyName}-${idx}`} symbol={symbol} selected />;
               })}
             </>

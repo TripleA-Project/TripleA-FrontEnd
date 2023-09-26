@@ -44,20 +44,18 @@ function LightWeightChart(
   return (
     <div ref={chartContainerRef} className="chart_container relative">
       {container ? (
-        <>
-          <LightWeightChartContainer
-            ref={chartAPIRef}
-            resample={resample}
-            container={container}
-            charts={charts}
-            source={source}
-            timeMarkerVisible={timeMarkerVisible}
-            tooltipVisible={tooltipVisible}
-            options={{ height: 322 / 2, ...options } as ChartOptions}
-          >
-            {children}
-          </LightWeightChartContainer>
-        </>
+        <LightWeightChartContainer
+          ref={chartAPIRef}
+          resample={resample}
+          container={container}
+          charts={charts}
+          source={source}
+          timeMarkerVisible={timeMarkerVisible}
+          tooltipVisible={tooltipVisible}
+          options={{ height: 322 / 2, ...options } as ChartOptions}
+        >
+          {children}
+        </LightWeightChartContainer>
       ) : null}
     </div>
   );

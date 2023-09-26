@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import EditPasswordPage from '@/components/Mypage/EditPasswordPage';
+import MypageUserFetcher from '@/components/Mypage/MypageUserFetcher';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -11,9 +12,12 @@ export const metadata: Metadata = {
 
 async function PasswordEditPage() {
   return (
-    <div className="mt-[73px] box-border px-4">
-      <EditPasswordPage />
-    </div>
+    <>
+      {/* @ts-expect-error server component */}
+      <MypageUserFetcher>
+        <EditPasswordPage />
+      </MypageUserFetcher>
+    </>
   );
 }
 

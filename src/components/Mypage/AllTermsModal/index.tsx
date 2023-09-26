@@ -64,7 +64,7 @@ function AllTermsModal({ open, onClose }: AllTermsModalProps) {
         </div>
         <div>
           <div className="h-80 overflow-hidden">
-            <div ref={termsRef} className="h-full overflow-y-auto scrollbar-none">
+            <div ref={termsRef} className="h-full overflow-y-auto overscroll-contain scrollbar-none">
               {terms === 'serviceTerm' ? <ServiceTermContent /> : <PrivacyTermContent />}
             </div>
           </div>

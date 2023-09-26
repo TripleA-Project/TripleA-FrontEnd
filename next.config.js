@@ -19,6 +19,14 @@ const nextConfig = {
     ],
     domains: ['s.yimg.com'],
   },
+  async rewrites() {
+    return [
+      {
+        source: `/moya/api/globalnews/:id`,
+        destination: `${process.env.NEXT_PUBLIC_MOYA_SERVER}/globalnews?id=:id&token=${process.env.NEXT_PUBLIC_TOKEN}`,
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;

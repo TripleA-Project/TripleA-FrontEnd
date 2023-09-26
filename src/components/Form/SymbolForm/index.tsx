@@ -1,266 +1,239 @@
 'use client';
 
-import { useLayoutEffect, useState, useRef } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import { HttpStatusCode } from 'axios';
+import { useLayoutEffect, useState, useRef, useEffect } from 'react';
+import { flushSync } from 'react-dom';
+import { usePathname } from 'next/navigation';
 import { useFormContext } from 'react-hook-form';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { throttle } from 'lodash';
 import { ToastContainer } from 'react-toastify';
 import { initLikedSymbolMap, initSelectedSymbolMap, reset, useSymbolList } from '@/redux/slice/symbolSlice';
+import FormTitleHighLightText from '../FormTitleHighLightText';
 import MuiSpinner from '@/components/UI/Spinner/MuiSpinner';
 import Button from '@/components/Button/Button';
 import { SearchSymbol, SelectedSymbolHorizonList, SearchSymbolResult } from '@/components/Search/SearchSymbol';
 import { LockNotification } from '@/components/Notification';
-import { disLikeSymbol, getLikeSymbol, likeSymbol } from '@/service/symbol';
-import { getProfile } from '@/service/user';
-import { toastNotify } from '@/util/toastNotify';
 import { LockNotificationTemplate } from '@/constants/notification';
-import { type UseStepFormContext } from '../StepForm';
-import { type SearchedSymbol } from '@/interfaces/Symbol';
+import SymbolFormUnauthorized from '@/components/ErrorBoundary/ErrorFallback/SymbolForm/Unauthorized';
+import SymbolEditResultModal, { SymbolEditResultModalProps } from './ResultModal/Modal';
+import { useLikedSymbols } from '@/hooks/useLikedSymbols';
+import { useSymbolAsyncMutation } from '@/hooks/useSymbolAsyncMutation';
+import type { UseStepFormContext } from '../StepForm';
+import type { SearchedSymbol } from '@/interfaces/Symbol';
 
 interface SymbolFormProps {
   buttonText?: string;
   skipable?: boolean;
 }
 
-function SymbolForm({ buttonText = '선택 완료' }: SymbolFormProps) {
-  const queryClient = useQueryClient();
-
-  const pathName = usePathname();
-  const { push } = useRouter();
-
-  const formContext = useFormContext() as UseStepFormContext;
-
-  const handleView = () => {
-    if (window.innerHeight < 700) {
-      formWrapperRef.current!.style.marginTop = '-32px';
-
-      return;
+function handleView(formWrapper: HTMLDivElement | null) {
+  if (window.innerHeight < 700) {
+    if (formWrapper) {
+      formWrapper.style.marginTop = '-32px';
     }
 
-    formWrapperRef.current!.style.removeProperty('margin-top');
-  };
+    return;
+  }
 
-  const resizeThrottle = throttle((e: UIEvent) => {
-    handleView();
-  }, 300);
+  if (formWrapper) {
+    formWrapper.style.removeProperty('margin-top');
+  }
+}
 
-  const cleanUp = () => {
-    formWrapperRef.current?.style.removeProperty('margin-top');
-  };
+function cleanUp(formWrapper: HTMLDivElement | null) {
+  if (formWrapper) {
+    formWrapper.style.removeProperty('margin-top');
+  }
+}
 
-  const { data: profileResponse, status: profileStatus } = useQuery(['profile'], () => getProfile(), {
-    retry: 0,
-    refetchOnWindowFocus: false,
-    select(response) {
-      return response.data;
-    },
-  });
+// symbolForm
+function SymbolForm({ buttonText = '선택 완료' }: SymbolFormProps) {
+  const pathName = usePathname();
 
-  const { data: likedSymbolResponse, status: likedSymbolStatus } = useQuery(
-    ['likedSymbolList'],
-    () => getLikeSymbol(),
-    {
-      retry: 0,
-      refetchOnWindowFocus: false,
-      select(response) {
-        return response.data;
-      },
-    },
-  );
+  const formContext = useFormContext() as UseStepFormContext;
 
   const formWrapperRef = useRef<HTMLDivElement>(null);
   const submitWrapperRef = useRef<HTMLDivElement>(null);
 
-  const isSubmittingRef = useRef(false);
-  const isSuccessRef = useRef(true);
+  const [isSubmit, setIsSubmit] = useState(false);
 
-  const { mutateAsync: like, status: likeStatus } = useMutation((symbol: string) => likeSymbol({ symbol }), {
-    retry: 0,
-    onSuccess(data, symbolName) {
-      successSymbolListRef.current.like.push(symbolName);
-    },
-    onError(error, symbolName) {
-      failSymbolListRef.current.like.push(symbolName);
+  const {
+    like,
+    unlike,
+    getResultList,
+    resetResultList,
+    isSuccessLikes,
+    isSuccessUnlikes,
+    isUnauthorizedMutation,
+    isFetching,
+  } = useSymbolAsyncMutation();
 
-      if (isSuccessRef.current === true) {
-        isSuccessRef.current = false;
-      }
-    },
-  });
+  const { likedSymbols, invalidateQuery, removeQuery, loginRequired, status: likedSymbolsStatus } = useLikedSymbols();
 
-  const { mutateAsync: unlike, status: unlikeStatus } = useMutation((id: number) => disLikeSymbol({ id }), {
-    retry: 0,
-    onSuccess(data, index) {
-      if (likedSymbolResponse?.data) {
-        const symbol = likedSymbolResponse.data.find((_, idx) => idx === index - 1)!.symbol;
+  const { dispatch, requestLikeSymbolMap, requestUnLikeSymbolMap, selectedSymbolMap } = useSymbolList();
+  const [searchedSymbols, setSearchedSymbols] = useState<SearchedSymbol[]>([]);
+  const selectedSymbols = Object.keys(selectedSymbolMap)?.length
+    ? [...Array.from(Object.entries(selectedSymbolMap)).map(([key, value]) => ({ key, ...value } as SearchedSymbol))]
+    : [];
 
-        successSymbolListRef.current.unlike.push(symbol);
-      }
-    },
-    onError(error, index, context) {
-      if (likedSymbolResponse?.data) {
-        const symbol = likedSymbolResponse.data.find((_, idx) => idx === index - 1)!.symbol;
+  const hasNotRequest = !Object.keys(requestLikeSymbolMap).length && !Object.keys(requestUnLikeSymbolMap).length;
 
-        failSymbolListRef.current.unlike.push(symbol);
+  const syncSymbols = () => {
+    dispatch(reset());
 
-        if (isSuccessRef.current === true) {
-          isSuccessRef.current = false;
-        }
-      }
-    },
-  });
+    dispatch(
+      initLikedSymbolMap({
+        symbols: likedSymbols?.symbols ?? [],
+      }),
+    );
 
-  const successSymbolListRef = useRef<{ like: string[]; unlike: string[] }>({
-    like: [],
-    unlike: [],
-  });
-  const failSymbolListRef = useRef<{ like: string[]; unlike: string[] }>({
-    like: [],
-    unlike: [],
-  });
+    dispatch(initSelectedSymbolMap());
+  };
+
+  const resizeThrottle = throttle((e: UIEvent) => {
+    handleView(formWrapperRef.current);
+  }, 300);
 
   const [showSubscribeNotification, setShowSubScribeNotification] = useState(false);
 
-  const [searchedSymbols, setSearchedSymbols] = useState<SearchedSymbol[]>([]);
-  const { dispatch, requestLikeSymbolMap, requestUnLikeSymbolMap, selectedSymbolMap } = useSymbolList();
-  const selectedSymbols = Object.keys(selectedSymbolMap)?.length
-    ? [
-        ...Array.from(Object.entries(selectedSymbolMap)).map(
-          ([key, value]) => ({ symbol: key, ...value } as SearchedSymbol),
-        ),
-      ]
-    : [];
+  const [resultModal, setResultModal] = useState<SymbolEditResultModalProps>({
+    open: false,
+    result: 'success',
+    symbolResults: {
+      success: {
+        like: [],
+        unlike: [],
+      },
+      fail: {
+        like: [],
+        unlike: [],
+      },
+    },
+    onClose() {
+      setResultModal((prev) => ({
+        ...prev,
+        open: false,
+        result: 'success',
+        symbolResults: {
+          success: {
+            like: [],
+            unlike: [],
+          },
+          fail: {
+            like: [],
+            unlike: [],
+          },
+        },
+      }));
+    },
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (isSubmittingRef.current === true) return;
-
-    isSubmittingRef.current = true;
-
     if (Object.keys(requestUnLikeSymbolMap).length) {
+      /*
+        unlike : 관심심볼 응답에서의 id로 요청해야 함
+      */
       await Promise.allSettled([
-        ...Object.keys(requestUnLikeSymbolMap).map((symbol) => {
-          if (likedSymbolResponse?.data) {
-            const unlikeTarget = likedSymbolResponse.data.find((likedSymbol) => likedSymbol.symbol === symbol);
-
-            return unlike(unlikeTarget ? unlikeTarget.symbolId : -1);
-          }
+        ...Object.values(requestUnLikeSymbolMap).map((requestSymbol) => {
+          return unlike({ requestId: requestSymbol.symbolId, symbol: requestSymbol });
         }),
       ]);
     }
 
     if (Object.keys(requestLikeSymbolMap).length) {
-      await Promise.allSettled([...Object.keys(requestLikeSymbolMap).map((symbol) => like(symbol.toUpperCase()))]);
+      await Promise.allSettled([
+        ...Object.values(requestLikeSymbolMap).map((requestSymbol) => {
+          return like({ symbol: requestSymbol });
+        }),
+      ]);
     }
 
-    isSubmittingRef.current = false;
+    invalidateQuery.likedSymbols();
 
-    if (isSuccessRef.current === true) {
-      if (pathName.startsWith('/signup')) {
-        queryClient.invalidateQueries(['likedSymbolList']);
+    setIsSubmit(true);
+  };
+
+  useLayoutEffect(() => {
+    const formWrapperRefClone = formWrapperRef.current;
+
+    window.addEventListener('resize', resizeThrottle);
+
+    handleView(formWrapperRef.current);
+
+    return () => {
+      cleanUp(formWrapperRefClone);
+
+      window.removeEventListener('resize', resizeThrottle);
+
+      removeQuery.likedSymbols();
+
+      syncSymbols();
+    };
+  }, []); /* eslint-disable-line */
+
+  useEffect(() => {
+    if (likedSymbolsStatus === 'success') {
+      syncSymbols();
+    }
+
+    (async () => {
+      if (!isSubmit) return;
+
+      if (isUnauthorizedMutation) return;
+
+      const { success, fail } = getResultList();
+
+      if (pathName?.startsWith('/signup')) {
+        await invalidateQuery.likedSymbols();
 
         formContext.done();
 
         return;
       }
 
-      toastNotify('success', '관심 심볼 처리 성공');
-    }
+      if (isSuccessLikes && isSuccessUnlikes) {
+        setResultModal((prev) => ({
+          ...prev,
+          open: true,
+          result: 'success',
+          symbolResults: {
+            success,
+            fail,
+          },
+        }));
+      }
 
-    if (isSuccessRef.current === false) {
-      toastNotify('error', '관심 심볼 처리 실패');
-    }
+      if (!isSuccessLikes || !isSuccessUnlikes) {
+        flushSync(() => {
+          setResultModal((prev) => ({
+            ...prev,
+            open: true,
+            result: 'fail',
+            symbolResults: {
+              success,
+              fail,
+            },
+          }));
+        });
+      }
 
-    // reset
+      // reset
+      resetResultList();
 
-    queryClient.invalidateQueries(['likedSymbolList']);
+      setIsSubmit(false);
+    })();
+  }, [isSubmit, likedSymbolsStatus]); /* eslint-disable-line */
 
-    dispatch(reset());
-    dispatch(
-      initLikedSymbolMap({
-        symbols:
-          likedSymbolResponse?.data?.map((symbol) => {
-            const likedSymbolIdx = likedSymbolResponse.data?.findIndex(
-              (likeSymbol) => likeSymbol.symbol === symbol.symbol,
-            );
-
-            return {
-              ...symbol,
-              requestId: likedSymbolIdx! + 1,
-            };
-          }) ?? [],
-      }),
-    );
-    dispatch(initSelectedSymbolMap());
-
-    isSuccessRef.current = true;
-
-    successSymbolListRef.current.like = [];
-    successSymbolListRef.current.unlike = [];
-
-    failSymbolListRef.current.like = [];
-    failSymbolListRef.current.unlike = [];
-  };
-
-  useLayoutEffect(() => {
-    if (profileStatus === 'loading' || likedSymbolStatus === 'loading') return;
-
-    if (
-      profileStatus === 'error' ||
-      likedSymbolStatus === 'error' ||
-      likedSymbolResponse.status !== HttpStatusCode.Ok
-    ) {
-      push('/login?continueURL=/mypage/edit/symbol');
-
-      return;
-    }
-
-    if (likedSymbolResponse) {
-      dispatch(reset());
-      dispatch(
-        initLikedSymbolMap({
-          symbols:
-            likedSymbolResponse.data?.map((symbol) => {
-              const likedSymbolIdx = likedSymbolResponse.data?.findIndex(
-                (likeSymbol) => likeSymbol.symbol === symbol.symbol,
-              );
-
-              return {
-                ...symbol,
-                requestId: likedSymbolIdx! + 1,
-              };
-            }) ?? [],
-        }),
-      );
-    }
-
-    dispatch(initSelectedSymbolMap());
-  }, [profileStatus, likedSymbolStatus, likedSymbolResponse]); /* eslint-disable-line */
-
-  useLayoutEffect(() => {
-    window.addEventListener('resize', resizeThrottle);
-
-    handleView();
-
-    return () => {
-      cleanUp();
-
-      window.removeEventListener('resize', resizeThrottle);
-    };
-  }, []); /* eslint-disable-line */
+  if (loginRequired || isUnauthorizedMutation) {
+    return <SymbolFormUnauthorized />;
+  }
 
   return (
     <div ref={formWrapperRef} className="relative">
       <div className="my-11 space-y-3">
         <h3 className="flex items-center justify-center text-xl font-bold">
-          <span className="relative inline-block align-top">
-            관심심볼
-            <div className="absolute bottom-0 left-0 -z-[1] h-2 w-full bg-[#FFB682]" />
-          </span>
-          을 설정해주세요
+          <FormTitleHighLightText content={'관심심볼'} />을 설정해주세요
         </h3>
         <h4 className="flex flex-col items-center justify-center text-sm font-semibold">
           <span>선택한 종목이 언급된</span>
@@ -271,10 +244,10 @@ function SymbolForm({ buttonText = '선택 완료' }: SymbolFormProps) {
         <SearchSymbol
           submitWrapper={submitWrapperRef.current}
           onSearch={(symbols) => setSearchedSymbols(symbols)}
-          disabled={profileStatus === 'loading' || likedSymbolStatus !== 'success'}
+          disabled={likedSymbolsStatus === 'loading' || likedSymbolsStatus === 'fetching'}
         />
         <SearchSymbolResult
-          loading={profileStatus === 'loading' || likedSymbolStatus !== 'success'}
+          isSyncing={likedSymbolsStatus === 'loading' || likedSymbolsStatus === 'fetching'}
           symbols={searchedSymbols}
           onDispatch={(requiredSubscribe) => {
             if (requiredSubscribe) setShowSubScribeNotification(true);
@@ -282,7 +255,7 @@ function SymbolForm({ buttonText = '선택 완료' }: SymbolFormProps) {
         />
         <div ref={submitWrapperRef} className="fixed_inner fixed bottom-12">
           <SelectedSymbolHorizonList
-            loading={profileStatus === 'loading' || likedSymbolStatus !== 'success'}
+            loading={likedSymbolsStatus === 'loading' || likedSymbolsStatus === 'fetching'}
             symbols={selectedSymbols}
             shadowEffect
             closeButton
@@ -290,13 +263,15 @@ function SymbolForm({ buttonText = '선택 완료' }: SymbolFormProps) {
           <div className="mx-auto mt-4 box-border w-full">
             <Button
               type="submit"
-              disabled={likedSymbolStatus === 'loading' || likeStatus === 'loading' || unlikeStatus === 'loading'}
+              disabled={
+                likedSymbolsStatus === 'loading' || hasNotRequest || isFetching || likedSymbolsStatus === 'fetching'
+              }
               bgColorTheme="orange"
               textColorTheme="white"
               fullWidth
               className="relative disabled:!cursor-progress disabled:!bg-slate-300 disabled:!opacity-60"
             >
-              {likeStatus === 'loading' || unlikeStatus === 'loading' ? (
+              {isFetching ? (
                 <div className="absolute left-0 top-0 flex h-full w-full items-center justify-center">
                   <div className="translate-y-[3.4px]">
                     <MuiSpinner />
@@ -327,10 +302,14 @@ function SymbolForm({ buttonText = '선택 완료' }: SymbolFormProps) {
           setShowSubScribeNotification(false);
         }}
       />
+      <SymbolEditResultModal
+        open={resultModal.open}
+        result={resultModal.result}
+        onClose={resultModal.onClose}
+        symbolResults={resultModal.symbolResults}
+      />
     </div>
   );
 }
 
 export default SymbolForm;
-
-// className={`fixed left-0 w-full ${hasNotNavBar ? 'bottom-2 ' : 'bottom-[calc(63px+8px)]'}`}
