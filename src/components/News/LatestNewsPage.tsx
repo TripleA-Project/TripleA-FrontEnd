@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosError, HttpStatusCode } from 'axios';
 import { ToastContainer } from 'react-toastify';
@@ -15,7 +14,7 @@ import LatestNewsInternalServerError from '../ErrorBoundary/ErrorFallback/Latest
 import { HorizontalLine } from '../UI/DivideLine';
 import { latestNews } from '@/service/news';
 import { TIMEOUT_CODE } from '@/service/axios';
-import { APIResponse } from '@/interfaces/Dto/Core';
+import type { APIResponse } from '@/interfaces/Dto/Core';
 
 function LatestNewsPage() {
   const queryClient = useQueryClient();
@@ -25,7 +24,6 @@ function LatestNewsPage() {
   const {
     data: latestNewsPageResponse,
     isSuccess,
-    isInitialLoading,
     isLoading,
     hasNextPage,
     fetchNextPage,
@@ -41,12 +39,12 @@ function LatestNewsPage() {
 
       const nextPage = LastPageResponse.data?.nextPage;
 
-      return status === 200 && nextPage ? nextPage : undefined;
+      return status === HttpStatusCode.Ok && nextPage ? nextPage : undefined;
     },
   });
 
   if (isSuccess && latestNewsPageResponse.pages[0].data.status !== HttpStatusCode.Ok) {
-    redirect('/login');
+    return <LatestNewsInternalServerError refetch={refetch} />;
   }
 
   if (error) {
@@ -108,14 +106,6 @@ function LatestNewsPage() {
       {!isFetchingNextPage && hasNextPage ? (
         <InfiniteTrigger onTrigger={fetchNextPage} isFetching={isFetchingNextPage} hasNextPage={hasNextPage} />
       ) : null}
-      <ToastContainer
-        position="bottom-center"
-        autoClose={3000}
-        hideProgressBar
-        newestOnTop={true}
-        pauseOnFocusLoss={false}
-        pauseOnHover={false}
-      />
     </>
   );
 }

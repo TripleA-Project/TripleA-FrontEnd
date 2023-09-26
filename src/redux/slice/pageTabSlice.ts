@@ -1,17 +1,20 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '../store';
-import type { TabPage } from '@/components/News/NewsTab';
+import type { MainPageNewsTab } from '@/components/News/NewsTab';
 import type { ChartHomeTab } from '@/components/Chart/ChartPageHome';
+import { ResampleFrequency } from '@/interfaces/Dto/Stock';
 
 type PageTabState = {
-  mainPageTab: TabPage;
+  mainPageTab: MainPageNewsTab;
   chartPageHomeTab: ChartHomeTab;
+  symbolChartPageResampleFrequencyTab: ResampleFrequency;
 };
 
 const initialState: PageTabState = {
   mainPageTab: 'latestNews',
   chartPageHomeTab: 'likedSymbols',
+  symbolChartPageResampleFrequencyTab: 'daily',
 };
 
 const pageTabSlice = createSlice({
@@ -24,10 +27,16 @@ const pageTabSlice = createSlice({
     setChartPageHomeTab: (state, action: PayloadAction<PageTabState['chartPageHomeTab']>) => {
       state.chartPageHomeTab = action.payload;
     },
+    setSymbolChartPageResampleFrequencyTab: (
+      state,
+      action: PayloadAction<PageTabState['symbolChartPageResampleFrequencyTab']>,
+    ) => {
+      state.symbolChartPageResampleFrequencyTab = action.payload;
+    },
   },
 });
 
-export const { setMainPageTab, setChartPageHomeTab } = pageTabSlice.actions;
+export const { setMainPageTab, setChartPageHomeTab, setSymbolChartPageResampleFrequencyTab } = pageTabSlice.actions;
 
 export function usePageTab() {
   const dispatch = useDispatch();

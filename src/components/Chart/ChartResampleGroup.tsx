@@ -1,51 +1,65 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
-import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Button from '../Button/Button';
+import { setSymbolChartPageResampleFrequencyTab, usePageTab } from '@/redux/slice/pageTabSlice';
+import { ResampleFrequency } from '@/interfaces/Dto/Stock';
+import { twMerge } from 'tailwind-merge';
 
 interface ChartResampleGroupProps {
   symbol: string;
 }
 
 function ChartResampleGroup({ symbol }: ChartResampleGroupProps) {
-  const resample = useSearchParams()?.get('resample');
+  const { push } = useRouter();
+
+  const searchParams = useSearchParams();
+  const queryStringResample = (searchParams.get('resample') || 'daily') as ResampleFrequency;
+
+  const { dispatch, pageTabs } = usePageTab();
+
+  const selectedResample =
+    queryStringResample !== pageTabs.symbolChartPageResampleFrequencyTab
+      ? queryStringResample
+      : pageTabs.symbolChartPageResampleFrequencyTab;
+
+  const tabClassNames = `w-full rounded-[4px] hover:bg-[#9AA1A9] hover:text-white bg-transparent`;
+
+  const activeClassNames = {
+    content: `bg-[#9AA1A9] text-white`,
+  };
+
+  const classNames = {
+    tabContainer: twMerge([`box-border flex divide-x-2 divide-white rounded-lg bg-[#F5F7F9] p-1.5`]),
+    tabWrapper: twMerge([`flex-1`]),
+    monthlyTab: twMerge([tabClassNames, selectedResample === 'monthly' && activeClassNames.content]),
+    weeklyTab: twMerge([tabClassNames, selectedResample === 'weekly' && activeClassNames.content]),
+    dailyTab: twMerge([tabClassNames, selectedResample === 'daily' && activeClassNames.content]),
+  };
+
+  function tab(resample: ResampleFrequency) {
+    dispatch(setSymbolChartPageResampleFrequencyTab(resample));
+
+    push(`/chart/symbol?name=${symbol}&resample=${resample}`);
+  }
 
   return (
-    <div className="box-border flex divide-x-2 divide-white rounded-lg bg-[#F5F7F9] p-1.5">
-      <Link href={`/chart/symbol?name=${symbol.toUpperCase()}&resample=monthly`} className={`flex-1`}>
-        <Button
-          className={`!w-full !rounded-[4px] hover:!bg-[#9AA1A9] hover:!text-white ${
-            resample === 'monthly' ? '!bg-[#9AA1A9] text-white' : '!bg-transparent'
-          }`}
-          bgColorTheme="gray"
-          textColorTheme="black"
-        >
+    <div className={classNames.tabContainer}>
+      <div className={classNames.tabWrapper} onClick={() => tab('monthly')}>
+        <Button className={classNames.monthlyTab} bgColorTheme="gray" textColorTheme="black">
           월
         </Button>
-      </Link>
-      <Link href={`/chart/symbol?name=${symbol.toUpperCase()}&resample=weekly`} className={`flex-1`}>
-        <Button
-          className={`!w-full !rounded-[4px] hover:!bg-[#9AA1A9] hover:!text-white ${
-            resample === 'weekly' ? '!bg-[#9AA1A9] text-white' : '!bg-transparent'
-          }`}
-          bgColorTheme="gray"
-          textColorTheme="black"
-        >
+      </div>
+      <div className={classNames.tabWrapper} onClick={() => tab('weekly')}>
+        <Button className={classNames.weeklyTab} bgColorTheme="gray" textColorTheme="black">
           주
         </Button>
-      </Link>
-      <Link href={`/chart/symbol?name=${symbol.toUpperCase()}&resample=daily`} className={`flex-1`}>
-        <Button
-          className={`!w-full !rounded-[4px] hover:!bg-[#9AA1A9] hover:!text-white ${
-            resample === 'daily' || !resample ? '!bg-[#9AA1A9] text-white' : '!bg-transparent'
-          }`}
-          bgColorTheme="gray"
-          textColorTheme="black"
-        >
+      </div>
+      <div className={classNames.tabWrapper} onClick={() => tab('daily')}>
+        <Button className={classNames.dailyTab} bgColorTheme="gray" textColorTheme="black">
           일
         </Button>
-      </Link>
+      </div>
     </div>
   );
 }

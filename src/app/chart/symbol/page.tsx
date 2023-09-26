@@ -38,8 +38,6 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 }
 
 function SymbolChart({ searchParams }: PageProps) {
-  // return <ChartSymbolPage />;
-
   const name = searchParams?.name;
   const resample = searchParams?.resample || 'daily';
 

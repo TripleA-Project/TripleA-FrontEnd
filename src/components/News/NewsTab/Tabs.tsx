@@ -1,20 +1,54 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { setMainPageTab, usePageTab } from '@/redux/slice/pageTabSlice';
 import { ErrorNotification } from '@/components/Notification';
 import { NotificationTemplate } from '@/constants/notification';
-import { type TabPage } from '.';
 import SetInterestsPortal from '@/components/SetInterestsModal/SetInterestsPortal';
-import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
 import { useLikes } from '@/hooks/useLikes';
+import { twMerge } from 'tailwind-merge';
+import type { MainPageNewsTab } from '.';
 
 function Tabs() {
   const searchParams = useSearchParams();
-  const tabParams = searchParams?.get('tab');
-  const tab: TabPage = !tabParams ? 'latestNews' : !!tabParams && tabParams === 'interest' ? 'likeNews' : 'latestNews';
+  const queryStringTab = (searchParams.get('tab') || 'latestNews') as MainPageNewsTab;
 
-  const [tabPage, setTabPage] = useState<TabPage>(tab);
+  const { dispatch, pageTabs } = usePageTab();
+
+  const selectedTab = queryStringTab !== pageTabs.mainPageTab ? queryStringTab : pageTabs.mainPageTab;
+
+  const activeTabClassNames = {
+    content: 'text-black',
+    bottomLine: 'bg-black',
+  };
+
+  const classNames = {
+    tabContainer: twMerge([`mx-auto flex w-[70%] items-center justify-between`]),
+    latestNewsTab: {
+      content: twMerge([
+        `relative font-semibold box-border w-[87px] cursor-pointer px-1.5 py-2 text-center text-[#969696] transition-colors duration-200`,
+        selectedTab === 'latestNews' && activeTabClassNames.content,
+      ]),
+      bottomLine: twMerge([
+        `absolute bottom-0 left-0 h-1 w-full rounded-lg`,
+        selectedTab === 'latestNews' && activeTabClassNames.bottomLine,
+        selectedTab !== 'latestNews' && 'hidden',
+      ]),
+    },
+    interestNewsTab: {
+      content: twMerge([
+        `relative font-semibold box-border w-[87px] cursor-pointer px-1.5 py-2 text-center text-[#969696] transition-colors duration-200`,
+        selectedTab === 'interestNews' && activeTabClassNames.content,
+      ]),
+      bottomLine: twMerge([
+        `absolute bottom-0 left-0 h-1 w-full rounded-lg`,
+        selectedTab === 'interestNews' && activeTabClassNames.bottomLine,
+        selectedTab !== 'interestNews' && 'hidden',
+      ]),
+    },
+  };
 
   const ref = useRef<HTMLDivElement>(null);
 
@@ -36,91 +70,81 @@ function Tabs() {
     linkURL: '',
   });
 
-  function handleTab() {
-    function getDimHeight() {
-      if (!ref.current) return 0;
+  function getDimHeight() {
+    if (!ref.current) return 0;
 
-      return ref.current.getBoundingClientRect().bottom + 4;
-    }
-
-    if (loginRequired) {
-      setNotification((prev) => ({
-        ...prev,
-        active: true,
-        dimHeight: getDimHeight(),
-        content: NotificationTemplate.LikeNewsLoginRequired.content,
-        buttonText: NotificationTemplate.LikeNewsLoginRequired.buttonText,
-        linkURL: NotificationTemplate.LikeNewsLoginRequired.linkURL,
-      }));
-
-      return;
-    }
-
-    if (status === 'success' && likedSymbols.empty && likedCategories.empty) {
-      setNotification((prev) => ({
-        ...prev,
-        active: true,
-        dimHeight: getDimHeight(),
-        content: NotificationTemplate.LikeEmpty.content,
-        buttonText: NotificationTemplate.LikeEmpty.buttonText,
-        linkURL: NotificationTemplate.LikeEmpty.linkURL,
-      }));
-
-      return;
-    }
-
-    push('/?tab=interest');
+    return ref.current.getBoundingClientRect().bottom + 4;
   }
 
   useEffect(() => {
-    const tab: TabPage = !tabParams
-      ? 'latestNews'
-      : !!tabParams && tabParams === 'interest'
-      ? 'likeNews'
-      : 'latestNews';
+    switch (pageTabs.mainPageTab) {
+      case 'latestNews':
+        setNotification((prev) => ({
+          ...prev,
+          active: false,
+          dimHeight: 0,
+          content: '',
+          buttonText: '',
+          linkURL: '',
+        }));
 
-    setTabPage(tab);
-  }, [tabParams]);
+        return;
+      case 'interestNews':
+        if (loginRequired) {
+          setNotification((prev) => ({
+            ...prev,
+            active: true,
+            dimHeight: getDimHeight(),
+            content: NotificationTemplate.LikeNewsLoginRequired.content,
+            buttonText: NotificationTemplate.LikeNewsLoginRequired.buttonText,
+            linkURL: NotificationTemplate.LikeNewsLoginRequired.linkURL,
+          }));
+
+          return;
+        }
+
+        if (status === 'success' && likedSymbols.empty && likedCategories.empty) {
+          setNotification((prev) => ({
+            ...prev,
+            active: true,
+            dimHeight: getDimHeight(),
+            content: NotificationTemplate.LikeEmpty.content,
+            buttonText: NotificationTemplate.LikeEmpty.buttonText,
+            linkURL: NotificationTemplate.LikeEmpty.linkURL,
+          }));
+
+          return;
+        }
+
+        push('/?tab=interestNews');
+
+      default:
+        return;
+    }
+  }, [pageTabs.mainPageTab]); /* eslint-disable-line */
 
   return (
     <>
-      <div ref={ref} className="mx-auto flex w-[70%] items-center justify-between">
+      <div ref={ref} className={classNames.tabContainer}>
         <Link
           href={'/'}
           onClick={() => {
-            setNotification((prev) => ({
-              ...prev,
-              active: false,
-              dimHeight: 0,
-              content: '',
-              buttonText: '',
-              linkURL: '',
-            }));
-            setTabPage('latestNews');
+            dispatch(setMainPageTab('latestNews'));
           }}
         >
-          <div
-            className={`relative font-semibold ${
-              tabPage === 'latestNews' ? 'text-black' : 'text-[#969696]'
-            } box-border w-[87px] cursor-pointer px-1.5 py-2 text-center`}
-          >
+          <div className={classNames.latestNewsTab.content}>
             전체 뉴스
-            {tabPage === 'latestNews' ? (
-              <div className="absolute bottom-0 left-0 h-1 w-full rounded-lg bg-black" />
-            ) : null}
+            <div className={classNames.latestNewsTab.bottomLine} />
           </div>
         </Link>
         <div
-          className={`relative font-semibold ${
-            tabPage === 'likeNews' ? 'text-black' : 'text-[#969696]'
-          } box-border w-[87px] cursor-pointer px-1.5 py-2 text-center`}
+          className={classNames.interestNewsTab.content}
           onClick={() => {
-            setTabPage('likeNews');
-            handleTab();
+            dispatch(setMainPageTab('interestNews'));
           }}
         >
           관심 뉴스
-          {tabPage === 'likeNews' ? <div className="absolute bottom-0 left-0 h-1 w-full rounded-lg bg-black" /> : null}
+          <div className={classNames.interestNewsTab.bottomLine} />
         </div>
       </div>
       <ErrorNotification
@@ -140,7 +164,7 @@ function Tabs() {
             linkURL: '',
           }));
 
-          setTabPage('latestNews');
+          dispatch(setMainPageTab('latestNews'));
 
           if (notification.linkURL === '' && from === 'button') {
             setTimeout(() => {

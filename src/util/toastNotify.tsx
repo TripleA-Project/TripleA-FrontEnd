@@ -10,6 +10,10 @@ export function toastNotify(type: ToastOptions['type'], message: string, contain
       overflow: 'hidden',
       borderRadius: '50px',
     },
+    autoClose: 3000,
+    hideProgressBar: true,
+    pauseOnFocusLoss: false,
+    pauseOnHover: false,
     icon(props) {
       return (
         <div className="flex h-fit w-fit items-center justify-center rounded-[4px] bg-white p-1">

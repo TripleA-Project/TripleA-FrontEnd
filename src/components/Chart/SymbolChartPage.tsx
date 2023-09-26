@@ -20,6 +20,8 @@ import type { Symbol } from '@/interfaces/Symbol';
 import type { ProfilePayload } from '@/interfaces/Dto/User';
 import type { ResampleFrequency } from '@/interfaces/Dto/Stock';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { flushSync } from 'react-dom';
+import ChartLoading from './ChartLoding';
 
 interface SymbolChartPageProps {
   user?: ProfilePayload;
@@ -34,7 +36,6 @@ function SymbolChartPage({ user, matchedSymbol, resample }: SymbolChartPageProps
   const symbolName = searchParams.get('name');
   const requestSymbolName = matchedSymbol?.symbol?.toUpperCase() ?? (symbolName ? symbolName.toUpperCase() : '');
 
-  const [chartIsEmpty, setChartIsEmpty] = useState(false);
   const [sentimentList, setSentimentList] = useState<SentimentData[]>([]);
 
   useEffect(() => {
@@ -51,31 +52,14 @@ function SymbolChartPage({ user, matchedSymbol, resample }: SymbolChartPageProps
       <div className="relative box-border min-h-[calc(100vh-147px)] px-4">
         <SymbolChartNotification user={user} />
         <section className="mt-4">
-          <ChartHeader symbolPayload={matchedSymbol} priceInfo={{} as any} symbol={''} sentimentData={sentimentList} />
-          {chartIsEmpty ? (
-            <div className="flex h-[322px] items-center justify-center">차트 데이터가 없습니다</div>
-          ) : (
-            <>
-              <Chart
-                matchedSymbol={matchedSymbol!}
-                resample={resample}
-                onDataFetched={(source, error) => {
-                  if (error) {
-                    setChartIsEmpty(true);
-                    return;
-                  }
-
-                  if (!source) {
-                    setChartIsEmpty(true);
-                    return;
-                  }
-
-                  setSentimentList(source.sentimentData ?? []);
-                }}
-              />
-              <ChartResampleGroup symbol={requestSymbolName} />
-            </>
-          )}
+          <ChartHeader
+            symbolPayload={matchedSymbol}
+            priceInfo={{} as any}
+            symbolName={requestSymbolName}
+            sentimentData={sentimentList}
+          />
+          <Chart matchedSymbol={matchedSymbol!} resample={resample} />
+          <ChartResampleGroup symbol={requestSymbolName} />
           <HorizontalLine style={{ marginTop: '1.25rem' }} />
           <section className="mb-11 mt-5">
             <h3 className="mb-4 font-bold text-black">{requestSymbolName} 관련 뉴스</h3>
@@ -94,14 +78,7 @@ function SymbolChartPage({ user, matchedSymbol, resample }: SymbolChartPageProps
             </Link>
           </section>
         </section>
-        <ToastContainer
-          position="bottom-center"
-          autoClose={3000}
-          hideProgressBar
-          newestOnTop={true}
-          pauseOnFocusLoss={false}
-          pauseOnHover={false}
-        />
+        <ToastContainer position="bottom-center" newestOnTop={true} />
       </div>
     </>
   );

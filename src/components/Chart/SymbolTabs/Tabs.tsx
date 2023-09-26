@@ -1,6 +1,5 @@
 'use client';
 
-import { useLayoutEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { setChartPageHomeTab, usePageTab } from '@/redux/slice/pageTabSlice';
 import { twMerge } from 'tailwind-merge';
@@ -8,9 +7,13 @@ import type { ChartHomeTab } from '../ChartPageHome';
 
 function Tabs() {
   const { push } = useRouter();
+
   const searchParams = useSearchParams();
+  const queryStringTab = (searchParams.get('tab') || 'likedSymbols') as ChartHomeTab;
 
   const { dispatch, pageTabs } = usePageTab();
+
+  const selectedTab = queryStringTab !== pageTabs.chartPageHomeTab ? queryStringTab : pageTabs.chartPageHomeTab;
 
   const activeTabClassNames = {
     content: 'text-black',
@@ -22,22 +25,22 @@ function Tabs() {
     tabWrapper: twMerge([`relative box-border flex-1 shrink-0 cursor-pointer px-1.5 py-2 text-center`]),
     likedSymbolsTab: {
       content: twMerge([
-        `font-semibold text-[#969696]`,
-        pageTabs.chartPageHomeTab === 'likedSymbols' && activeTabClassNames.content,
+        `font-semibold text-[#969696] transition-colors duration-200`,
+        selectedTab === 'likedSymbols' && activeTabClassNames.content,
       ]),
       bottomLine: twMerge([
-        `absolute bottom-0 left-0 h-[1px] w-full bg-[#9AA1A9]`,
-        pageTabs.chartPageHomeTab === 'likedSymbols' && activeTabClassNames.bottomLine,
+        `absolute bottom-0 left-0 h-[1px] w-full bg-[#9AA1A9] transition-colors duration-200`,
+        selectedTab === 'likedSymbols' && activeTabClassNames.bottomLine,
       ]),
     },
     recommandSymbolsTab: {
       content: twMerge([
-        `font-semibold text-[#969696]`,
-        pageTabs.chartPageHomeTab === 'recommandSymbols' && activeTabClassNames.content,
+        `font-semibold text-[#969696] transition-colors duration-200`,
+        selectedTab === 'recommandSymbols' && activeTabClassNames.content,
       ]),
       bottomLine: twMerge([
-        `absolute bottom-0 left-0 h-[1px] w-full bg-[#9AA1A9]`,
-        pageTabs.chartPageHomeTab === 'recommandSymbols' && activeTabClassNames.bottomLine,
+        `absolute bottom-0 left-0 h-[1px] w-full bg-[#9AA1A9] transition-colors duration-200`,
+        selectedTab === 'recommandSymbols' && activeTabClassNames.bottomLine,
       ]),
     },
   };
@@ -56,12 +59,6 @@ function Tabs() {
         return;
     }
   };
-
-  useLayoutEffect(() => {
-    const urlQueryString = (searchParams.get('tab') || 'likedSymbols') as ChartHomeTab;
-
-    dispatch(setChartPageHomeTab(urlQueryString));
-  }, []); /* eslint-disable-line */
 
   return (
     <>
