@@ -14,7 +14,7 @@ function SymbolLikeHeader({ symbolName }: SymbolLikeHeaderProps) {
 
   return (
     <Header fixed>
-      <AppIcons.BackArrow.Bar className="cursor-pointer" onClick={() => back()} />
+      <AppIcons.BackArrow.NoBar className="cursor-pointer" onClick={() => back()} />
       <h2 className="text-2xl font-bold text-[#131F3C]">{symbolName?.toUpperCase() ?? 'Notfound Symbol'}</h2>
       <LikeButton symbolName={symbolName} />
     </Header>

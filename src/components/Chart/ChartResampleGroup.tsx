@@ -1,10 +1,10 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
+import { twMerge } from 'tailwind-merge';
 import Button from '../Button/Button';
 import { setSymbolChartPageResampleFrequencyTab, usePageTab } from '@/redux/slice/pageTabSlice';
-import { ResampleFrequency } from '@/interfaces/Dto/Stock';
-import { twMerge } from 'tailwind-merge';
+import type { ResampleFrequency } from '@/interfaces/Dto/Stock';
 
 interface ChartResampleGroupProps {
   symbol: string;
@@ -18,19 +18,25 @@ function ChartResampleGroup({ symbol }: ChartResampleGroupProps) {
 
   const { dispatch, pageTabs } = usePageTab();
 
+  /* --- 새로고침 시 동기화 --- */
   const selectedResample =
     queryStringResample !== pageTabs.symbolChartPageResampleFrequencyTab
       ? queryStringResample
       : pageTabs.symbolChartPageResampleFrequencyTab;
 
-  const tabClassNames = `w-full rounded-[4px] hover:bg-[#9AA1A9] hover:text-white bg-transparent`;
+  if (queryStringResample !== pageTabs.symbolChartPageResampleFrequencyTab) {
+    dispatch(setSymbolChartPageResampleFrequencyTab(selectedResample));
+  }
+  /* --- */
+
+  const tabClassNames = `w-full h-full rounded-[4px] hover:bg-[#9AA1A9] hover:text-white bg-transparent`;
 
   const activeClassNames = {
     content: `bg-[#9AA1A9] text-white`,
   };
 
   const classNames = {
-    tabContainer: twMerge([`box-border flex divide-x-2 divide-white rounded-lg bg-[#F5F7F9] p-1.5`]),
+    tabContainer: twMerge([`h-[40px] box-border flex divide-x-2 divide-white rounded-lg bg-[#F5F7F9] p-1.5`]),
     tabWrapper: twMerge([`flex-1`]),
     monthlyTab: twMerge([tabClassNames, selectedResample === 'monthly' && activeClassNames.content]),
     weeklyTab: twMerge([tabClassNames, selectedResample === 'weekly' && activeClassNames.content]),

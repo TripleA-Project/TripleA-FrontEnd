@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosError, HttpStatusCode } from 'axios';
-import { ToastContainer } from 'react-toastify';
 import { useNewsListFilter } from '@/redux/slice/newsListFilterSlice';
 import { LatestNewsHeader, LatestNewsList, LatestNewsListLoading } from './LatestNews';
 import { TrendNewsHeader } from './TrendNews';

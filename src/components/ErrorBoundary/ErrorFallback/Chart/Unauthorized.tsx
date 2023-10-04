@@ -46,7 +46,7 @@ function ChartUnauthorized({ continuePath = '/chart' }: ChartUnauthorizedProps) 
               __html: content.trim().replaceAll('\n', '<br />'),
             }}
           />
-          <Link href={`/login?continueURL=${continuePath}`} className="w-full">
+          <Link href={`/login?continueURL=${encodeURIComponent(continuePath)}`} className="w-full">
             <Button bgColorTheme="orange" textColorTheme="white" fullWidth>
               로그인 하러가기
             </Button>

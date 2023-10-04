@@ -3,17 +3,13 @@
 import React from 'react';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
-import { type SentimentData } from '@/service/chart';
-import { DeltaPriceColor, DeltaPriceType, getPriceInfo, type PriceInfo } from '@/util/chart';
+import { DeltaPriceColor, DeltaPriceType, getPriceInfo } from '@/util/chart';
 import { Symbol } from '@/interfaces/Symbol';
 import { useChartSource } from '@/redux/slice/chartSourceSlice';
 
 interface ChartHeaderProps {
   symbolPayload?: Symbol | null;
   symbolName: string;
-  companyName?: string;
-  sentimentData?: SentimentData[];
-  priceInfo: PriceInfo;
 }
 
 const StyledDeltaPrice = styled.p<{ type: keyof typeof DeltaPriceType }>`
@@ -28,7 +24,7 @@ export function ChartHeaderLoading() {
     <div className="mb-5 flex justify-between">
       <div>
         <div className="skeleton_loading relative">
-          <h3 className="h-7 w-20 rounded-md bg-slate-500"></h3>
+          <h3 className="mb-2.5 h-7 w-20 rounded-md bg-slate-500"></h3>
           <p className="mt-2 h-9 w-28 rounded-md"></p>
         </div>
         <p className="skeleton_loading">
@@ -45,7 +41,7 @@ export function ChartHeaderLoading() {
   );
 }
 
-function ChartHeader({ symbolPayload, symbolName, companyName, priceInfo, sentimentData }: ChartHeaderProps) {
+function ChartHeader({ symbolPayload, symbolName }: ChartHeaderProps) {
   const { source } = useChartSource();
 
   const { delta, close } = symbolPayload
@@ -56,16 +52,16 @@ function ChartHeader({ symbolPayload, symbolName, companyName, priceInfo, sentim
     <div className="mb-5 flex justify-between">
       <div>
         {/* companyName */}
-        <h3 className="text-xl font-semibold text-[#131F3C]">
+        <h3 className="mb-2.5 text-xl font-semibold text-[#131F3C]">
           {symbolPayload?.companyName || symbolName?.toUpperCase()}
         </h3>
         {/* close price */}
-        <p className="text-3xl text-black">{`${close} USD`}</p>
+        <p className="text-3xl font-semibold text-black">{`${close} USD`}</p>
         <StyledDeltaPrice type={delta.type}>
-          <span>
+          <span className="font-medium">
             {DeltaPriceType[delta.type]} {delta.value}
           </span>{' '}
-          <span>
+          <span className="font-medium">
             ({DeltaPriceType[delta.type]} {delta.percent}%)
           </span>
         </StyledDeltaPrice>

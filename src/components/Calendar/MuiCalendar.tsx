@@ -11,6 +11,8 @@ import { styled } from '@mui/material/styles';
 import MonthSelect from './MonthSelect';
 import YearSelect from './YearSelect';
 import { Days, Kor_Days } from '@/constants/calendar';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { getInitialDate } from '../HistoryPage/helper/calendar';
 
 dayjs.extend(isBetweenPlugin);
 
@@ -158,9 +160,15 @@ function Day(
 }
 
 function MuiCalendar({ onChangeDate, activeRangeSelect = true, disabled = false }: MuiCalendarProps) {
+  const { push } = useRouter();
+
+  const searchParams = useSearchParams();
+
+  const initialDate = getInitialDate({ year: searchParams.get('year'), month: searchParams.get('month') });
+
   const [date, setDate] = useState<CalenderDate>({
-    selectedDate: dayjs(),
-    startDate: dayjs(),
+    selectedDate: initialDate,
+    startDate: initialDate,
     endDate: null,
   });
 
@@ -183,11 +191,11 @@ function MuiCalendar({ onChangeDate, activeRangeSelect = true, disabled = false 
           <MonthSelect
             disabled={disabled}
             onMonthselect={({ month }) => {
+              const targetDate = dayjs(date.selectedDate).set('month', month).set('dates', 1);
+
+              rangeSelectedRef.current = false;
+
               setDate((prev) => {
-                const targetDate = dayjs(date.selectedDate).set('month', month);
-
-                rangeSelectedRef.current = false;
-
                 return {
                   ...prev,
                   selectedDate: targetDate,
@@ -195,12 +203,14 @@ function MuiCalendar({ onChangeDate, activeRangeSelect = true, disabled = false 
                   endDate: null,
                 };
               });
+
+              push(`/history?year=${targetDate.get('years')}&month=${month + 1}`);
             }}
           />
           <YearSelect
             disabled={disabled}
             onYearselect={(year) => {
-              const targetDate = dayjs(date.selectedDate).set('year', year);
+              const targetDate = dayjs(date.selectedDate).set('year', year).set('dates', 1);
 
               rangeSelectedRef.current = false;
 
@@ -210,6 +220,8 @@ function MuiCalendar({ onChangeDate, activeRangeSelect = true, disabled = false 
                 startDate: targetDate,
                 endDate: null,
               }));
+
+              push(`/history?year=${year}&month=${targetDate.get('month') + 1}`);
             }}
           />
         </div>

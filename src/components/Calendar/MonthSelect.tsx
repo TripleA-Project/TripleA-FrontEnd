@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
+import { useSearchParams } from 'next/navigation';
 
 interface Month {
   label: keyof typeof Months;
@@ -29,10 +30,30 @@ const Months = {
 } as const;
 
 function MonthSelect({ onMonthselect, disabled = false }: MounthSelectProps) {
+  const monthQuery = useSearchParams().get('month');
+
+  const getTargetMonthLabel = () => {
+    if (!monthQuery) return null;
+
+    const target = Array.from(Object.entries(Months)).find(([key, value]) => value === Number(monthQuery) - 1)![0];
+
+    return target as Month['label'];
+  };
+
+  const getRenderLabel = (label: Month['label']) => {
+    const monthValue = Months[label];
+
+    return `${label} (${monthValue + 1}월)`;
+  };
+
+  const initialMonth: Month = {
+    label: getTargetMonthLabel() ?? (dayjs().format('MMMM') as Month['label']),
+    month: monthQuery ? Number(monthQuery) : dayjs().get('month'),
+  };
+
   const [open, setOpen] = useState(false);
   const [month, setMonth] = useState<Month>({
-    label: dayjs().format('MMMM') as Month['label'],
-    month: dayjs().get('month'),
+    ...initialMonth,
   });
 
   useEffect(() => {
@@ -51,11 +72,11 @@ function MonthSelect({ onMonthselect, disabled = false }: MounthSelectProps) {
 
   return (
     <div
-      className="relative inline-flex w-[6.25rem] cursor-pointer"
+      className="relative inline-flex w-[130px] cursor-pointer"
       onClick={() => !disabled && setOpen((prev) => !prev)}
     >
       <div className="box-border inline-flex w-full items-center gap-1 p-2">
-        <div className="text-xs font-semibold">{month.label}</div>
+        <div className="text-xs font-semibold">{getRenderLabel(month.label)}</div>
         <button
           className={`relative z-[3] origin-center select-none text-xs transition ${
             open ? 'rotate-180 text-[#FD954A]' : '-rotate-360 text-[#9F9F9F]'
@@ -68,7 +89,7 @@ function MonthSelect({ onMonthselect, disabled = false }: MounthSelectProps) {
         <div className="absolute left-0 top-2 w-full select-none overflow-hidden rounded-[10px]">
           <div className="flex max-h-60 w-full flex-col gap-2 overflow-auto bg-[#F3F3F3] p-2 scrollbar-thin scrollbar-track-[#A7A7A7] scrollbar-thumb-[#FD954A] scrollbar-thumb-rounded-[0]">
             <div className="sticky top-0 -mx-2 -mt-2 box-border flex w-[calc(100%+16px)] -translate-y-2 justify-between bg-[#F3F3F3] pl-2 text-xs font-semibold text-[#FD954A]">
-              {month.label}
+              {getRenderLabel(month.label)}
             </div>
             {(Object.keys(Months) as (keyof typeof Months)[]).map((label) => {
               return (
@@ -82,7 +103,7 @@ function MonthSelect({ onMonthselect, disabled = false }: MounthSelectProps) {
                     onMonthselect && onMonthselect({ label, month: Months[label] });
                   }}
                 >
-                  {label}
+                  {getRenderLabel(label)}
                 </button>
               );
             })}

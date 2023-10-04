@@ -45,7 +45,7 @@ function Tabs() {
     },
   };
 
-  const tab = (tabName: ChartHomeTab) => {
+  function tab(tabName: ChartHomeTab) {
     dispatch(setChartPageHomeTab(tabName));
 
     switch (tabName) {
@@ -58,7 +58,7 @@ function Tabs() {
 
         return;
     }
-  };
+  }
 
   return (
     <>

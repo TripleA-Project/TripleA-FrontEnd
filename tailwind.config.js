@@ -9,8 +9,8 @@ module.exports = {
     extend: {
       screens: {
         card: { max: '500px' },
-        mobile: { max: '390px' },
-        tablet: { min: '390px', max: '767px' },
+        mobile: { max: '391px' },
+        tablet: { min: '392px', max: '767px' },
         pc: '768px',
         footer: { max: '650px' },
       },

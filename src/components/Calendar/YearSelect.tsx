@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
+import { useSearchParams } from 'next/navigation';
 
 interface MounthSelectProps {
   disabled?: boolean;
@@ -15,8 +16,12 @@ const Years = Array.from({ length: dayjs().get('year') - MinYear + 1 }).map((_, 
 });
 
 function YearSelect({ onYearselect, disabled = false }: MounthSelectProps) {
+  const yearQuery = useSearchParams().get('year');
+
+  const initialYear = yearQuery && Years.includes(Number(yearQuery)) ? Number(yearQuery) : dayjs().get('year');
+
   const [open, setOpen] = useState(false);
-  const [year, setYear] = useState<number>(dayjs().get('year'));
+  const [year, setYear] = useState<number>(initialYear);
 
   useEffect(() => {
     if (!open) return;

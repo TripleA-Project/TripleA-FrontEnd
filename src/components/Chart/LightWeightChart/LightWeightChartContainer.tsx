@@ -1,146 +1,297 @@
 'use client';
 
-import { forwardRef, useRef, useLayoutEffect, useImperativeHandle, useState, type ForwardedRef } from 'react';
-import {
-  createChart,
-  type IChartApi,
-  type ChartOptions,
-  type MouseEventParams,
-  LogicalRange,
-  LineData,
-  ISeriesApi,
-} from 'lightweight-charts';
-import { ChartContext, type ChartContextState } from '@/context/ChartContext';
+import { useRef, useLayoutEffect, useContext, useTransition } from 'react';
+import dayjs from 'dayjs';
+import { debounce, throttle } from 'lodash';
+import { isMobile } from 'react-device-detect';
+import { ChartContext } from '@/context/ChartContext';
+import { useChartSource } from '@/redux/slice/chartSourceSlice';
 import ChartTimeMarker, { type TimeMarkerControl } from '../ChartTimeMarker';
-import { getTimeMarker } from '@/util/chart';
-import { type ResampleFrequency } from '@/interfaces/Dto/Stock';
 import { ChartTooltip } from '..';
-import { ChartTooltipControl, ChartTooltipSource } from '../ChartTooltip';
+import PriceMarkerContainer, { type PriceMarkerControl } from '../PriceMarker/PriceMarkerContainer';
+import MaxPriceMarker from '../PriceMarker/MaxPriceMarker';
+import MinPriceMarker from '../PriceMarker/MinPriceMarker';
+import { getDataMinMax } from '@/util/chart';
+import { chartAreaMouseLeaveEventName, chartTooltipCloseEventName } from '../constants/event';
+import type { IChartApi, MouseEventParams, LogicalRange, ISeriesApi, LineData } from 'lightweight-charts';
+import type { ChartTooltipControl } from '../ChartTooltip';
+
+type MetaIChartApis = {
+  symbolPriceIChartApi: IChartApi | null;
+  buzzIChartApi: IChartApi | null;
+};
+
+type MetaISeriesApis = {
+  symbolPriceLineSeriesApi: ISeriesApi<'Line'> | null;
+  buzzHistogramSeriesApi: ISeriesApi<'Histogram'> | null;
+};
+
+export interface ChartApiList {
+  chartApis: MetaIChartApis;
+  seriesApis: MetaISeriesApis;
+}
 
 interface ChartContainerProps {
-  resample: ResampleFrequency;
-  charts: {
-    payload: IChartApi[];
-    triggerSize: number;
-  };
-  options?: Partial<ChartOptions>;
-  source?: ChartTooltipSource;
-  tooltipVisible?: boolean;
-  timeMarkerVisible?: boolean;
-  container: HTMLDivElement;
+  chartApiList: ChartApiList;
   children: React.ReactNode;
 }
 
-function LightWeightChartContainer(
-  {
-    resample,
-    charts,
-    source,
-    timeMarkerVisible,
-    tooltipVisible = true,
-    options,
-    container,
-    children,
-  }: ChartContainerProps,
-  ref: ForwardedRef<IChartApi>,
-) {
-  const [context, setContext] = useState<ChartContextState>({ api: null });
+function LightWeightChartContainer({ chartApiList, children }: ChartContainerProps) {
+  const context = useContext(ChartContext);
 
-  function logicalRangeHandler(this: IChartApi, range: LogicalRange | null, arr: IChartApi[]) {
-    const targetCharts = arr.filter((chart) => chart !== this);
+  const { source } = useChartSource();
 
-    if (range) {
-      targetCharts.forEach((chart) => {
-        chart.timeScale().setVisibleLogicalRange(range);
-      });
-    }
-  }
+  const isPendingRef = useRef(false);
+
+  const isCloseBtnClickRef = useRef(false);
+  const prevPointRef = useRef(0);
 
   const chartTimeMarkerControlRef = useRef<TimeMarkerControl>(null);
   const chartTooltipControlRef = useRef<ChartTooltipControl>(null);
 
-  const chartAPIRef = useRef<{ _api: IChartApi | null; api: () => IChartApi }>({
-    _api: null,
-    api() {
-      if (!this._api) {
-        this._api = createChart(container, { ...options });
-        this._api.timeScale().fitContent();
+  const maxPriceMarkerControlRef = useRef<PriceMarkerControl>(null);
+  const minPriceMarkerControlRef = useRef<PriceMarkerControl>(null);
+
+  function calcMinmax({ currentChartApi, targetChartApi }: { currentChartApi: IChartApi; targetChartApi: IChartApi }) {
+    if (currentChartApi === targetChartApi) {
+      const minmax =
+        context.markerVisible && source?.lineData?.length ? getDataMinMax<LineData>(source.lineData) : null;
+
+      if (minmax) {
+        const { min, max } = minmax;
+
+        if (max.target?.time) {
+          const maxTimeCoord = Number(
+            chartApiList.chartApis.symbolPriceIChartApi?.timeScale().timeToCoordinate(max.target.time)?.toFixed(2),
+          );
+          const maxPriceCoord = Number(chartApiList.seriesApis.symbolPriceLineSeriesApi?.priceToCoordinate(max.value));
+
+          maxPriceMarkerControlRef.current?.setPosition({
+            time: maxTimeCoord,
+            price: maxPriceCoord,
+          });
+          maxPriceMarkerControlRef.current?.display(max.value);
+
+          maxPriceMarkerControlRef.current?.render();
+        }
+
+        if (min.target?.time) {
+          const minTimeCoord = Number(
+            chartApiList.chartApis.symbolPriceIChartApi?.timeScale().timeToCoordinate(min.target.time)?.toFixed(2),
+          );
+          const minPriceCoord = Number(chartApiList.seriesApis.symbolPriceLineSeriesApi?.priceToCoordinate(min.value));
+
+          minPriceMarkerControlRef.current?.setPosition({
+            time: minTimeCoord,
+            price: minPriceCoord,
+          });
+          minPriceMarkerControlRef.current?.display(min.value);
+
+          minPriceMarkerControlRef.current?.render();
+        }
       }
+    }
+  }
 
-      return this._api;
-    },
-  });
+  // handlers
+  function logicalRangeHandler(this: IChartApi, range: LogicalRange | null, arr: IChartApi[]) {
+    const targetCharts = arr.filter((chart) => chart !== this);
 
-  useLayoutEffect(() => {
-    chartAPIRef.current.api();
+    chartTimeMarkerControlRef.current?.unmount();
+    chartTooltipControlRef.current?.unmount();
 
-    setContext((prev) => ({ ...prev, api: chartAPIRef.current._api }));
-  }, []);
+    if (range) {
+      isPendingRef.current = true;
 
-  useLayoutEffect(() => {
-    if (context.api) {
+      targetCharts.forEach((chart) => {
+        chart.timeScale().setVisibleLogicalRange(range);
+      });
+
+      setTimeout(() => {
+        calcMinmax({ currentChartApi: this, targetChartApi: arr[1] });
+      }, 100);
+    }
+  }
+
+  function clickHandler(param: MouseEventParams) {
+    if (!param.point?.y || !param.point?.y) {
       chartTimeMarkerControlRef.current?.unmount();
       chartTooltipControlRef.current?.unmount();
 
-      charts.payload.push(context.api);
+      return;
     }
-    if (charts.payload.length === charts.triggerSize) {
-      charts.payload.forEach((chart, idx, arr) => {
-        function crossHairMoveHandler(param: MouseEventParams) {
-          if (!param.point || Number(param.point.x) < 0 || Number(param.point.y) < 0 || !param.time) {
-            chartTimeMarkerControlRef.current?.unmount();
-            chartTooltipControlRef.current?.unmount();
-            return;
-          }
 
-          if (param.time) {
-            chartTimeMarkerControlRef.current?.display(getTimeMarker(param.time, resample));
-            chartTooltipControlRef.current?.display(param.time);
+    if (param.time) {
+      // line(주가) 차트의 timeScale 적용
+      const timeCoord = chartApiList.chartApis.symbolPriceIChartApi!.timeScale().timeToCoordinate(param.time);
 
-            const coord = chart.timeScale().timeToCoordinate(param.time);
+      chartTimeMarkerControlRef.current?.display(param.time);
+      chartTooltipControlRef.current?.display(param.time);
 
-            chartTimeMarkerControlRef.current?.setPosition(coord);
-            chartTimeMarkerControlRef.current?.render();
+      const targetPrice = source?.lineData.find(
+        (lineSource) =>
+          dayjs(lineSource.time as string).format('YYYY-MM-DD') === dayjs(param.time as string).format('YYYY-MM-DD'),
+      )?.value;
+      const priceCoord = targetPrice
+        ? chartApiList.seriesApis.symbolPriceLineSeriesApi!.priceToCoordinate(targetPrice)
+        : -1;
 
-            chartTooltipControlRef.current?.setPosition(coord);
-            chartTooltipControlRef.current?.render();
-          }
+      chartTimeMarkerControlRef.current?.setPosition({ time: timeCoord, price: priceCoord as any });
+      chartTimeMarkerControlRef.current?.render();
+
+      chartTooltipControlRef.current?.setPosition(timeCoord);
+      chartTooltipControlRef.current?.render();
+    }
+  }
+
+  function crossHairMoveHandler(param: MouseEventParams) {
+    if (isCloseBtnClickRef.current === true) {
+      chartTimeMarkerControlRef.current?.unmount();
+      chartTooltipControlRef.current?.unmount();
+
+      if (context.container?.parentElement) {
+        context.container.parentElement.style.cursor = 'default';
+      }
+
+      if ((param.point?.x ?? 0) - prevPointRef.current !== 0) {
+        isCloseBtnClickRef.current = false;
+      }
+
+      return;
+    }
+
+    if (param.time) {
+      // line(주가) 차트의 timeScale 적용
+      const timeCoord = chartApiList.chartApis.symbolPriceIChartApi!.timeScale().timeToCoordinate(param.time);
+
+      chartTimeMarkerControlRef.current?.display(param.time);
+      chartTooltipControlRef.current?.display(param.time);
+
+      const targetPrice = source?.lineData.find(
+        (lineSource) =>
+          dayjs(lineSource.time as string).format('YYYY-MM-DD') === dayjs(param.time as string).format('YYYY-MM-DD'),
+      )?.value;
+      const priceCoord = targetPrice
+        ? chartApiList.seriesApis.symbolPriceLineSeriesApi!.priceToCoordinate(targetPrice)
+        : -1;
+
+      if (timeCoord !== null && context.container) {
+        if (timeCoord < 0 || timeCoord > context.container.clientWidth - 40) {
+          chartTimeMarkerControlRef.current?.unmount();
+          chartTooltipControlRef.current?.unmount();
+
+          return;
+        }
+      }
+
+      chartTimeMarkerControlRef.current?.setPosition({ time: timeCoord, price: priceCoord as any });
+      chartTimeMarkerControlRef.current?.render();
+
+      chartTooltipControlRef.current?.setPosition(timeCoord);
+      chartTooltipControlRef.current?.render();
+
+      prevPointRef.current = param.point?.x ?? 0;
+    }
+  }
+
+  useLayoutEffect(() => {
+    const leaveHandler = (e: CustomEvent) => {
+      chartTimeMarkerControlRef.current?.unmount();
+      chartTooltipControlRef.current?.unmount();
+    };
+
+    const closeHandler = (e: CustomEvent) => {
+      isCloseBtnClickRef.current = true;
+
+      chartTimeMarkerControlRef.current?.unmount();
+      chartTooltipControlRef.current?.unmount();
+    };
+
+    const dimHandler = (e: MouseEvent) => {
+      const closest = (e.target as HTMLElement).closest('#symbol-chart');
+
+      if (!closest) {
+        chartTimeMarkerControlRef.current?.unmount();
+        chartTooltipControlRef.current?.unmount();
+      }
+    };
+
+    window.addEventListener(chartAreaMouseLeaveEventName as any, leaveHandler);
+    window.addEventListener(chartTooltipCloseEventName as any, closeHandler);
+
+    window.addEventListener('click', dimHandler);
+
+    return () => {
+      if (chartTimeMarkerControlRef) {
+        chartTimeMarkerControlRef!.current?.unmount();
+      }
+
+      if (chartTooltipControlRef) {
+        chartTooltipControlRef!.current?.unmount();
+      }
+
+      window.removeEventListener(chartAreaMouseLeaveEventName as any, leaveHandler);
+      window.removeEventListener(chartTooltipCloseEventName as any, closeHandler);
+
+      window.removeEventListener('click', dimHandler);
+    };
+  }, []);
+
+  useLayoutEffect(() => {
+    const charts = [chartApiList.chartApis.symbolPriceIChartApi, chartApiList.chartApis.buzzIChartApi];
+
+    const logicalRangeHandlers = {
+      symbolPriceIChart: (range: LogicalRange | null) =>
+        logicalRangeHandler.call(charts[0]!, range, charts as IChartApi[]),
+      buzzIChart: (range: LogicalRange | null) => logicalRangeHandler.call(charts[1]!, range, charts as IChartApi[]),
+    };
+
+    if (chartApiList.chartApis.symbolPriceIChartApi && chartApiList.chartApis.buzzIChartApi) {
+      charts.forEach((chart, idx) => {
+        isMobile ? chart?.subscribeClick(clickHandler) : chart?.subscribeCrosshairMove(crossHairMoveHandler);
+
+        if (idx === 0) {
+          chart?.timeScale().subscribeVisibleLogicalRangeChange(logicalRangeHandlers.symbolPriceIChart);
         }
 
-        chart.subscribeCrosshairMove(crossHairMoveHandler);
-
-        chart
-          .timeScale()
-          .subscribeVisibleLogicalRangeChange((logicalRange) => logicalRangeHandler.call(chart, logicalRange, arr));
+        if (idx === 1) {
+          chart?.timeScale().subscribeVisibleLogicalRangeChange(logicalRangeHandlers.buzzIChart);
+        }
       });
     }
-  }, [context]); /* eslint-disable-line */
 
-  useImperativeHandle(ref, () => chartAPIRef.current.api());
+    return () => {
+      chartApiList.chartApis.symbolPriceIChartApi?.unsubscribeCrosshairMove(crossHairMoveHandler);
+      chartApiList.chartApis.buzzIChartApi?.unsubscribeCrosshairMove(crossHairMoveHandler);
+
+      chartApiList.chartApis.symbolPriceIChartApi?.unsubscribeClick(clickHandler);
+      chartApiList.chartApis.buzzIChartApi?.unsubscribeClick(clickHandler);
+
+      chartApiList.chartApis.symbolPriceIChartApi
+        ?.timeScale()
+        .unsubscribeVisibleLogicalRangeChange(logicalRangeHandlers.symbolPriceIChart);
+      chartApiList.chartApis.buzzIChartApi
+        ?.timeScale()
+        .unsubscribeVisibleLogicalRangeChange(logicalRangeHandlers.buzzIChart);
+    };
+  }, [chartApiList, source]); /* eslint-disable-line */
 
   return (
-    <ChartContext.Provider value={context}>
+    <>
       {children}
-      <ChartTimeMarker
-        chartApi={context.api}
-        container={container}
-        controlRef={chartTimeMarkerControlRef}
-        height={context.api?.timeScale().height()}
-        visible={timeMarkerVisible}
-      />
+      <ChartTimeMarker controlRef={chartTimeMarkerControlRef} crossHairHorizonVisible={false} />
       <ChartTooltip
-        container={container}
         controlRef={chartTooltipControlRef}
         chartApi={context.api}
-        width={150}
+        tooltipWidth={209}
         height={context.api?.options().height}
-        source={source}
-        visible={tooltipVisible}
       />
-    </ChartContext.Provider>
+      <PriceMarkerContainer>
+        <MaxPriceMarker ref={maxPriceMarkerControlRef} />
+        <MinPriceMarker ref={minPriceMarkerControlRef} />
+      </PriceMarkerContainer>
+    </>
   );
 }
 
-LightWeightChartContainer.displayName = 'LightWeightChartContainer';
-
-export default forwardRef<IChartApi, ChartContainerProps>(LightWeightChartContainer);
+export default LightWeightChartContainer;

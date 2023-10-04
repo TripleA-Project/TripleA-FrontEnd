@@ -40,7 +40,6 @@ function AllCategoryList({ onDispatch, isSyncing }: AllCategoryListProps, ref: F
     },
     shrink() {
       if (wrapperRef.current) {
-        console.log('expand', { wrapperRef });
         wrapperRef.current.style.height = '100px';
         this.isExpand = false;
       }

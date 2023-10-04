@@ -35,16 +35,18 @@ export const getSymbolLineChartContainerOptions: (resample: ResampleFrequency) =
     horzLine: {
       color: '#9AA1A9',
       labelVisible: false,
+      visible: false,
     },
     vertLine: {
       color: '#FC954A',
       labelVisible: false,
       width: 1,
+      visible: false,
     },
   },
   timeScale: {
     tickMarkFormatter: (time: Time) => getTimeMarker(time, resample),
-    visible: true,
+    visible: false,
     fixLeftEdge: true,
     fixRightEdge: true,
     borderVisible: false,
