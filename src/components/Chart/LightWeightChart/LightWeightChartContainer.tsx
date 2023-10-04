@@ -1,8 +1,7 @@
 'use client';
 
-import { useRef, useLayoutEffect, useContext, useTransition } from 'react';
+import { useRef, useLayoutEffect, useContext } from 'react';
 import dayjs from 'dayjs';
-import { debounce, throttle } from 'lodash';
 import { isMobile } from 'react-device-detect';
 import { ChartContext } from '@/context/ChartContext';
 import { useChartSource } from '@/redux/slice/chartSourceSlice';
@@ -40,8 +39,6 @@ function LightWeightChartContainer({ chartApiList, children }: ChartContainerPro
   const context = useContext(ChartContext);
 
   const { source } = useChartSource();
-
-  const isPendingRef = useRef(false);
 
   const isCloseBtnClickRef = useRef(false);
   const prevPointRef = useRef(0);
@@ -101,8 +98,6 @@ function LightWeightChartContainer({ chartApiList, children }: ChartContainerPro
     chartTooltipControlRef.current?.unmount();
 
     if (range) {
-      isPendingRef.current = true;
-
       targetCharts.forEach((chart) => {
         chart.timeScale().setVisibleLogicalRange(range);
       });
