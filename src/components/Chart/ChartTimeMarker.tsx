@@ -125,7 +125,7 @@ const ChartTimeMarker = forwardRef<TimeMarkerControl, ChartTimeMarkerProps>(
       <>
         {crossHairHorizonVisible ? (
           <StyledCrossHairHorizontalLine
-            className="pointer-events-none absolute left-0 z-[7] h-0.5"
+            className="pointer-events-none absolute left-0 z-[3] h-0.5"
             viewBox={`0 0 ${
               container && !!seriesApis[0] ? container.clientWidth - seriesApis[0].priceScale().width() : 0
             } 2`}
@@ -145,7 +145,7 @@ const ChartTimeMarker = forwardRef<TimeMarkerControl, ChartTimeMarkerProps>(
         ) : null}
         {crossHairVeritcalVisible ? (
           <StyledCrossHairVerticalLine
-            className="pointer-events-none absolute z-[7] h-[320px] w-0.5"
+            className="pointer-events-none absolute z-[3] h-[320px] w-0.5"
             viewBox="0 0 2 320"
             positionLeft={positionLeft}
             timeHeight={api?.timeScale().height() ?? 0}

@@ -36,7 +36,7 @@ function PriceMarkerContainer({ children }: PriceMarkerContainerProps) {
   const { markerVisible } = useContext(ChartContext);
 
   return markerVisible ? (
-    <StyledPriceMarkerContainer className="pointer-events-none absolute left-0 top-0 z-[8] h-full" priceWidth={40}>
+    <StyledPriceMarkerContainer className="pointer-events-none absolute left-0 top-0 z-[2] h-full" priceWidth={40}>
       {children}
     </StyledPriceMarkerContainer>
   ) : null;

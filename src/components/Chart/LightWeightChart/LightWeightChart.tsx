@@ -1,29 +1,15 @@
 'use client';
 
-import {
-  useRef,
-  useState,
-  useEffect,
-  forwardRef,
-  useImperativeHandle,
-  type ForwardedRef,
-  useContext,
-  useLayoutEffect,
-} from 'react';
-import LightWeightChartContainer, { ChartApiList } from './LightWeightChartContainer';
+import { useRef, useState, forwardRef, useImperativeHandle, useLayoutEffect, type ForwardedRef } from 'react';
 import {
   createChart,
   type ChartOptions,
   type DeepPartial,
   type IChartApi,
-  type Time,
-  ISeriesApi,
-  SeriesOptionsMap,
+  type ISeriesApi,
+  type SeriesOptionsMap,
 } from 'lightweight-charts';
 import { ChartContext, ChartContextState, initalContextState } from '@/context/ChartContext';
-import { getTimeMarker } from '@/util/chart';
-import { useSearchParams } from 'next/navigation';
-import { ResampleFrequency } from '@/interfaces/Dto/Stock';
 
 export interface ChartApiRef {
   _api: IChartApi | null;
@@ -33,7 +19,6 @@ export interface ChartApiRef {
 }
 
 export interface ChartProps {
-  chartApiList: ChartApiList;
   tooltipVisible?: boolean;
   timeMarkerVisible?: boolean;
   markerVisible?: boolean;
@@ -42,14 +27,7 @@ export interface ChartProps {
 }
 
 function LightWeightChart(
-  {
-    chartApiList,
-    options,
-    timeMarkerVisible = false,
-    tooltipVisible = false,
-    markerVisible = false,
-    children,
-  }: ChartProps,
+  { options, timeMarkerVisible = false, tooltipVisible = false, markerVisible = false, children }: ChartProps,
   ref: ForwardedRef<ChartApiRef>,
 ) {
   const [context, setContext] = useState<ChartContextState>({
@@ -58,8 +36,6 @@ function LightWeightChart(
     tooltipVisible,
     markerVisible,
   });
-
-  const resample = (useSearchParams().get('resample') || 'daily') as ResampleFrequency;
 
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartApiRef = useRef<ChartApiRef>({
@@ -71,7 +47,7 @@ function LightWeightChart(
 
   useImperativeHandle(ref, () => {
     if (!chartApiRef.current._api) {
-      const chartOptions = { height: 322 / 2, ...options } as ChartOptions;
+      const chartOptions = { ...options } as ChartOptions;
 
       chartApiRef.current._api = createChart(chartContainerRef.current!, { ...chartOptions });
     }
@@ -83,12 +59,6 @@ function LightWeightChart(
     if (chartApiRef.current._seriesApis.length !== context.seriesApis.length) {
       chartApiRef.current._seriesApis = [...context.seriesApis];
     }
-
-    chartApiRef.current._api.applyOptions({
-      timeScale: {
-        tickMarkFormatter: (time: Time) => getTimeMarker(time, resample),
-      },
-    });
 
     chartApiRef.current.clear = () => {
       chartApiRef.current._api?.remove();
@@ -119,7 +89,7 @@ function LightWeightChart(
     }
 
     if (!Array.isArray(children) && !context.seriesApis.length) {
-      const seriesApiRef = (children as React.ReactElement & { ref: any })?.ref.current;
+      const seriesApiRef = (children as React.ReactElement & { ref: any })?.ref?.current;
 
       if (!!seriesApiRef?.seriesType) {
         setContext((prev) => ({ ...prev, seriesApis: [...prev.seriesApis, seriesApiRef] }));
@@ -131,9 +101,7 @@ function LightWeightChart(
 
   return (
     <div ref={chartContainerRef} className="relative">
-      <ChartContext.Provider value={context}>
-        <LightWeightChartContainer chartApiList={chartApiList}>{children}</LightWeightChartContainer>
-      </ChartContext.Provider>
+      <ChartContext.Provider value={context}>{children}</ChartContext.Provider>
     </div>
   );
 }

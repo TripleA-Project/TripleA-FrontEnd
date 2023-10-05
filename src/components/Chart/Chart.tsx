@@ -2,13 +2,13 @@
 
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import type { ISeriesApi } from 'lightweight-charts';
-import { LightWeightChart, LightWeightChartLineSeries, LightWeightHistogramSeries } from './LightWeightChart';
+import { LightWeightChartLineSeries, LightWeightHistogramSeries } from './LightWeightChart';
 import { getSymbolLineChartContainerOptions, getSymbolLineChartSeriesOptions } from './constants/symbolLineChartConfig';
 import {
   getSymbolHistogramChartContainerOptions,
   getSymbolHistogramSeriesOptions,
 } from './constants/symbolHistogramConfig';
+import SymbolChart from './SymbolChart';
 import ChartLoading from './ChartLoding';
 import ChartEmpty from './ChartEmpty';
 import { DeltaPriceColor, getChartDate, getPriceInfo } from '@/util/chart';
@@ -17,9 +17,11 @@ import { useChart } from '@/hooks/useChart';
 import { setChartPayload, useChartSource } from '@/redux/slice/chartSourceSlice';
 import { usePageTab } from '@/redux/slice/pageTabSlice';
 import { ChartAreaLeaveEvent } from './constants/event';
+import type { ISeriesApi } from 'lightweight-charts';
 import type { Symbol } from '@/interfaces/Symbol';
 import type { ChartApiRef } from './LightWeightChart/LightWeightChart';
-import type { ChartApiList } from './LightWeightChart/LightWeightChartContainer';
+import type { ChartApiList } from './SymbolChartContainer';
+import ChartError from './ChartError';
 
 interface ChartProps {
   matchedSymbol?: Symbol | null;
@@ -140,14 +142,11 @@ function Chart({ matchedSymbol }: ChartProps) {
     dispatch(setChartPayload(chartSource));
   }, [chartData, status]); /* eslint-disable-line */
 
-  if (status === 'loading' || status === 'fetching')
-    return (
-      <div className="space-y-4 divide-y-2 divide-dashed">
-        <ChartLoading />
-      </div>
-    );
+  if (status === 'loading' || status === 'fetching') return <ChartLoading />;
 
-  if (empty || status === 'error') return <ChartEmpty refetch={refetchChart} />;
+  if (status === 'error' || status === 'timeout') return <ChartError refetch={refetchChart} />;
+
+  if (empty) return <ChartEmpty />;
 
   /* 
     redux의 chartSource를 props로 전달시
@@ -169,7 +168,7 @@ function Chart({ matchedSymbol }: ChartProps) {
         window.dispatchEvent(ChartAreaLeaveEvent);
       }}
     >
-      <LightWeightChart
+      <SymbolChart
         ref={lineChartApiRef}
         chartApiList={chartApiList}
         timeMarkerVisible={false}
@@ -187,12 +186,12 @@ function Chart({ matchedSymbol }: ChartProps) {
           }}
           lineChartData={chartSource?.lineData ?? null}
         />
-      </LightWeightChart>
+      </SymbolChart>
       <div className="divide-y-2 divide-dashed divide-[#A7A7A7]">
         <div className="h-2" />
         <div className="h-2 pt-0.5" />
       </div>
-      <LightWeightChart
+      <SymbolChart
         ref={histogramChartApiRef}
         chartApiList={chartApiList}
         options={{
@@ -206,7 +205,7 @@ function Chart({ matchedSymbol }: ChartProps) {
           histogramChartData={chartSource?.buzzData ?? null}
           histogramSeriesOptions={getSymbolHistogramSeriesOptions()}
         />
-      </LightWeightChart>
+      </SymbolChart>
     </div>
   );
 }

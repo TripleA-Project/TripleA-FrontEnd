@@ -1,9 +1,8 @@
 'use client';
 
-import { useContext, forwardRef, useImperativeHandle, useRef, useLayoutEffect } from 'react';
+import { useContext, forwardRef, useImperativeHandle, useRef } from 'react';
 import { ChartContext } from '@/context/ChartContext';
 import type { ISeriesApi, LineData, LineSeriesOptions } from 'lightweight-charts';
-import { getDataMinMax } from '@/util/chart';
 
 interface LineChartProps {
   lineSeriesOptions?: Partial<LineSeriesOptions>;

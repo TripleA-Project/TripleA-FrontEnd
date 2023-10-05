@@ -155,7 +155,7 @@ const ChartTooltip = forwardRef<ChartTooltipControl, ChartTooltipProps>(
         tooltipWidth={tooltipWidth}
         coord={coord}
         container={container}
-        className="absolute -top-16 z-[9] box-border space-y-2 rounded-lg bg-black/70 px-4 py-2.5 text-sm font-normal text-white mobile:!w-[150px] tablet:!w-[150px]"
+        className="absolute -top-16 z-[4] box-border space-y-2 rounded-lg bg-black/70 px-4 py-2.5 text-sm font-normal text-white mobile:!w-[150px] tablet:!w-[150px]"
       >
         <div className="absolute left-0 top-0 flex w-full">
           <button

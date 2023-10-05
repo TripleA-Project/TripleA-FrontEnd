@@ -1,5 +1,4 @@
 import React, { cloneElement } from 'react';
-import dayjs from 'dayjs';
 import { AxiosError, HttpStatusCode } from 'axios';
 import Timeout from '../ErrorBoundary/ErrorFallback/common/Timeout';
 import HistoryUnauthorized from '../ErrorBoundary/ErrorFallback/History/Unauthorized';
@@ -7,8 +6,8 @@ import HistoryInternalServerError from '../ErrorBoundary/ErrorFallback/History/I
 import { getProfile } from '@/service/user';
 import { getNewsHistory } from '@/service/news';
 import { TIMEOUT_CODE } from '@/service/axios';
-import { type APIResponse } from '@/interfaces/Dto/Core';
 import { getInitialDate } from './helper/calendar';
+import type { APIResponse } from '@/interfaces/Dto/Core';
 
 interface HistoryInitialFetcherProps {
   year: number;
