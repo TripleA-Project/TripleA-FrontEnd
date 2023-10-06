@@ -18,7 +18,6 @@ function ChartResampleGroup({ symbol }: ChartResampleGroupProps) {
 
   const { dispatch, pageTabs } = usePageTab();
 
-  /* --- 새로고침 시 동기화 --- */
   const selectedResample =
     queryStringResample !== pageTabs.symbolChartPageResampleFrequencyTab
       ? queryStringResample
@@ -27,7 +26,6 @@ function ChartResampleGroup({ symbol }: ChartResampleGroupProps) {
   if (queryStringResample !== pageTabs.symbolChartPageResampleFrequencyTab) {
     dispatch(setSymbolChartPageResampleFrequencyTab(selectedResample));
   }
-  /* --- */
 
   const tabClassNames = `w-full h-full rounded-[4px] hover:bg-[#9AA1A9] hover:text-white bg-transparent`;
 
