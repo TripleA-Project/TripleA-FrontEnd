@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useRef } from 'react';
-import { useLexicalComposerContext } from '@lexical/react/lexicalComposerContext';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $patchStyleText } from '@lexical/selection';
 import { $getSelection, $isRangeSelection, COMMAND_PRIORITY_EDITOR } from 'lexical';
 import { twMerge } from 'tailwind-merge';

@@ -1,7 +1,7 @@
 'use client';
 
 import { useLayoutEffect, useRef, useState } from 'react';
-import { useLexicalComposerContext } from '@lexical/react/lexicalComposerContext';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $getNodeByKey } from 'lexical';
 import { LinkNode } from '@lexical/link';
 import { AiOutlineCheckSquare } from 'react-icons/ai';

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import axios, { AxiosError } from 'axios';
-import { useLexicalComposerContext } from '@lexical/react/lexicalComposerContext';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { useForm } from 'react-hook-form';
 import { AppIcons } from '@/components/Icons';
 import { TfiClose } from 'react-icons/tfi';

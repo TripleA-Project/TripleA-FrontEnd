@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { useLexicalComposerContext } from '@lexical/react/lexicalComposerContext';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { HistoryToolbar, FontToolbar } from '../../Toolbar';
 import { $getSelection, $isRangeSelection, COMMAND_PRIORITY_EDITOR, SELECTION_CHANGE_COMMAND } from 'lexical';
 import { EditorDialogContextProvider } from '@/context/EditorDialogContext';

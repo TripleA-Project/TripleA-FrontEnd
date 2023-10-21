@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
-import { useLexicalComposerContext } from '@lexical/react/lexicalComposerContext';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { COMMAND_PRIORITY_CRITICAL, COMMAND_PRIORITY_EDITOR, FORMAT_TEXT_COMMAND } from 'lexical';
 import { TOGGLE_LINK_COMMAND } from '@lexical/link';
 import { ToolbarIcons } from './ToolbarIcons';

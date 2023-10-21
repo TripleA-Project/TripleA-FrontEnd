@@ -2,7 +2,7 @@
 
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import { useLexicalComposerContext } from '@lexical/react/lexicalComposerContext';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import React, { useLayoutEffect, useState } from 'react';
 
 interface PlaceHolderPosition {

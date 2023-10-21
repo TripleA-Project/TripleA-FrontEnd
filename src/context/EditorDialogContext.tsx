@@ -4,7 +4,7 @@ import OpenGraphLinkDialog, {
   type OpenGraphLinkDialogProps,
 } from '@/components/Editor/Toolbar/Dialog/OpenGraphLinkDialog';
 import LinkDialog, { type LinkDialogProps } from '@/components/Editor/Toolbar/Dialog/LinkDialog';
-import { useLexicalComposerContext } from '@lexical/react/lexicalComposerContext';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 
 interface EditorDialogPayload {
   openGraphLink: OpenGraphLinkDialogProps;
