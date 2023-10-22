@@ -9,6 +9,7 @@ import { ProfilePayload } from '@/interfaces/Dto/User';
 import { useState } from 'react';
 import UnsubscribeDialog from './Dialog/UnsubscribeDialog';
 import { toastNotify } from '@/util/toastNotify';
+import dayjs from 'dayjs';
 
 interface MembershipInfoProps {
   user?: ProfilePayload;
@@ -45,15 +46,23 @@ function MembershipInfo({ user }: MembershipInfoProps) {
           </span>
         </div>
         {user?.membership === 'PREMIUM' ? (
-          <button
-            className="mb-1.5 mt-[15px] border-b-2 border-b-[#777777] text-sm font-semibold text-[#777777] disabled:cursor-not-allowed disabled:text-violet-400/60"
-            disabled={unSubscribeStatus === 'loading'}
-            onClick={() => {
-              setOpenUnsubscribeDialog(true);
-            }}
-          >
-            해지하기
-          </button>
+          <>
+            <div className="mt-1.5">
+              <span className="font-semibold text-[#5B6267]">다음 결제일 : </span>
+              <span className="font-semibold text-[#FD954A]">
+                {user.nextPaymentDate ? dayjs(user.nextPaymentDate).format('YYYY/MM/DD') : ''}
+              </span>
+            </div>
+            <button
+              className="mb-1.5 mt-[15px] border-b-2 border-b-[#777777] text-sm font-semibold text-[#777777] disabled:cursor-not-allowed disabled:text-violet-400/60"
+              disabled={unSubscribeStatus === 'loading'}
+              onClick={() => {
+                setOpenUnsubscribeDialog(true);
+              }}
+            >
+              해지하기
+            </button>
+          </>
         ) : null}
       </div>
       <Link href="/mypage/membership">
