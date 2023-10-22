@@ -1,12 +1,13 @@
 import { twMerge } from 'tailwind-merge';
 import { BiRedo, BiSolidColorFill, BiUndo } from 'react-icons/bi';
 import { AiOutlineBold, AiOutlineFontSize, AiOutlineItalic } from 'react-icons/ai';
+import { MdAddLink, MdFormatAlignCenter, MdFormatAlignLeft, MdFormatAlignRight } from 'react-icons/md';
+import { BsLink45Deg, BsListOl, BsListUl } from 'react-icons/bs';
 import { ImTextColor } from 'react-icons/im';
 import type { IconBaseProps } from 'react-icons';
 import type { HistoryToolbarNames } from './HistoryToolbar';
 import type { FontToolbarNames } from './FontToolbar';
-import { BsLink45Deg } from 'react-icons/bs';
-import { MdAddLink, MdFormatAlignCenter, MdFormatAlignLeft, MdFormatAlignRight } from 'react-icons/md';
+import type { ListToolbarNames } from './ListToolbar';
 
 interface ToolbarIconProps extends IconBaseProps {
   active?: boolean;
@@ -18,7 +19,7 @@ interface ToolbarIcon {
 
 export type AlignNames = 'AlignLeft' | 'AlignCenter' | 'AlignRight';
 
-type ToolbarNames = HistoryToolbarNames | FontToolbarNames | AlignNames;
+type ToolbarNames = HistoryToolbarNames | FontToolbarNames | AlignNames | ListToolbarNames;
 
 type ToolbarIconsType = Record<ToolbarNames, ToolbarIcon>;
 
@@ -82,6 +83,16 @@ export const ToolbarIcons: ToolbarIconsType = {
     const classNames = getIconClassNames({ active, classNameProp: className });
 
     return <MdFormatAlignRight className={classNames} {...props} />;
+  },
+  UnOrderedList: ({ active = true, className, ...props }) => {
+    const classNames = getIconClassNames({ active, classNameProp: className });
+
+    return <BsListUl className={classNames} {...props} />;
+  },
+  OrderedList: ({ active = true, className, ...props }) => {
+    const classNames = getIconClassNames({ active, classNameProp: className });
+
+    return <BsListOl className={classNames} {...props} />;
   },
 };
 

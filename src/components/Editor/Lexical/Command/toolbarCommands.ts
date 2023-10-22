@@ -16,6 +16,8 @@ export type FontBackgroundColorCommandPayload = {
 export type FontSizeCommandPayload = {
   fontSize: TOOLBAR_FONT_SIZE;
 };
+export type IsUnorderedListCommandPayload = boolean;
+export type IsOrderedListCommandPayload = boolean;
 
 export const IS_BOLD_COMMAND = createCommand<IsBoldCommandPayload>('isActiveBold');
 export const IS_ITALIC_COMMAND = createCommand<IsItalicCommandPayload>('isItalic');
@@ -24,3 +26,5 @@ export const FONT_COLOR_COMMAND = createCommand<FontColorCommandPayload>('select
 export const FONT_BACKGROUND_COLOR_COMMAND =
   createCommand<FontBackgroundColorCommandPayload>('selectionFontBackground');
 export const FONT_SIZE_COMMAND = createCommand<FontSizeCommandPayload>('selectionFontSize');
+export const IS_UNOREDERED_LIST_COMMAND = createCommand<IsUnorderedListCommandPayload>('isList');
+export const IS_OREDERED_LIST_COMMAND = createCommand<IsUnorderedListCommandPayload>('isList');

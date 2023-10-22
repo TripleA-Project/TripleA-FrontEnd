@@ -28,6 +28,15 @@ function TripleANoticeViewer({ initialEditorState }: TripleANoticeViewerProps) {
               italic: 'italic',
             },
             link: 'text-blue-500 underline',
+            list: {
+              ul: 'list-disc',
+              ol: 'list-decimal',
+              nested: {
+                listitem: 'list-none',
+              },
+              olDepth: ['pl-[40px]'],
+              ulDepth: ['pl-[40px]'],
+            },
           },
           editable: false,
           onError,

@@ -8,6 +8,9 @@ import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { LinkNode } from '@lexical/link';
 import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
+import { ListNode, ListItemNode } from '@lexical/list';
+import { ListPlugin } from '@lexical/react/LexicalListPlugin';
+import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin';
 import { EditorRefPlugin } from '@lexical/react/LexicalEditorRefPlugin';
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
 import PlaceHolder from './PlaceHolder';
@@ -54,9 +57,10 @@ function LexicalEditor({ config }: LexicalEditorProps, ref: ForwardedRef<Editor>
     <LexicalComposer
       initialConfig={{
         ...config,
-        nodes: [LinkNode, OpenGraphLinkNode],
+        nodes: [LinkNode, OpenGraphLinkNode, ListNode, ListItemNode],
       }}
     >
+      <EditorRefPlugin editorRef={editorRef} />
       <ToolbarPlugin />
       <RichTextPlugin
         contentEditable={<ContentEditable spellCheck="false" />}
@@ -64,9 +68,10 @@ function LexicalEditor({ config }: LexicalEditorProps, ref: ForwardedRef<Editor>
         ErrorBoundary={LexicalErrorBoundary}
       />
       <HistoryPlugin />
+      <TabIndentationPlugin />
       <LinkPlugin />
-      <EditorRefPlugin editorRef={editorRef} />
       <OpenGraphLinkPlugin />
+      <ListPlugin />
     </LexicalComposer>
   );
 }

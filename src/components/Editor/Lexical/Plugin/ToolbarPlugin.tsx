@@ -13,10 +13,14 @@ import {
   IS_BOLD_COMMAND,
   IS_ITALIC_COMMAND,
   IS_LINK_COMMAND,
+  IS_UNOREDERED_LIST_COMMAND,
+  IS_OREDERED_LIST_COMMAND,
 } from '../Command/toolbarCommands';
 import { $isLinkNode } from '@lexical/link';
+import { $isListNode, ListNode } from '@lexical/list';
 import { $getSelectionStyleValueForProperty } from '@lexical/selection';
 import { AlignNames } from '../../Toolbar/ToolbarIcons';
+import ListToolbar from '../../Toolbar/ListToolbar';
 
 export type TOOLBAR_FONT_SIZE = '12px' | '14px' | '16px';
 
@@ -62,6 +66,19 @@ function ToolbarPlugin() {
               TOOLBAR_DEFAULT_FONT_SIZE,
             ) as TOOLBAR_FONT_SIZE,
           });
+
+          const satisfiedListNode = selection
+            .getNodes()
+            .filter((node) => $isListNode(node.getTopLevelElement()))
+            ?.map((node) => node.getTopLevelElement());
+          editor.dispatchCommand(
+            IS_UNOREDERED_LIST_COMMAND,
+            !!satisfiedListNode?.find((node) => (node as ListNode).getTag() === 'ul'),
+          );
+          editor.dispatchCommand(
+            IS_OREDERED_LIST_COMMAND,
+            !!satisfiedListNode?.find((node) => (node as ListNode).getTag() === 'ol'),
+          );
         }
 
         return false;
@@ -79,6 +96,7 @@ function ToolbarPlugin() {
   return editor.isEditable() ? (
     <div className="z-[1] box-border flex w-full items-center gap-2 overflow-auto border-b-2 border-b-[#eee] bg-white px-2 pb-2 pt-1 scrollbar-thin">
       <HistoryToolbar />
+      <ListToolbar />
       <EditorDialogContextProvider>
         <FontToolbar />
       </EditorDialogContextProvider>
