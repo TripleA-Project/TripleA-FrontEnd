@@ -17,7 +17,7 @@ import {
   IS_OREDERED_LIST_COMMAND,
 } from '../Command/toolbarCommands';
 import { $isLinkNode } from '@lexical/link';
-import { $isListNode, ListNode } from '@lexical/list';
+import { $isListNode, $isListItemNode, ListNode, ListItemNode } from '@lexical/list';
 import { $getSelectionStyleValueForProperty } from '@lexical/selection';
 import { AlignNames } from '../../Toolbar/ToolbarIcons';
 import ListToolbar from '../../Toolbar/ListToolbar';
@@ -69,15 +69,22 @@ function ToolbarPlugin() {
 
           const satisfiedListNode = selection
             .getNodes()
-            .filter((node) => $isListNode(node.getTopLevelElement()))
-            ?.map((node) => node.getTopLevelElement());
+            .filter((node) => $isListItemNode(node.getParent()) || $isListItemNode(node))
+            ?.map((node) => {
+              const targetItemNode = $isListItemNode(node.getParent())
+                ? (node.getParent() as ListItemNode)
+                : (node as ListItemNode);
+
+              return targetItemNode;
+            });
+
           editor.dispatchCommand(
             IS_UNOREDERED_LIST_COMMAND,
-            !!satisfiedListNode?.find((node) => (node as ListNode).getTag() === 'ul'),
+            !!satisfiedListNode?.find((node) => (node.getParent() as ListNode).getTag() === 'ul'),
           );
           editor.dispatchCommand(
             IS_OREDERED_LIST_COMMAND,
-            !!satisfiedListNode?.find((node) => (node as ListNode).getTag() === 'ol'),
+            !!satisfiedListNode?.find((node) => (node.getParent() as ListNode).getTag() === 'ol'),
           );
         }
 

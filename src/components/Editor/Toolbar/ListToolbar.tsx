@@ -2,14 +2,34 @@
 
 import { useEffect, useState } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { insertList, removeList } from '@lexical/list';
+import {
+  insertList,
+  removeList as removeAllListToTopLevel,
+  INSERT_UNORDERED_LIST_COMMAND,
+  ListNode,
+  ListItemNode,
+  $isListNode,
+  $isListItemNode,
+} from '@lexical/list';
 import { twMerge } from 'tailwind-merge';
 import { IS_UNOREDERED_LIST_COMMAND, IS_OREDERED_LIST_COMMAND } from '../Lexical/Command/toolbarCommands';
-import { COMMAND_PRIORITY_EDITOR } from 'lexical';
+import {
+  $getSelection,
+  COMMAND_PRIORITY_EDITOR,
+  LexicalEditor,
+  $isRangeSelection,
+  $createParagraphNode,
+  ElementNode,
+  LexicalNode,
+} from 'lexical';
 import { ToolbarIcons } from './ToolbarIcons';
 import type { CleanupCommand } from '../Lexical/LexicalEditor';
 
 export type ListToolbarNames = 'UnOrderedList' | 'OrderedList';
+
+function append(node: ElementNode, nodesToAppend: Array<LexicalNode>) {
+  node.splice(node.getChildrenSize(), 0, nodesToAppend);
+}
 
 function ListToolbar() {
   const [editor] = useLexicalComposerContext();
@@ -26,6 +46,57 @@ function ListToolbar() {
     get OrderedList() {
       return twMerge([this.base], isOrderedList && this.active);
     },
+  };
+
+  const removeList = (editor: LexicalEditor) => {
+    editor.update(() => {
+      const selection = $getSelection();
+
+      if ($isRangeSelection(selection)) {
+        /*
+          const listItem = selection.anchor.getNode().getParent();
+
+          const list = listItem?.getParent();
+
+          if (list && $isListNode(list)) {
+            const idx = list.getChildren().findIndex((childListItem) => listItem === childListItem);
+            console.log({ idx });
+            if (idx > -1) {
+              const paragraph = $createParagraphNode();
+
+              append(paragraph, listItem!.getChildren());
+
+              listItem?.insertAfter(paragraph);
+
+              listItem?.remove();
+            }
+          }
+        */
+
+        // orderedList 영역 찾고
+        // 해당 부분 교체
+        if (isOrderedList) {
+          const orderedListItems = selection.getNodes().filter((node) => $isListItemNode(node.getParent()));
+
+          orderedListItems?.forEach((node) => {
+            const listItemNode = node.getParent() as ListItemNode;
+            const listNode = listItemNode.getParent() as ListNode;
+
+            const paragraph = $createParagraphNode();
+
+            append(paragraph, listItemNode.getChildren());
+            listItemNode.insertAfter(paragraph);
+
+            listItemNode.remove();
+          });
+        }
+
+        // unorderedList 영역 찾고
+        // 해당 부분 교체
+
+        // removeAllListToTopLevel(editor);
+      }
+    });
   };
 
   const unorderedList = (e: React.MouseEvent) => {
