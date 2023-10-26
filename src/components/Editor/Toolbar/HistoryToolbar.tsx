@@ -3,11 +3,11 @@
 import React, { useEffect, useState } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { CAN_REDO_COMMAND, CAN_UNDO_COMMAND, COMMAND_PRIORITY_CRITICAL, REDO_COMMAND, UNDO_COMMAND } from 'lexical';
-import { ToolbarIcons } from './ToolbarIcons';
+import Toolbar from '../Lexical/Component/ToolbarUI/Toolbar';
 
 export type HistoryToolbarNames = 'Undo' | 'Redo';
 
-function HistoryToolbar() {
+export function HistoryToolbar() {
   const [editor] = useLexicalComposerContext();
 
   const [canUndo, setCanUndo] = useState(false);
@@ -61,15 +61,23 @@ function HistoryToolbar() {
   }, [editor]);
 
   return (
-    <div className="inline-flex items-center gap-1">
-      <button className="shrink-0 p-1 hover:bg-gray-100" title="실행 취소(ctrl + z)" onClick={undo}>
-        <ToolbarIcons.Undo active={canUndo} />
-      </button>
-      <button className="shrink-0 p-1 hover:bg-gray-100" title="실행 복원(ctrl + x)" onClick={redo}>
-        <ToolbarIcons.Redo active={canRedo} />
-      </button>
-    </div>
+    <Toolbar.GroupWrapper>
+      <Toolbar.Button
+        active={canUndo}
+        activeColor="#000"
+        nonActiveColor="#C6C6C6"
+        icon={'Undo'}
+        title={'실행 취소(ctrl + z)'}
+        onClick={undo}
+      />
+      <Toolbar.Button
+        active={canRedo}
+        activeColor="#000"
+        nonActiveColor="#C6C6C6"
+        icon={'Redo'}
+        title={'실행 복원(ctrl + x)'}
+        onClick={redo}
+      />
+    </Toolbar.GroupWrapper>
   );
 }
-
-export default HistoryToolbar;

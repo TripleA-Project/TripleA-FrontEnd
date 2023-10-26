@@ -3,12 +3,10 @@ import { createPortal } from 'react-dom';
 import OpenGraphLinkDialog, {
   type OpenGraphLinkDialogProps,
 } from '@/components/Editor/Toolbar/Dialog/OpenGraphLinkDialog';
-import LinkDialog, { type LinkDialogProps } from '@/components/Editor/Toolbar/Dialog/LinkDialog';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 
 interface EditorDialogPayload {
   openGraphLink: OpenGraphLinkDialogProps;
-  link: LinkDialogProps;
 }
 
 type EditorDialogType = keyof EditorDialogPayload;
@@ -79,10 +77,6 @@ function EditorDialog({ open, type, payload }: EditorDialogContextState) {
       case 'openGraphLink':
         // const {} = payload as EditorDialogPayload['openGraphLink'];
         return <OpenGraphLinkDialog />;
-      case 'link':
-        const { linkNodeKey } = payload as EditorDialogPayload['link'];
-
-        return <LinkDialog linkNodeKey={linkNodeKey} />;
     }
   };
 

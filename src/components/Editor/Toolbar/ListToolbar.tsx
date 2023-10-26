@@ -2,17 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import {
-  insertList,
-  removeList as removeAllListToTopLevel,
-  INSERT_UNORDERED_LIST_COMMAND,
-  ListNode,
-  ListItemNode,
-  $isListNode,
-  $isListItemNode,
-} from '@lexical/list';
-import { twMerge } from 'tailwind-merge';
-import { IS_UNOREDERED_LIST_COMMAND, IS_OREDERED_LIST_COMMAND } from '../Lexical/Command/toolbarCommands';
+import { insertList, ListNode, ListItemNode, $isListNode, $isListItemNode } from '@lexical/list';
 import {
   $getSelection,
   COMMAND_PRIORITY_EDITOR,
@@ -21,93 +11,112 @@ import {
   $createParagraphNode,
   ElementNode,
   LexicalNode,
+  RangeSelection,
+  createCommand,
 } from 'lexical';
-import { ToolbarIcons } from './ToolbarIcons';
+import Toolbar from '../Lexical/Component/ToolbarUI/Toolbar';
 import type { CleanupCommand } from '../Lexical/LexicalEditor';
 
 export type ListToolbarNames = 'UnOrderedList' | 'OrderedList';
+
+export type IsUnorderedListCommandPayload = boolean;
+export type IsOrderedListCommandPayload = boolean;
+
+export const IS_UNOREDERED_LIST_COMMAND = createCommand<IsUnorderedListCommandPayload>('isUnorderedList');
+export const IS_OREDERED_LIST_COMMAND = createCommand<IsUnorderedListCommandPayload>('isOrderedList');
 
 function append(node: ElementNode, nodesToAppend: Array<LexicalNode>) {
   node.splice(node.getChildrenSize(), 0, nodesToAppend);
 }
 
-function ListToolbar() {
+export function ListToolbar() {
   const [editor] = useLexicalComposerContext();
 
   const [isUnorderedList, setIsUnorderedList] = useState(false);
   const [isOrderedList, setIsOrderedList] = useState(false);
 
-  const buttonWrapperClassNames = {
-    base: `shrink-0 p-1 align-top hover:bg-gray-100`,
-    active: `bg-blue-50`,
-    get UnorderedList() {
-      return twMerge([this.base, isUnorderedList && this.active]);
-    },
-    get OrderedList() {
-      return twMerge([this.base], isOrderedList && this.active);
-    },
-  };
-
-  const removeList = (editor: LexicalEditor) => {
+  const removeList = (type: 'orderedList' | 'unorderedList', editor: LexicalEditor) => {
     editor.update(() => {
       const selection = $getSelection();
 
       if ($isRangeSelection(selection)) {
-        /*
-          const listItem = selection.anchor.getNode().getParent();
+        switch (type) {
+          case 'unorderedList':
+            const unorderedListItemNodeChildList = getUnOrderedListItemNodeChildFromRangeSelection(selection);
 
-          const list = listItem?.getParent();
+            if (unorderedListItemNodeChildList) {
+              unorderedListItemNodeChildList.forEach((node) => {
+                const listItemNode = node.getParent() as ListItemNode;
+                // const listNode = listItemNode.getParent() as ListNode;
 
-          if (list && $isListNode(list)) {
-            const idx = list.getChildren().findIndex((childListItem) => listItem === childListItem);
-            console.log({ idx });
-            if (idx > -1) {
-              const paragraph = $createParagraphNode();
+                const paragraph = $createParagraphNode();
 
-              append(paragraph, listItem!.getChildren());
+                append(paragraph, listItemNode.getChildren());
+                listItemNode.insertAfter(paragraph);
 
-              listItem?.insertAfter(paragraph);
-
-              listItem?.remove();
+                listItemNode.remove();
+              });
             }
-          }
-        */
 
-        // orderedList 영역 찾고
-        // 해당 부분 교체
-        if (isOrderedList) {
-          const orderedListItems = selection.getNodes().filter((node) => $isListItemNode(node.getParent()));
+            break;
+          case 'orderedList':
+            const orderedListItemNodeChildList = getOrderedListItemNodeChildFromRangeSelection(selection);
 
-          orderedListItems?.forEach((node) => {
-            const listItemNode = node.getParent() as ListItemNode;
-            const listNode = listItemNode.getParent() as ListNode;
+            if (orderedListItemNodeChildList) {
+              orderedListItemNodeChildList.forEach((node) => {
+                const listItemNode = node.getParent() as ListItemNode;
+                // const listNode = listItemNode.getParent() as ListNode;
 
-            const paragraph = $createParagraphNode();
+                const paragraph = $createParagraphNode();
 
-            append(paragraph, listItemNode.getChildren());
-            listItemNode.insertAfter(paragraph);
+                append(paragraph, listItemNode.getChildren());
+                listItemNode.insertAfter(paragraph);
 
-            listItemNode.remove();
-          });
+                listItemNode.remove();
+              });
+
+              return;
+            }
+
+            break;
         }
-
-        // unorderedList 영역 찾고
-        // 해당 부분 교체
-
-        // removeAllListToTopLevel(editor);
       }
     });
+
+    function getOrderedListItemNodeChildFromRangeSelection(selection: RangeSelection) {
+      const orderedListItemNodeChildList = selection
+        .getNodes()
+        .filter(
+          (node) =>
+            $isListItemNode(node.getParent()) &&
+            ((node.getParent() as ListItemNode).getParent() as ListNode).getTag() === 'ol',
+        );
+
+      return orderedListItemNodeChildList.length ? orderedListItemNodeChildList : null;
+    }
+
+    function getUnOrderedListItemNodeChildFromRangeSelection(selection: RangeSelection) {
+      const unorderedListItemNodeChildList = selection
+        .getNodes()
+        .filter(
+          (node) =>
+            $isListItemNode(node.getParent()) &&
+            ((node.getParent() as ListItemNode).getParent() as ListNode).getTag() === 'ul',
+        );
+
+      return unorderedListItemNodeChildList.length ? unorderedListItemNodeChildList : null;
+    }
   };
 
   const unorderedList = (e: React.MouseEvent) => {
     editor.update(() => {
-      isUnorderedList ? removeList(editor) : insertList(editor, 'bullet');
+      isUnorderedList ? removeList('unorderedList', editor) : insertList(editor, 'bullet');
     });
   };
 
   const orderedList = (e: React.MouseEvent) => {
     editor.update(() => {
-      isOrderedList ? removeList(editor) : insertList(editor, 'number');
+      isOrderedList ? removeList('orderedList', editor) : insertList(editor, 'number');
     });
   };
 
@@ -148,15 +157,21 @@ function ListToolbar() {
   }, [editor]);
 
   return (
-    <div className="inline-flex items-center gap-1 align-top">
-      <button className={buttonWrapperClassNames.UnorderedList} onClick={unorderedList}>
-        <ToolbarIcons.UnOrderedList active={isUnorderedList} className="translate-y-[1px]" />
-      </button>
-      <button className={buttonWrapperClassNames.OrderedList} onClick={orderedList}>
-        <ToolbarIcons.OrderedList active={isOrderedList} className="translate-y-[1px]" />
-      </button>
-    </div>
+    <Toolbar.GroupWrapper>
+      <Toolbar.Button
+        active={isUnorderedList}
+        icon={'UnOrderedList'}
+        iconClassName={'translate-y-[1px]'}
+        title={'순서없는 리스트(ul)'}
+        onClick={unorderedList}
+      />
+      <Toolbar.Button
+        active={isOrderedList}
+        icon={'OrderedList'}
+        iconClassName={'translate-y-[1px]'}
+        title={'순서있는 리스트(ol)'}
+        onClick={orderedList}
+      />
+    </Toolbar.GroupWrapper>
   );
 }
-
-export default ListToolbar;

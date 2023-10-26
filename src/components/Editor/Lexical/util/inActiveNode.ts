@@ -1,7 +1,7 @@
 import { $getRoot, $getSelection, $isRangeSelection, LexicalEditor } from 'lexical';
 import { $isOpenGraphLinkNode, OpenGraphLinkNode } from '../Nodes/OpenGraphLinkNode';
 import { $isLinkNode } from '@lexical/link';
-import { IS_LINK_COMMAND } from '../Command/toolbarCommands';
+import { IS_LINK_COMMAND } from '../../Toolbar';
 
 interface RequiredTargetElementPayload {
   target: HTMLElement;

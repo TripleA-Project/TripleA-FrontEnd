@@ -22,7 +22,7 @@ import {
 import { type CleanupCommand } from '../LexicalEditor';
 import { DecoratorOpenGraphLinkNodeKeyboardUtil } from '../util/keyboard';
 
-function OpenGraphLinkPlugin() {
+export function OpenGraphLinkPlugin() {
   const [editor] = useLexicalComposerContext();
 
   const $addOpenGraphLink = useCallback(({ url, title, ogImage, description }: OpenGraphLinkNodeCommandPayload) => {
@@ -97,5 +97,3 @@ function OpenGraphLinkPlugin() {
 
   return null;
 }
-
-export default OpenGraphLinkPlugin;

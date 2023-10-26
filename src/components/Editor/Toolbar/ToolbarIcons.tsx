@@ -1,107 +1,168 @@
 import { twMerge } from 'tailwind-merge';
-import { BiRedo, BiSolidColorFill, BiUndo } from 'react-icons/bi';
-import { AiOutlineBold, AiOutlineFontSize, AiOutlineItalic } from 'react-icons/ai';
+import { BiRedo, BiUndo } from 'react-icons/bi';
+import { AiOutlineBold, AiOutlineItalic } from 'react-icons/ai';
 import { MdAddLink, MdFormatAlignCenter, MdFormatAlignLeft, MdFormatAlignRight } from 'react-icons/md';
-import { BsLink45Deg, BsListOl, BsListUl } from 'react-icons/bs';
-import { ImTextColor } from 'react-icons/im';
-import type { IconBaseProps } from 'react-icons';
-import type { HistoryToolbarNames } from './HistoryToolbar';
-import type { FontToolbarNames } from './FontToolbar';
-import type { ListToolbarNames } from './ListToolbar';
+import { BsImage, BsLink45Deg, BsListOl, BsListUl } from 'react-icons/bs';
+import type { IconBaseProps, IconType } from 'react-icons';
+import type { FontToolbarNames, HistoryToolbarNames, ImageToolbarNames, LinkToolbarNames, ListToolbarNames } from './';
 
 interface ToolbarIconProps extends IconBaseProps {
   active?: boolean;
+  activeColor?: string;
+  nonActiveColor?: string;
+  icon: IconType;
 }
 
 interface ToolbarIcon {
-  (props: ToolbarIconProps): JSX.Element;
+  (props: Omit<ToolbarIconProps, 'icon'>): JSX.Element;
 }
 
 export type AlignNames = 'AlignLeft' | 'AlignCenter' | 'AlignRight';
 
-type ToolbarNames = HistoryToolbarNames | FontToolbarNames | AlignNames | ListToolbarNames;
+type ToolbarNames =
+  | HistoryToolbarNames
+  | FontToolbarNames
+  | LinkToolbarNames
+  | AlignNames
+  | ListToolbarNames
+  | ImageToolbarNames;
 
 type ToolbarIconsType = Record<ToolbarNames, ToolbarIcon>;
 
 export const ToolbarIcons: ToolbarIconsType = {
-  Undo: ({ active, className, ...props }) => {
-    const classNames = getIconClassNames({ active, classNameProp: className });
-
-    return <BiUndo className={classNames} {...props} />;
+  Undo: ({ active, activeColor, nonActiveColor, ...props }) => {
+    return (
+      <ToolbarIcon icon={BiUndo} active={active} activeColor={activeColor} nonActiveColor={nonActiveColor} {...props} />
+    );
   },
-  Redo: ({ active, className, ...props }) => {
-    const classNames = getIconClassNames({ active, classNameProp: className });
-
-    return <BiRedo className={classNames} {...props} />;
+  Redo: ({ active, activeColor, nonActiveColor, ...props }) => {
+    return (
+      <ToolbarIcon icon={BiRedo} active={active} activeColor={activeColor} nonActiveColor={nonActiveColor} {...props} />
+    );
   },
-  Bold: ({ active, className, ...props }) => {
-    const classNames = getIconClassNames({ active, classNameProp: className });
-
-    return <AiOutlineBold className={classNames} {...props} />;
+  Bold: ({ active, activeColor, nonActiveColor, ...props }) => {
+    return (
+      <ToolbarIcon
+        icon={AiOutlineBold}
+        active={active}
+        activeColor={activeColor}
+        nonActiveColor={nonActiveColor}
+        {...props}
+      />
+    );
   },
-  Italic: ({ active, className, ...props }) => {
-    const classNames = getIconClassNames({ active, classNameProp: className });
-
-    return <AiOutlineItalic className={classNames} {...props} />;
+  Italic: ({ active, activeColor, nonActiveColor, ...props }) => {
+    return (
+      <ToolbarIcon
+        icon={AiOutlineItalic}
+        active={active}
+        activeColor={activeColor}
+        nonActiveColor={nonActiveColor}
+        {...props}
+      />
+    );
   },
-  FontSize: ({ active = true, className, ...props }) => {
-    const classNames = getIconClassNames({ active, classNameProp: className });
-
-    return <AiOutlineFontSize className={classNames} {...props} />;
+  Link: ({ active, activeColor, nonActiveColor, ...props }) => {
+    return (
+      <ToolbarIcon
+        icon={BsLink45Deg}
+        active={active}
+        activeColor={activeColor}
+        nonActiveColor={nonActiveColor}
+        {...props}
+      />
+    );
   },
-  FontColor: ({ active = true, className, ...props }) => {
-    const classNames = getIconClassNames({ active, classNameProp: className });
-
-    return <ImTextColor className={classNames} {...props} />;
+  OpenGraphLink: ({ active, activeColor, nonActiveColor, ...props }) => {
+    return (
+      <ToolbarIcon
+        icon={MdAddLink}
+        active={active}
+        activeColor={activeColor}
+        nonActiveColor={nonActiveColor}
+        {...props}
+      />
+    );
   },
-  BackgroundColor: ({ active = true, className, ...props }) => {
-    const classNames = getIconClassNames({ active, classNameProp: className });
-
-    return <BiSolidColorFill className={classNames} {...props} />;
+  AlignLeft: ({ active, activeColor, nonActiveColor, ...props }) => {
+    return (
+      <ToolbarIcon
+        icon={MdFormatAlignLeft}
+        active={active}
+        activeColor={activeColor}
+        nonActiveColor={nonActiveColor}
+        {...props}
+      />
+    );
   },
-  Link: ({ active = true, className, ...props }) => {
-    const classNames = getIconClassNames({ active, classNameProp: className });
-
-    return <BsLink45Deg className={classNames} {...props} />;
+  AlignCenter: ({ active, activeColor, nonActiveColor, ...props }) => {
+    return (
+      <ToolbarIcon
+        icon={MdFormatAlignCenter}
+        active={active}
+        activeColor={activeColor}
+        nonActiveColor={nonActiveColor}
+        {...props}
+      />
+    );
   },
-  OpenGraphLink: ({ active = true, className, ...props }) => {
-    const classNames = getIconClassNames({ active, classNameProp: className });
-
-    return <MdAddLink className={classNames} {...props} />;
+  AlignRight: ({ active, activeColor, nonActiveColor, ...props }) => {
+    return (
+      <ToolbarIcon
+        icon={MdFormatAlignRight}
+        active={active}
+        activeColor={activeColor}
+        nonActiveColor={nonActiveColor}
+        {...props}
+      />
+    );
   },
-  AlignLeft: ({ active = true, className, ...props }) => {
-    const classNames = getIconClassNames({ active, classNameProp: className });
-
-    return <MdFormatAlignLeft className={classNames} {...props} />;
+  UnOrderedList: ({ active, activeColor, nonActiveColor, ...props }) => {
+    return (
+      <ToolbarIcon
+        icon={BsListUl}
+        active={active}
+        activeColor={activeColor}
+        nonActiveColor={nonActiveColor}
+        {...props}
+      />
+    );
   },
-  AlignCenter: ({ active = true, className, ...props }) => {
-    const classNames = getIconClassNames({ active, classNameProp: className });
-
-    return <MdFormatAlignCenter className={classNames} {...props} />;
+  OrderedList: ({ active, activeColor, nonActiveColor, ...props }) => {
+    return (
+      <ToolbarIcon
+        icon={BsListOl}
+        active={active}
+        activeColor={activeColor}
+        nonActiveColor={nonActiveColor}
+        {...props}
+      />
+    );
   },
-  AlignRight: ({ active = true, className, ...props }) => {
-    const classNames = getIconClassNames({ active, classNameProp: className });
-
-    return <MdFormatAlignRight className={classNames} {...props} />;
-  },
-  UnOrderedList: ({ active = true, className, ...props }) => {
-    const classNames = getIconClassNames({ active, classNameProp: className });
-
-    return <BsListUl className={classNames} {...props} />;
-  },
-  OrderedList: ({ active = true, className, ...props }) => {
-    const classNames = getIconClassNames({ active, classNameProp: className });
-
-    return <BsListOl className={classNames} {...props} />;
+  Image: ({ active, activeColor, nonActiveColor, ...props }) => {
+    return (
+      <ToolbarIcon
+        icon={BsImage}
+        active={active}
+        activeColor={activeColor}
+        nonActiveColor={nonActiveColor}
+        {...props}
+      />
+    );
   },
 };
 
-function getIconClassNames({ active, classNameProp }: { active?: boolean; classNameProp?: string }) {
-  const iconActiveClassName = `text-black`;
+function ToolbarIcon({
+  active = false,
+  activeColor = '#ff8503',
+  nonActiveColor = '#1f1f1f',
+  icon,
+  className,
+  ...props
+}: ToolbarIconProps) {
+  const classNames = twMerge([`shrink-0 text-xl`, className]);
 
-  return twMerge([getIconBaseClassNames(), classNameProp, active && iconActiveClassName]);
-}
+  const Icon = icon;
 
-function getIconBaseClassNames() {
-  return `shrink-0 text-xl text-[#C6C6C6]`;
+  return <Icon className={classNames} style={{ color: active ? activeColor : nonActiveColor }} {...props} />;
 }

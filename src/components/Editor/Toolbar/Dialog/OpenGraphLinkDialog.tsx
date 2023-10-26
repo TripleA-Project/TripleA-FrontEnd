@@ -118,7 +118,7 @@ function OpenGraphLinkDialog(props: OpenGraphLinkDialogProps) {
         openGraph: {
           url: data.url,
           title,
-          ogImage,
+          ogImage: ogImage && ogImage.startsWith('//') ? `https:` + ogImage : ogImage,
           description,
         },
       }));
@@ -144,7 +144,7 @@ function OpenGraphLinkDialog(props: OpenGraphLinkDialogProps) {
   }, [result]);
 
   return (
-    <div className="fixed_inner fixed top-0 flex h-full items-center justify-center bg-black/10">
+    <div className="fixed_inner fixed top-0 z-[2] flex h-full items-center justify-center bg-black/10">
       {/* wrapper */}
       <form
         className="relative box-border w-[412px] rounded-lg border bg-white p-4 shadow-md"
@@ -165,6 +165,7 @@ function OpenGraphLinkDialog(props: OpenGraphLinkDialogProps) {
               className="w-full outline-none"
               placeholder="URL을 입력하세요."
               spellCheck="false"
+              autoComplete="off"
             />
             {isSubmitting ? (
               <div className="absolute right-8 inline-flex shrink-0">

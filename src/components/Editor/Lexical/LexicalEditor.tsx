@@ -14,10 +14,10 @@ import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin
 import { EditorRefPlugin } from '@lexical/react/LexicalEditorRefPlugin';
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
 import PlaceHolder from './PlaceHolder';
-import ToolbarPlugin from './Plugin/ToolbarPlugin';
 import { OpenGraphLinkNode } from './Nodes/OpenGraphLinkNode';
-import OpenGraphLinkPlugin from './Plugin/OpenGraphLinkPlugin';
 import { EditorInActiveUtil } from './util/inActiveNode';
+import { ImagePlugin, OpenGraphLinkPlugin, ToolbarPlugin } from './Plugin';
+import { ImageNode } from './Nodes/ImageNode';
 
 interface LexicalEditorProps {
   config: Parameters<typeof LexicalComposer>['0']['initialConfig'];
@@ -57,21 +57,24 @@ function LexicalEditor({ config }: LexicalEditorProps, ref: ForwardedRef<Editor>
     <LexicalComposer
       initialConfig={{
         ...config,
-        nodes: [LinkNode, OpenGraphLinkNode, ListNode, ListItemNode],
+        nodes: [LinkNode, OpenGraphLinkNode, ListNode, ListItemNode, ImageNode],
       }}
     >
       <EditorRefPlugin editorRef={editorRef} />
       <ToolbarPlugin />
-      <RichTextPlugin
-        contentEditable={<ContentEditable spellCheck="false" />}
-        placeholder={(isEditable) => (isEditable ? <PlaceHolder /> : null)}
-        ErrorBoundary={LexicalErrorBoundary}
-      />
+      <div className="relative flex-1 overflow-y-auto scrollbar-thin">
+        <RichTextPlugin
+          contentEditable={<ContentEditable spellCheck="false" />}
+          placeholder={(isEditable) => (isEditable ? <PlaceHolder /> : null)}
+          ErrorBoundary={LexicalErrorBoundary}
+        />
+      </div>
       <HistoryPlugin />
       <TabIndentationPlugin />
       <LinkPlugin />
       <OpenGraphLinkPlugin />
       <ListPlugin />
+      <ImagePlugin />
     </LexicalComposer>
   );
 }

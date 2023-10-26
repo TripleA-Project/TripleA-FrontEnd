@@ -1,4 +1,5 @@
-import HistoryToolbar from './HistoryToolbar';
-import FontToolbar from './FontToolbar';
-
-export { HistoryToolbar, FontToolbar };
+export * from './FontToolbar';
+export * from './LinkToolbar';
+export * from './ListToolbar';
+export * from './HistoryToolbar';
+export * from './ImageToolbar';

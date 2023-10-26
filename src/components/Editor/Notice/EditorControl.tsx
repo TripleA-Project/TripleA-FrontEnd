@@ -56,6 +56,7 @@ function EditorControl({ open = true }: EditorControlProps, ref: ForwardedRef<Ed
             ref={noticeTitleInputRef}
             className="box-border w-full px-2 py-1 font-bold outline-none placeholder:font-bold placeholder:text-[#c9c8c7]"
             placeholder="공지사항 제목"
+            autoComplete="off"
           />
         </div>
         <div className="flex shrink-0 gap-2">
