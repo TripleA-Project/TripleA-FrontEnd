@@ -2,7 +2,7 @@
 
 import { throttle } from 'lodash';
 import { usePathname } from 'next/navigation';
-import { useEffect, useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 
 function Footer() {
   const pathName = usePathname();
@@ -23,7 +23,7 @@ function Footer() {
     handleResize();
   }, 300);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!allowedPathList.includes(pathName!)) return;
 
     const page = document.getElementById('page_wrapper');
