@@ -40,6 +40,19 @@ function EditorControl({ open = true }: EditorControlProps, ref: ForwardedRef<Ed
 
       console.log(`%c---`, `background-color: green; color: #fff;`);
     });
+
+    console.log('');
+
+    editor.getEditorState().read(() => {
+      const html = $generateHtmlFromNodes(editor);
+
+      console.log(`%c---`, `background-color: green; color: #fff;`);
+
+      console.log('html글자수', html.length);
+      console.log(html);
+
+      console.log(`%c---`, `background-color: green; color: #fff;`);
+    });
   };
 
   const onCancel = () => {

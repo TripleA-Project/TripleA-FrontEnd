@@ -2,148 +2,91 @@
 
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import Toolbar from './Toolbar';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { CleanupCommand } from '../../LexicalEditor';
-import { IS_LINK_COMMAND } from '@/components/Editor/Toolbar';
-import { $getNodeByKey, $getSelection, $isRangeSelection, COMMAND_PRIORITY_EDITOR } from 'lexical';
-import { $isLinkNode, LinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link';
-import { AiOutlineCheck } from 'react-icons/ai';
-import { RiDeleteBin6Line } from 'react-icons/ri';
-import { flushSync } from 'react-dom';
+import { COMMAND_PRIORITY_EDITOR, createCommand } from 'lexical';
+import { LinkNode } from '@lexical/link';
+import { ImageNode } from '../../Nodes/ImageNode';
+import { ImageSubToolbar } from './SubToolbar/ImageSubToolbar';
+import { LinkSubToolbar } from './SubToolbar/LinkSubToolbar';
 
-type SubToolbarType = 'link' | 'nonActive';
+type SubToolbarType = 'link' | 'image' | 'nonActive';
+
 interface SubToolbarPayload {
   link?: {
-    url?: string;
-    node: LinkNode | null;
+    url: string;
+    node: LinkNode;
   };
   image?: {
-    width: number;
-    height: number;
+    node: ImageNode;
   };
 }
+
+interface SubToolbarCommandPayload {
+  open: boolean;
+  payload?: SubToolbarPayload;
+}
+
+const defaultPayload = {};
 
 export function SubToolbar() {
   const [editor] = useLexicalComposerContext();
 
-  const linkURLInputRef = useRef<HTMLInputElement>(null);
-
   const [type, setType] = useState<SubToolbarType>('nonActive');
-  const [payload, setPayload] = useState<SubToolbarPayload>({
-    link: {
-      url: '',
-      node: null,
-    },
-  });
+  const [payload, setPayload] = useState<SubToolbarPayload>(defaultPayload);
 
-  const EditorSubToolbar = useCallback(() => {
+  const unActive = useCallback(() => {
+    setType('nonActive');
+    setPayload(defaultPayload);
+  }, []);
+
+  // const EditorSubToolbar = useCallback(() => {
+  //   switch (type) {
+  //     case 'link':
+  //       return <LinkSubToolbar url={payload.link!.url} node={payload.link!.node} />;
+  //     case 'image':
+  //       return <ImageSubToolbar node={payload.image!.node} />;
+  //     case 'nonActive':
+  //     default:
+  //       return null;
+  //   }
+  // }, [type, payload]);
+  const EditorSubToolbar = () => {
     switch (type) {
       case 'link':
-        return (
-          <Toolbar.GroupWrapper>
-            <div>
-              <label htmlFor="link-url" className="mr-2 text-xs font-bold text-[#1E1E1E]">
-                링크 주소
-              </label>
-              <input
-                ref={linkURLInputRef}
-                id="link-url"
-                placeholder="URL을 입력하세요"
-                defaultValue={payload.link?.url ?? ''}
-                spellCheck="false"
-                className="box-border h-full w-52 border border-[#CACACA] px-1"
-              />
-            </div>
-            <button
-              className="hover:text-orange-400"
-              title="링크 주소 수정"
-              onClick={(e) => {
-                if (!linkURLInputRef.current) return;
-                if (!payload.link?.node) return;
-
-                if (linkURLInputRef.current?.value === '') {
-                  editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
-
-                  return;
-                }
-
-                if (linkURLInputRef.current.value && linkURLInputRef.current.value !== payload.link.url) {
-                  editor.update(() => {
-                    payload.link!.node!.setURL(linkURLInputRef.current!.value);
-                  });
-                }
-              }}
-            >
-              <AiOutlineCheck />
-            </button>
-            <button
-              className="hover:text-orange-400"
-              title="링크 삭제"
-              onClick={(e) => {
-                if (!payload.link?.node) return;
-
-                editor.update(() => {
-                  payload.link!.node!.remove();
-                });
-              }}
-            >
-              <RiDeleteBin6Line />
-            </button>
-          </Toolbar.GroupWrapper>
-        );
+        return <LinkSubToolbar url={payload.link!.url} node={payload.link!.node} />;
+      case 'image':
+        return <ImageSubToolbar node={payload.image!.node} />;
+      case 'nonActive':
       default:
         return null;
     }
-  }, [type]); /* eslint-disable-line */
+  };
 
   useEffect(() => {
-    let cleanupLinkCommand: CleanupCommand = null;
+    let cleanupSubToolbarCommand: CleanupCommand = null;
 
     if (editor.isEditable()) {
-      cleanupLinkCommand = editor.registerCommand(
-        IS_LINK_COMMAND,
-        ({ active, nodeKey }) => {
-          const selection = $getSelection();
-
-          if ($isRangeSelection(selection)) {
-            const selectionNodes = selection.getNodes();
-
-            const satisfiedLinkNode: LinkNode | null | undefined = selectionNodes
-              .find((node) => $isLinkNode(node.getParent()))
-              ?.getParent();
-
-            setType(satisfiedLinkNode ? 'link' : 'nonActive');
-
-            if (satisfiedLinkNode) {
-              editor.getEditorState().read(() => {
-                flushSync(() => {
-                  setPayload((prev) => ({
-                    ...prev,
-                    link: {
-                      url: satisfiedLinkNode.getURL(),
-                      node: satisfiedLinkNode,
-                    },
-                  }));
-                });
-              });
-
-              if (!active) {
-                editor.dispatchCommand(IS_LINK_COMMAND, { active: true, nodeKey: satisfiedLinkNode.getKey() });
-              }
+      cleanupSubToolbarCommand = editor.registerCommand(
+        SUB_TOOLBAR_COMMAND,
+        ({ open, payload }) => {
+          if (open) {
+            if (payload?.link) {
+              setType('link');
+              setPayload({ link: { ...payload.link } });
 
               return false;
             }
 
-            setPayload((prev) => ({
-              ...prev,
-              link: {
-                url: '',
-                node: null,
-              },
-            }));
+            if (payload?.image) {
+              setType('image');
+              setPayload({ image: { ...payload.image } });
 
-            return false;
+              return false;
+            }
           }
+
+          unActive();
 
           return false;
         },
@@ -152,11 +95,11 @@ export function SubToolbar() {
     }
 
     return () => {
-      if (cleanupLinkCommand) {
-        cleanupLinkCommand();
+      if (cleanupSubToolbarCommand) {
+        cleanupSubToolbarCommand();
       }
     };
-  }, [editor]);
+  }, [editor, unActive]);
 
   return (
     <Toolbar className={`h-[30px] px-1 py-0.5 shadow-sm ${type === 'nonActive' ? 'opacity-0' : 'opacity-100'}`}>
@@ -164,3 +107,5 @@ export function SubToolbar() {
     </Toolbar>
   );
 }
+
+export const SUB_TOOLBAR_COMMAND = createCommand<SubToolbarCommandPayload>('subToolbarCommand');

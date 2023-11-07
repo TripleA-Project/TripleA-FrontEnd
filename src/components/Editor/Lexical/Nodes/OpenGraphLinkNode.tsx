@@ -8,8 +8,10 @@ import {
   type SerializedLexicalNode,
   type EditorConfig,
   type DOMExportOutput,
+  $createNodeSelection,
 } from 'lexical';
 import EditorOpenGraphLink from '../Component/OpenGraphLink/EditorOpenGraphLink';
+import { DATASET_NAME_FOR_HANDLE } from '../util/toolbar';
 
 export type OpenGraphLinkNodeAlign = 'start' | 'center' | 'end';
 
@@ -27,6 +29,7 @@ export interface OpenGraphLinkNodeCommandPayload {
   ogImage?: string;
   description?: string;
   align?: OpenGraphLinkNodeAlign;
+  active?: boolean;
 }
 
 export class OpenGraphLinkNode extends DecoratorNode<ReactNode> {
@@ -37,7 +40,10 @@ export class OpenGraphLinkNode extends DecoratorNode<ReactNode> {
   __active: boolean;
   __align: OpenGraphLinkNodeAlign;
 
-  constructor({ url, title, ogImage, description, align = 'start' }: OpenGraphLinkNodeCommandPayload, key?: NodeKey) {
+  constructor(
+    { url, title, ogImage, description, align = 'start', active }: OpenGraphLinkNodeCommandPayload,
+    key?: NodeKey,
+  ) {
     super(key);
 
     this.__url = url;
@@ -45,7 +51,7 @@ export class OpenGraphLinkNode extends DecoratorNode<ReactNode> {
     this.__ogImage = ogImage;
     this.__description = description;
 
-    this.__active = false;
+    this.__active = active ?? false;
     this.__align = align;
   }
 
@@ -71,21 +77,28 @@ export class OpenGraphLinkNode extends DecoratorNode<ReactNode> {
     return {
       type: this.getType(),
       version: 1,
-      ...this.getPayload(),
+      ...this.getJSONPayload(),
     };
   }
 
   createDOM(_config: EditorConfig, _editor: LexicalEditor): HTMLElement {
     const element = document.createElement('div');
-    element.className = `og-link box-border flex w-[calc(100%-16px)] select-none mx-2 mt-2 mb-[66px] ${this.getAlign()}`;
+    element.className = `og-link box-border flex w-[calc(100%-16px)] select-none mx-2 mt-2 mb-6 ${this.getAlign()}`;
 
-    if (_editor.isEditable() && this.__active === true) {
-      element.classList.add('active');
+    if (_editor.isEditable()) {
+      element.dataset[DATASET_NAME_FOR_HANDLE.CAMEL_CASE_NODE_TYPE] = this.getType();
+      element.dataset[DATASET_NAME_FOR_HANDLE.CAMEL_CASE_KEY] = this.__key;
+
+      if (this.__active === true) {
+        element.classList.add('active');
+      }
     }
 
     if (!_editor.isEditable()) {
       element.classList.add('view');
     }
+
+    element.classList.add(this.getAlign());
 
     return element;
   }
@@ -132,51 +145,45 @@ export class OpenGraphLinkNode extends DecoratorNode<ReactNode> {
       ogImage: this.__ogImage,
       description: this.__description,
       align: this.__align,
+      active: this.__active,
     };
   }
 
-  setPayload({ url, title, ogImage, description, align = 'start' }: OpenGraphLinkNodeCommandPayload) {
-    const writable = this.getWritable();
-
-    writable.__url = url;
-    writable.__title = title;
-    writable.__ogImage = ogImage;
-    writable.__description = description;
-    writable.__align = align;
+  getJSONPayload() {
+    return {
+      url: this.__url,
+      title: this.__title,
+      ogImage: this.__ogImage,
+      description: this.__description,
+      align: this.__align,
+    };
   }
 
   getIsActive() {
     return this.__active;
   }
 
-  setIsActive(payload: boolean, editor: LexicalEditor) {
-    const element = editor.getElementByKey(this.getKey());
-
-    if (!element) return;
-
+  setIsActive(payload: boolean) {
     const writable = this.getWritable();
 
-    if (payload === true) {
-      writable.__active = true;
-
-      return;
-    }
-
-    writable.__active = false;
+    writable.__active = payload;
   }
 
   getAlign() {
     return this.__align;
   }
 
-  setAlign(payload: OpenGraphLinkNodeAlign, editor: LexicalEditor) {
-    const element = editor.getElementByKey(this.getKey());
-
-    if (!element) return;
-
+  setAlign(payload: OpenGraphLinkNodeAlign) {
     const writable = this.getWritable();
 
     writable.__align = payload;
+  }
+
+  createSelfNodeSelection() {
+    const nodeSelection = $createNodeSelection();
+    nodeSelection.add(this.getKey());
+
+    return nodeSelection;
   }
 }
 

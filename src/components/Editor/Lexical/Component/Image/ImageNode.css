@@ -1,1 +1,11 @@
-/* test */
+.editor-image.start {
+  justify-content: start;
+}
+
+.editor-image.center {
+  justify-content: center;
+}
+
+.editor-image.end {
+  justify-content: end;
+}

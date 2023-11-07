@@ -1,11 +1,13 @@
 'use client';
 
-import { $createNodeSelection, $getNodeByKey, $setSelection, EditorConfig, LexicalEditor } from 'lexical';
-import { ImageNode, ImageNodeCommandPayload } from '../../Nodes/ImageNode';
-import { twMerge } from 'tailwind-merge';
-import { Resizable, ResizableProps, ResizeDirection, NumberSize } from 're-resizable';
+import { useLayoutEffect, useRef } from 'react';
 import Image from 'next/image';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { twMerge } from 'tailwind-merge';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { $getNodeByKey, $setSelection, type EditorConfig, LexicalEditor } from 'lexical';
+import { ImageNode, ImageNodeCommandPayload } from '../../Nodes/ImageNode';
+import { Resizable, ResizableProps } from 're-resizable';
+import { DATASET_NAME_FOR_HANDLE } from '../../util/toolbar';
 
 interface ImageComponentProps extends ImageNodeCommandPayload {
   editor: LexicalEditor;
@@ -14,18 +16,91 @@ interface ImageComponentProps extends ImageNodeCommandPayload {
   nodeKey: string;
 }
 
-interface IndicatorProps {
-  active: boolean;
-  direction?: ResizeDirection;
-  delta?: NumberSize;
+function ImageComponent({ src, alt, width, height, editor, config, nodeKey, active }: ImageComponentProps) {
+  const imageWrapperRef = useRef<HTMLDivElement>(null);
+
+  const handleClick = (e: React.MouseEvent) => {
+    editor.update(() => {
+      const activedImageNode = document.querySelector(
+        `[data-${DATASET_NAME_FOR_HANDLE.NODE_TYPE}=${ImageNode.getType()}].active`,
+      );
+      if (activedImageNode) {
+        const key = (activedImageNode as HTMLElement).dataset[DATASET_NAME_FOR_HANDLE.CAMEL_CASE_KEY];
+
+        if (key) {
+          const node = $getNodeByKey(key) as ImageNode;
+          node.setIsActive(false);
+        }
+      }
+
+      const node = $getNodeByKey(nodeKey) as ImageNode;
+
+      node.setIsActive(true);
+
+      $setSelection(node.createSelfNodeSelection());
+    });
+
+    e.stopPropagation();
+  };
+
+  const imgWrapperClassNames = twMerge([
+    `relative inline-block align-top outline max-w-full outline-transparent`,
+    active ? `outline-2` : `outline-1`,
+    editor.isEditable() ? `cursor-grab hover:outline-[#EFEFEF]` : `cursor-pointer`,
+  ]);
+
+  return (
+    <div ref={imageWrapperRef} className={imgWrapperClassNames} onClick={handleClick}>
+      <Image width={width} height={height} src={src} alt={alt} className="max-w-full" />
+      <ResizeImage active={active} nodeKey={nodeKey} src={src} width={width} height={height} />
+    </div>
+  );
 }
 
-function ImageComponent({ src, alt, width, height, arrange, editor, config, nodeKey, active }: ImageComponentProps) {
-  const [indicator, setIndicator] = useState<IndicatorProps>({
-    active: false,
-  });
+export default ImageComponent;
 
-  const ref = useRef<HTMLDivElement>(null);
+function ResizeImage({
+  active,
+  nodeKey,
+  src,
+  width,
+  height,
+}: {
+  active: boolean;
+  nodeKey: string;
+  src: string;
+  width: number;
+  height: number;
+}) {
+  const [editor] = useLexicalComposerContext();
+
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  const maxSize = getMaxSize();
+
+  const resizeComponentClassNames = twMerge([
+    `outline outline-2 outline-orange-500 !absolute !z-[2] !top-0 !box-content`,
+    !active && `hidden`,
+  ]);
+
+  const pointClassNames = {
+    topLeft: twMerge([
+      `!-left-1 !-top-1 !box-border !h-2 !w-2 !border !border-orange-500 bg-white hover:!bg-orange-500`,
+      `active:bg-orange-500`,
+    ]),
+    topRight: twMerge([
+      `!-right-1 !-top-1 !box-border !h-2 !w-2 !border !border-orange-500 bg-white hover:!bg-orange-500`,
+      `active:bg-orange-500`,
+    ]),
+    bottomLeft: twMerge([
+      `!-left-1 !-bottom-1 !box-border !h-2 !w-2 !border !border-orange-500 bg-white hover:!bg-orange-500`,
+      `active:bg-orange-500`,
+    ]),
+    bottomRight: twMerge([
+      `!-right-1 !-bottom-1 !box-border !h-2 !w-2 !border !border-orange-500 bg-white hover:!bg-orange-500`,
+      `active:bg-orange-500`,
+    ]),
+  };
 
   const enableConfig: ResizableProps['enable'] = {
     topLeft: true,
@@ -34,147 +109,64 @@ function ImageComponent({ src, alt, width, height, arrange, editor, config, node
     bottomRight: true,
   };
 
-  const handleClick = (e: React.MouseEvent) => {
-    if (!nodeKey) return;
+  function getMaxSize() {
+    const rootElement = editor.getRootElement()!;
+    const rootPadding = {
+      left: Number(getComputedStyle(rootElement).paddingLeft.replace('px', '')),
+      right: Number(getComputedStyle(rootElement).paddingRight.replace('px', '')),
+    };
 
+    const maxWidth = Number((rootElement.clientWidth - (rootPadding.left + rootPadding.right)).toFixed(0));
+
+    return {
+      width: maxWidth,
+      height: Number((maxWidth * (height / width)).toFixed(0)),
+    };
+  }
+
+  const handleResizeStop: ResizableProps['onResizeStop'] = (e, direction, ref, delta) => {
     editor.update(() => {
-      const node = $getNodeByKey(nodeKey) as ImageNode;
+      const imageNode = $getNodeByKey(nodeKey) as ImageNode;
 
-      node.setIsActive(true, editor);
+      const { width, height } = imageNode.getSize();
 
-      const nodeSelection = $createNodeSelection();
-      nodeSelection.add(nodeKey);
-      $setSelection(nodeSelection);
+      const targetWidth = width + delta.width;
+      const targetHeight = height + delta.height;
+
+      console.log({ width, height });
+      console.log({ delta });
+      console.log({ targetWidth, targetHeight });
+
+      imageNode.setSize({
+        width: targetWidth,
+        height: targetHeight,
+      });
     });
   };
 
-  const imgWrapperClassNames = twMerge([
-    `relative h-full w-full outline`,
-    active ? `outline-2 outline-orange-500` : `outline-1 outline-transparent hover:outline-[#EFEFEF]`,
-  ]);
+  useLayoutEffect(() => {
+    if (!imgRef?.current) return;
 
-  const pointClassNames = {
-    topLeft: twMerge([
-      `!-left-1 !-top-1 !box-border !h-2 !w-2 !border !border-orange-500 bg-white hover:!bg-orange-500`,
-    ]),
-    topRight: twMerge([
-      `!-right-1 !-top-1 !box-border !h-2 !w-2 !border !border-orange-500 bg-white hover:!bg-orange-500`,
-    ]),
-    bottomLeft: twMerge([
-      `!-left-1 !-bottom-1 !box-border !h-2 !w-2 !border !border-orange-500 bg-white hover:!bg-orange-500`,
-    ]),
-    bottomRight: twMerge([
-      `!-right-1 !-bottom-1 !box-border !h-2 !w-2 !border !border-orange-500 bg-white hover:!bg-orange-500`,
-    ]),
-  };
+    const resizableElement = imgRef.current.parentElement;
 
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      if (!ref.current) return;
-
-      const target = e.target as HTMLElement;
-
-      if (!ref.current.parentElement!.contains(target)) {
-        editor.update(() => {
-          const node = $getNodeByKey(nodeKey) as ImageNode;
-
-          node.setIsActive(false, editor);
-        });
-      }
-    };
-
-    document.addEventListener('click', handleClick);
-
-    return () => {
-      document.removeEventListener('click', handleClick);
-    };
-  }, [editor, nodeKey]);
+    if (resizableElement) {
+      resizableElement.style.width = `${width}px`;
+      resizableElement.style.height = `${height}px`;
+    }
+  }, [width, height]);
 
   return (
     <Resizable
+      className={resizeComponentClassNames}
       defaultSize={{ width, height }}
       lockAspectRatio={true}
-      maxWidth={'100%'}
+      maxWidth={maxSize.width}
+      maxHeight={maxSize.height}
       enable={active ? enableConfig : false}
-      handleClasses={{
-        topLeft: pointClassNames.topLeft,
-        topRight: pointClassNames.topRight,
-        bottomLeft: pointClassNames.bottomLeft,
-        bottomRight: pointClassNames.bottomRight,
-      }}
-      onResizeStart={(e, direction, ref) => {
-        setIndicator((prev) => ({
-          ...prev,
-          active,
-          direction,
-        }));
-      }}
-      onResize={(e, direction, ref, delta) => {
-        setIndicator((prev) => ({
-          ...prev,
-          delta,
-        }));
-      }}
-      onResizeStop={(e, direction, ref, delta) => {
-        setIndicator({
-          active: false,
-          direction: undefined,
-          delta: undefined,
-        });
-      }}
+      handleClasses={pointClassNames}
+      onResizeStop={handleResizeStop}
     >
-      <div ref={ref} className={imgWrapperClassNames} onClick={handleClick}>
-        <Image src={src} alt={alt} fill />
-      </div>
-      <SizeIndicator active={indicator.active} direction={indicator.direction} delta={indicator.delta} />
+      <Image ref={imgRef} className="opacity-[0.3]" src={src} alt="resize image" fill />
     </Resizable>
   );
-}
-
-export default ImageComponent;
-
-function SizeIndicator({ active, direction, delta }: IndicatorProps) {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    if (!active) return;
-    if (!ref.current) return;
-
-    const getPos = () => {
-      if (!delta)
-        return `
-        left: 0px;
-        top: 0px;
-      `;
-
-      switch (direction) {
-        case 'topLeft':
-          return `
-            left: 0px;
-            top: 0px;
-          `;
-        case 'topRight':
-          return `
-            right: ${-4 - delta!.width}px;
-            top: -4px;
-          `;
-        case 'bottomLeft':
-          return `
-
-          `;
-        case 'bottomRight':
-          return `
-          
-          `;
-      }
-    };
-
-    ref.current.style.cssText = getPos() as string;
-  }, [direction, delta, active]);
-
-  return active ? (
-    <div className="absolute" ref={ref}>
-      {delta?.width} {delta?.height}
-    </div>
-  ) : null;
 }

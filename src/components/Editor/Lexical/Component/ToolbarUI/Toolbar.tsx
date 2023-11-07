@@ -11,7 +11,7 @@ interface ToolbarGroupWrapperProps extends React.HTMLAttributes<HTMLDivElement> 
   children: React.ReactNode;
 }
 
-interface ToolbarButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
+interface ToolbarButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   shouldWrapperActiveStyle?: boolean;
   active?: boolean;
   activeColor?: string;

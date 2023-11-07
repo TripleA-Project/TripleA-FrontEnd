@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import {
+  $createNodeSelection,
   DOMExportOutput,
   DecoratorNode,
   EditorConfig,
@@ -10,17 +11,37 @@ import {
   createCommand,
 } from 'lexical';
 import ImageComponent from '../Component/Image/ImageComponent';
+import { DATASET_NAME_FOR_HANDLE } from '../util/toolbar';
 
-export type ArrangeImageType = 'inherit' | 'full-width' | 'full-page';
+export type ImageResizeFormat = 'full-width' | null;
 
-export type SerializedImageNode = SerializedLexicalNode & ImageNodeCommandPayload;
+export type SerializedImageNode = SerializedLexicalNode & Omit<ImageNodeCommandPayload, 'active'>;
+
+export type ImageNodeAlign = 'start' | 'center' | 'end';
 
 export interface ImageNodeCommandPayload {
   src: string;
   alt: string;
   width: number;
   height: number;
-  arrange?: ArrangeImageType;
+  active?: boolean;
+  align?: ImageNodeAlign;
+}
+
+interface ResizedImageCommandPayload {
+  nodeKey: string;
+  width: number;
+  height: number;
+}
+
+interface ChangeImageNodeAlignCommandPayload {
+  nodeKey: string;
+  align: ImageNodeAlign;
+}
+
+interface ChangeImageResizeFormatCommandPayload {
+  nodeKey: string;
+  resizeFormat: ImageResizeFormat;
 }
 
 export class ImageNode extends DecoratorNode<ReactNode> {
@@ -29,9 +50,15 @@ export class ImageNode extends DecoratorNode<ReactNode> {
   __width: number;
   __height: number;
   __active: boolean;
-  __arrange: ArrangeImageType;
+  __align: ImageNodeAlign;
 
-  constructor({ src, alt, width, height, arrange = 'inherit' }: ImageNodeCommandPayload, key?: NodeKey) {
+  maxSize: { width: number; height: number };
+  ratio: {
+    width: number;
+    height: number;
+  };
+
+  constructor({ src, alt, width, height, active, align = 'start' }: ImageNodeCommandPayload, key?: NodeKey) {
     super(key);
 
     this.__src = src;
@@ -39,12 +66,25 @@ export class ImageNode extends DecoratorNode<ReactNode> {
     this.__width = width;
     this.__height = height;
 
-    this.__active = false;
-    this.__arrange = arrange;
+    this.__active = active ?? false;
+
+    this.__align = align;
+
+    this.maxSize = {
+      width: ImageNode.MAX_WIDTH,
+      height: Number((ImageNode.MAX_WIDTH * (height / width)).toFixed(0)),
+    };
+
+    this.ratio = {
+      width: width / height,
+      height: height / width,
+    };
   }
 
+  static MAX_WIDTH = 725;
+
   static getType(): string {
-    return 'ImageNode';
+    return 'imageNode';
   }
 
   static clone(node: ImageNode): ImageNode {
@@ -57,7 +97,7 @@ export class ImageNode extends DecoratorNode<ReactNode> {
       alt: _serializedNode.alt,
       width: _serializedNode.width,
       height: _serializedNode.height,
-      arrange: _serializedNode.arrange,
+      align: _serializedNode.align,
     });
   }
 
@@ -65,21 +105,27 @@ export class ImageNode extends DecoratorNode<ReactNode> {
     return {
       type: this.getType(),
       version: 1,
-      ...this.getPayload(),
+      ...this.getJSONPayload(),
     };
   }
 
   createDOM(_config: EditorConfig, _editor: LexicalEditor): HTMLElement {
     const element = document.createElement('div');
-    element.className = 'editor-image w-full box-border m-1';
+    element.className = 'editor-image w-full max-w-[725px] flex box-border';
 
-    if (_editor.isEditable() && this.__active === true) {
-      element.classList.add('active');
+    if (_editor.isEditable()) {
+      element.dataset[DATASET_NAME_FOR_HANDLE.CAMEL_CASE_NODE_TYPE] = this.getType();
+      element.dataset[DATASET_NAME_FOR_HANDLE.CAMEL_CASE_KEY] = this.__key;
+      if (this.getIsActive() === true) {
+        element.classList.add('active');
+      }
     }
 
     if (!_editor.isEditable()) {
       element.classList.add('view');
     }
+
+    element.classList.add(this.getAlign());
 
     return element;
   }
@@ -94,27 +140,25 @@ export class ImageNode extends DecoratorNode<ReactNode> {
 
   updateDOM(_prevNode: ImageNode, _dom: HTMLElement, _config: EditorConfig): boolean {
     const targetIsActive = this.getIsActive();
-    const targetArrange = this.getArrange();
+    const targetResizeFormat = this.getResizeFormat();
+    const targetAlign = this.getAlign();
 
     _dom.classList.remove('active');
     if (targetIsActive === true) _dom.classList.add('active');
 
-    _dom.classList.remove('arrange__inherit', 'arrange__full-width', 'arrange__full-page');
-    _dom.classList.add(`arrange__${targetArrange}`);
+    _dom.classList.remove('resize__full-width');
+    if (targetResizeFormat) {
+      _dom.classList.add(`resize__${targetResizeFormat}`);
+    }
+
+    _dom.classList.remove('start', 'center', 'end');
+    _dom.classList.add(targetAlign);
 
     return false;
   }
 
   decorate(editor: LexicalEditor, config: EditorConfig): ReactNode {
-    return (
-      <ImageComponent
-        {...this.getPayload()}
-        editor={editor}
-        config={config}
-        nodeKey={this.getKey()}
-        active={this.getIsActive()}
-      />
-    );
+    return <ImageComponent {...this.getPayload()} editor={editor} config={config} nodeKey={this.getKey()} />;
   }
 
   getPayload() {
@@ -123,52 +167,90 @@ export class ImageNode extends DecoratorNode<ReactNode> {
       alt: this.__alt,
       width: this.__width,
       height: this.__height,
-      arrange: this.__arrange,
+      active: this.__active,
+      align: this.__align,
     };
   }
 
-  setPayload({ src, alt, width, height, arrange = 'inherit' }: ImageNodeCommandPayload) {
+  getJSONPayload() {
+    return {
+      src: this.__src,
+      alt: this.__alt,
+      width: this.__width,
+      height: this.__height,
+      align: this.__align,
+    };
+  }
+
+  getLockAspectRatioSize({ target, size }: { target: 'width' | 'height'; size: number }) {
+    switch (target) {
+      case 'width':
+        return Number((size * this.ratio.width).toFixed(0));
+      case 'height':
+        return Number((size * this.ratio.height).toFixed(0));
+    }
+  }
+
+  getSize() {
+    return { width: this.__width, height: this.__height };
+  }
+
+  setSize({ width, height }: { width: number; height: number }) {
     const writable = this.getWritable();
 
-    writable.__src = src;
-    writable.__alt = alt;
-    writable.__widht = width;
+    writable.__width = width;
     writable.__height = height;
-    writable.__arrange = arrange;
   }
 
   getIsActive() {
     return this.__active;
   }
 
-  setIsActive(payload: boolean, editor: LexicalEditor) {
-    const element = editor.getElementByKey(this.getKey());
-
-    if (!element) return;
-
+  setIsActive(payload: boolean) {
     const writable = this.getWritable();
 
     writable.__active = payload;
   }
 
-  getArrange() {
-    return this.__arrange;
+  getAlign() {
+    return this.__align;
   }
 
-  setArrange(payload: ArrangeImageType, editor: LexicalEditor) {
-    const element = editor.getElementByKey(this.getKey());
-
-    if (!element) return;
-
+  setAlign(align: ImageNodeAlign) {
     const writable = this.getWritable();
 
-    writable.__arrange = payload;
+    writable.__align = align;
+  }
+
+  getResizeFormat(): ImageResizeFormat {
+    return this.__resizeFormat ?? null;
+  }
+
+  setResizeFormat(payload: ImageResizeFormat) {
+    const writable = this.getWritable();
+
+    const { width: maxWidth, height: maxHeight } = this.maxSize;
+
+    if (payload === 'full-width') {
+      writable.__resizeFormat = payload;
+      writable.__width = maxWidth;
+      writable.__height = maxHeight;
+    }
+  }
+
+  createSelfNodeSelection() {
+    const nodeSelection = $createNodeSelection();
+    nodeSelection.add(this.getKey());
+
+    return nodeSelection;
   }
 }
 
-export const IMAGE_NODE_COMMAND_TYPE = 'insertImage';
-
-export const INSERT_IMAGE_COMMAND = createCommand<ImageNodeCommandPayload>(IMAGE_NODE_COMMAND_TYPE);
+export const INSERT_IMAGE_COMMAND = createCommand<ImageNodeCommandPayload>('insertImage');
+export const RESIZED_IMAGE_COMMAND = createCommand<ResizedImageCommandPayload>('resizedImage');
+export const CHANGE_IMAGE_NODE_ALIGN = createCommand<ChangeImageNodeAlignCommandPayload>('changeImageNodeAlign');
+export const CHANGE_IMAGE_RESIZE_FORMAT =
+  createCommand<ChangeImageResizeFormatCommandPayload>('changeImageResizeFormat');
 
 export function $createImageNode(payload: ImageNodeCommandPayload) {
   const imageNode = new ImageNode({ ...payload });

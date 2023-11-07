@@ -20,19 +20,12 @@ function PlaceHolder() {
       return;
     }
 
-    // const editorWrapperElement = editorRootElement.parentElement!;
+    const paddingTop = getComputedStyle(editorRootElement.parentElement!).paddingTop;
+    const paddingLeft = getComputedStyle(editorRootElement).paddingLeft;
 
-    // const gap = getComputedStyle(editorWrapperElement).gap;
-    // const toolbarElement = editorWrapperElement.firstElementChild!;
-    const rootPaddingLeft = getComputedStyle(editorRootElement).paddingLeft;
-
-    // placeHolderRef.current.style.cssText = `
-    //   left: ${rootPaddingLeft};
-    //   top: calc(${toolbarElement.clientHeight}px + ${gap});
-    // `;
     placeHolderRef.current.style.cssText = `
-      left: ${rootPaddingLeft};
-      top: 0;
+      top: ${paddingTop};
+      left: ${paddingLeft};
     `;
 
     placeHolderRef.current.classList.remove('hidden');

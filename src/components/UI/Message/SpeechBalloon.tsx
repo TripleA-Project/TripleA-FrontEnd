@@ -66,9 +66,9 @@ const StyledSpeechBalloonTail = styled.div<StyledSpeechBalloonTailProps>`
   &::before {
     bottom: 0;
     ${({ tailBorderColor, tailBorderWidth = 1 }) => css`
-      border-left: 7px solid transparent;
-      border-right: 7px solid transparent;
-      border-top: 23px solid ${tailBorderColor || '#000'};
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 6px solid ${tailBorderColor || '#000'};
       ${tailBorderWidth > 1
         ? css`
             zoom: ${1 +
@@ -84,9 +84,9 @@ const StyledSpeechBalloonTail = styled.div<StyledSpeechBalloonTailProps>`
   /* tailBox */
   &::after {
     bottom: 1px;
-    border-left: 6px solid transparent;
-    border-right: 6px solid transparent;
-    border-top: 22px solid ${({ tailBackgroundColor }) => tailBackgroundColor || '#fff'};
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 6px solid ${({ tailBackgroundColor }) => tailBackgroundColor || '#fff'};
     border-bottom: 0px solid transparent;
   }
 `;

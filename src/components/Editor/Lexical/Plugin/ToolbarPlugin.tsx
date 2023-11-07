@@ -1,13 +1,20 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import {
+  $getNodeByKey,
   $getSelection,
-  $isParagraphNode,
   $isRangeSelection,
-  $isTextNode,
+  COMMAND_PRIORITY_CRITICAL,
   COMMAND_PRIORITY_EDITOR,
+  KEY_ARROW_DOWN_COMMAND,
+  KEY_ARROW_LEFT_COMMAND,
+  KEY_ARROW_RIGHT_COMMAND,
+  KEY_ARROW_UP_COMMAND,
+  KEY_BACKSPACE_COMMAND,
+  KEY_DELETE_COMMAND,
+  LexicalEditor,
   SELECTION_CHANGE_COMMAND,
 } from 'lexical';
 import Toolbar from '../Component/ToolbarUI/Toolbar';
@@ -24,69 +31,112 @@ import {
   IS_LINK_COMMAND,
 } from '../../Toolbar';
 import { EditorDialogContextProvider } from '@/context/EditorDialogContext';
-import { $isLinkNode } from '@lexical/link';
-import { $isListItemNode, ListNode, ListItemNode } from '@lexical/list';
-import type { AlignNames } from '../../Toolbar/ToolbarIcons';
+import { SUB_TOOLBAR_COMMAND, SubToolbar } from '../Component/ToolbarUI/SubToolbar';
+import { FocusNodeKeyboardUtil } from '../util/focusNodeByKeyboard';
+import { mergeRegister } from '@lexical/utils';
+import {
+  DATASET_NAME_FOR_HANDLE,
+  dispatchSubToolbarCommand,
+  hasActivedImage,
+  selectionHasLink,
+  selectionHasList,
+} from '../util/toolbar';
 import type { CleanupCommand } from '../LexicalEditor';
-import { SubToolbar } from '../Component/ToolbarUI/SubToolbar';
-
-export const ALIGN_OPTIONS: AlignNames[] = ['AlignLeft', 'AlignCenter', 'AlignRight'];
 
 export function ToolbarPlugin() {
   const [editor] = useLexicalComposerContext();
 
+  const $updateToolbar = useCallback(() => {
+    const selection = $getSelection();
+
+    const { has: hasLink, node: linkNode } = selectionHasLink({ selection });
+    const { has: hasImage, node: imageNode } = hasActivedImage({ editor });
+    editor.dispatchCommand(IS_LINK_COMMAND, hasLink);
+    dispatchSubToolbarCommand(editor, {
+      linkPayload: { hasLink, linkNode },
+      imagePayload: { hasImage, imageNode },
+    });
+
+    const { hasUnorderedList, hasOrderedList } = selectionHasList({ selection });
+    editor.dispatchCommand(IS_UNOREDERED_LIST_COMMAND, hasUnorderedList);
+    editor.dispatchCommand(IS_OREDERED_LIST_COMMAND, hasOrderedList);
+
+    editor.dispatchCommand(IS_BOLD_COMMAND, $isRangeSelection(selection) ? selection.hasFormat('bold') : false);
+    editor.dispatchCommand(IS_ITALIC_COMMAND, $isRangeSelection(selection) ? selection.hasFormat('italic') : false);
+  }, [editor]);
+
   useEffect(() => {
     let cleanupSelectionChangeCommand: CleanupCommand = null;
+    let cleanupMergedKeyboardCommand: CleanupCommand = null;
 
     if (!editor.isEditable()) return;
 
+    // mouse event
+    const handleFocusOutNode = (e: MouseEvent) => {
+      const toolbar = editor.getRootElement()!.parentElement!.previousElementSibling!;
+      const target = e.target as HTMLElement;
+      const activeNode = document.querySelector(`[data-${DATASET_NAME_FOR_HANDLE.NODE_TYPE}].active`);
+
+      if (activeNode && !activeNode?.contains(target) && !toolbar.contains(target)) {
+        editor.update(() => {
+          const key = (activeNode as HTMLElement).dataset[DATASET_NAME_FOR_HANDLE.CAMEL_CASE_KEY];
+          const node = $getNodeByKey(key!);
+
+          if (node?.setIsActive) {
+            node.setIsActive(false, editor);
+          }
+
+          editor.dispatchCommand(SUB_TOOLBAR_COMMAND, { open: false });
+        });
+      }
+    };
+
+    document.addEventListener('click', handleFocusOutNode);
+
+    // command
     cleanupSelectionChangeCommand = editor.registerCommand(
       SELECTION_CHANGE_COMMAND,
-      (_payload, editor) => {
-        const selection = $getSelection();
-
-        if ($isRangeSelection(selection)) {
-          editor.dispatchCommand(IS_BOLD_COMMAND, selection.hasFormat('bold'));
-          editor.dispatchCommand(IS_ITALIC_COMMAND, selection.hasFormat('italic'));
-
-          const satisfiedLinkNode = selection.getNodes().find((node) => $isLinkNode(node.getParent()));
-          editor.dispatchCommand(IS_LINK_COMMAND, {
-            active: !!satisfiedLinkNode,
-            nodeKey: satisfiedLinkNode?.getParent()?.getKey(),
-          });
-
-          const satisfiedListNode = selection
-            .getNodes()
-            .filter((node) => $isListItemNode(node.getParent()) || $isListItemNode(node))
-            ?.map((node) => {
-              const targetItemNode = $isListItemNode(node.getParent())
-                ? (node.getParent() as ListItemNode)
-                : (node as ListItemNode);
-
-              return targetItemNode;
-            });
-
-          editor.dispatchCommand(
-            IS_UNOREDERED_LIST_COMMAND,
-            !!satisfiedListNode?.find((node) => (node.getParent() as ListNode).getTag() === 'ul'),
-          );
-          editor.dispatchCommand(
-            IS_OREDERED_LIST_COMMAND,
-            !!satisfiedListNode?.find((node) => (node.getParent() as ListNode).getTag() === 'ol'),
-          );
-        }
+      (_payload) => {
+        $updateToolbar();
 
         return false;
       },
       COMMAND_PRIORITY_EDITOR,
     );
 
+    if (FocusNodeKeyboardUtil.canRegisterEvent(editor)) {
+      const keyboardHandler = (e: KeyboardEvent, editor: LexicalEditor) => {
+        const selection = $getSelection();
+
+        const isHandled = FocusNodeKeyboardUtil.handleKeyboard({ e, editor, selection });
+        if (isHandled === true) {
+          e.preventDefault();
+        }
+
+        return isHandled;
+      };
+      cleanupMergedKeyboardCommand = mergeRegister(
+        editor.registerCommand(KEY_BACKSPACE_COMMAND, keyboardHandler, COMMAND_PRIORITY_CRITICAL),
+        editor.registerCommand(KEY_DELETE_COMMAND, keyboardHandler, COMMAND_PRIORITY_CRITICAL),
+        editor.registerCommand(KEY_ARROW_LEFT_COMMAND, keyboardHandler, COMMAND_PRIORITY_CRITICAL),
+        editor.registerCommand(KEY_ARROW_RIGHT_COMMAND, keyboardHandler, COMMAND_PRIORITY_CRITICAL),
+        editor.registerCommand(KEY_ARROW_UP_COMMAND, keyboardHandler, COMMAND_PRIORITY_CRITICAL),
+        editor.registerCommand(KEY_ARROW_DOWN_COMMAND, keyboardHandler, COMMAND_PRIORITY_CRITICAL),
+      );
+    }
+
     return () => {
+      document.removeEventListener('click', handleFocusOutNode);
+
       if (cleanupSelectionChangeCommand) {
         cleanupSelectionChangeCommand();
       }
+
+      if (cleanupMergedKeyboardCommand) {
+        cleanupMergedKeyboardCommand();
+      }
     };
-  }, [editor]);
+  }, [editor, $updateToolbar]);
 
   return editor.isEditable() ? (
     <div className="z-[1]">

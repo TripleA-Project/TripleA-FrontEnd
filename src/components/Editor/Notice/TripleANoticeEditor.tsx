@@ -24,12 +24,12 @@ function TripleANoticeEditor({ editable = true, initialEditorState }: TripleAEdi
   return (
     <div>
       <EditorControl ref={editorRef} open={editable} />
-      <div className="relative box-border flex h-96 w-full shrink-0 flex-col gap-3 border-2 border-[#eee] bg-white">
+      <div className="relative box-border flex min-h-[500px] w-full shrink-0 flex-col border-2 border-[#eee] bg-white">
         <LexicalEditor
           config={{
             namespace: 'triple-a-editor',
             theme: {
-              root: 'overflow-y-visible outline-none caret-black box-border px-1 bg-white',
+              root: 'overflow-y-visible outline-none caret-black box-border pb-1 px-1 bg-white',
               text: {
                 bold: 'font-bold',
                 italic: 'italic',

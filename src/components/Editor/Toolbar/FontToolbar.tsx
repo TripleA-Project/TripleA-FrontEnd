@@ -2,10 +2,20 @@
 
 import React, { useEffect, useState } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { COMMAND_PRIORITY_EDITOR, FORMAT_TEXT_COMMAND, createCommand } from 'lexical';
+import {
+  $getSelection,
+  $isLeafNode,
+  $isRangeSelection,
+  COMMAND_PRIORITY_CRITICAL,
+  COMMAND_PRIORITY_EDITOR,
+  FORMAT_TEXT_COMMAND,
+  createCommand,
+} from 'lexical';
+import { $moveCaretSelection } from '@lexical/selection';
 import { mergeRegister } from '@lexical/utils';
 import Toolbar from '../Lexical/Component/ToolbarUI/Toolbar';
 import type { CleanupCommand } from '../Lexical/LexicalEditor';
+import { $isLinkNode } from '@lexical/link';
 
 export type FontToolbarNames = 'Bold' | 'Italic';
 
@@ -34,7 +44,28 @@ export function FontToolbar() {
 
     if (editor.isEditable()) {
       cleanupMergedFontTollbarCommand = mergeRegister(
-        editor.registerCommand<IsBoldCommandPayload>(
+        editor.registerCommand(
+          FORMAT_TEXT_COMMAND,
+          (payload) => {
+            if (payload === 'bold' || payload === 'italic') {
+              const selection = $getSelection();
+              if ($isRangeSelection(selection)) {
+                const hasLinkNode = !!selection
+                  .getNodes()
+                  .find((node) => $isLinkNode($isLeafNode(node) ? node.getParent() : node));
+
+                if (hasLinkNode) {
+                  $moveCaretSelection(selection, false, selection.isBackward(), 'character');
+                  return true;
+                }
+              }
+            }
+
+            return false;
+          },
+          COMMAND_PRIORITY_CRITICAL,
+        ),
+        editor.registerCommand(
           IS_BOLD_COMMAND,
           (payload, editor) => {
             setIsBold(payload);
@@ -43,7 +74,7 @@ export function FontToolbar() {
           },
           COMMAND_PRIORITY_EDITOR,
         ),
-        editor.registerCommand<IsItalicCommandPayload>(
+        editor.registerCommand(
           IS_ITALIC_COMMAND,
           (payload, editor) => {
             setIsItalic(payload);

@@ -1,15 +1,15 @@
 'use client';
 
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { type EditorConfig, LexicalEditor, $getNodeByKey, $createNodeSelection, $setSelection } from 'lexical';
 import styled from '@emotion/styled';
-import { OpenGraphLinkNode } from '../../Nodes/OpenGraphLinkNode';
-import SpeechBalloon from '@/components/UI/Message/SpeechBalloon';
-import { ALIGN_OPTIONS } from '../../Plugin/ToolbarPlugin';
-import { AlignNames, ToolbarIcons } from '@/components/Editor/Toolbar/ToolbarIcons';
-import { RiDeleteBin6Line } from 'react-icons/ri';
 import { twMerge } from 'tailwind-merge';
+import SpeechBalloon from '@/components/UI/Message/SpeechBalloon';
+import { RiDeleteBin6Line } from 'react-icons/ri';
+import { type EditorConfig, LexicalEditor, $getNodeByKey, $setSelection } from 'lexical';
+import { OpenGraphLinkNode } from '../../Nodes/OpenGraphLinkNode';
+import { AlignNames, ToolbarIcons } from '@/components/Editor/Toolbar/ToolbarIcons';
+import { DATASET_NAME_FOR_HANDLE } from '../../util/toolbar';
 
 interface EditorOpenGraphLinkProps {
   editor: LexicalEditor;
@@ -24,36 +24,35 @@ interface EditorOpenGraphLinkProps {
   active: boolean;
 }
 
+const ALIGN_OPTIONS: AlignNames[] = ['AlignLeft', 'AlignCenter', 'AlignRight'];
+
 function EditorOpenGraphLink({ editor, active, config, nodeKey, openGraph }: EditorOpenGraphLinkProps) {
   const editable = editor.isEditable();
   const openGraphLinkRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!editor.isEditable()) return;
-    if (!openGraphLinkRef.current) return;
+  const handleClick = (e: React.MouseEvent) => {
+    editor.update(() => {
+      const activedOpenGraphLinkNode = document.querySelector(
+        `[data-${DATASET_NAME_FOR_HANDLE.NODE_TYPE}=${OpenGraphLinkNode.getType()}].active`,
+      );
+      if (activedOpenGraphLinkNode) {
+        const key = (activedOpenGraphLinkNode as HTMLElement).dataset[DATASET_NAME_FOR_HANDLE.CAMEL_CASE_KEY];
 
-    const wrapper = openGraphLinkRef.current.parentElement;
-
-    const handleClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-
-      if (!wrapper?.contains(target) && active) {
-        editor.update(() => {
-          const node = $getNodeByKey(nodeKey) as OpenGraphLinkNode;
-
-          node.setIsActive(false, editor);
-        });
+        if (key) {
+          const node = $getNodeByKey(key) as OpenGraphLinkNode;
+          node.setIsActive(false);
+        }
       }
-    };
 
-    if (wrapper) {
-      document.addEventListener('click', handleClick);
-    }
+      const node = $getNodeByKey(nodeKey) as OpenGraphLinkNode;
 
-    return () => {
-      document.removeEventListener('click', handleClick);
-    };
-  }, [editor, nodeKey, active]);
+      node.setIsActive(true);
+
+      $setSelection(node.createSelfNodeSelection());
+    });
+
+    e.stopPropagation();
+  };
 
   return (
     <StyledEditorOpenGraphLink
@@ -65,19 +64,7 @@ function EditorOpenGraphLink({ editor, active, config, nodeKey, openGraph }: Edi
       }
       {...(editor.isEditable() && {
         ref: openGraphLinkRef,
-        onClick: () => {
-          if (!nodeKey) return;
-
-          editor.update(() => {
-            const node = $getNodeByKey(nodeKey) as OpenGraphLinkNode;
-
-            node.setIsActive(true, editor);
-
-            const nodeSelection = $createNodeSelection();
-            nodeSelection.add(nodeKey);
-            $setSelection(nodeSelection);
-          });
-        },
+        onClick: handleClick,
       })}
     >
       {openGraph.ogImage ? (
@@ -118,16 +105,12 @@ function EditorOpenGraphLinkToolBar({
   const editorOpenGraphLinktoolbarRef = useRef<HTMLDivElement>(null);
   const toolbarContentRef = useRef<HTMLDivElement>(null);
 
-  const [overflow, setOverflow] = useState(false);
-
   const classNames = {
     openGraphLinkToolbarWrapper: twMerge([
       `absolute left-0 box-border flex w-full h-fit justify-center pointer-events-none`,
-      overflow
-        ? `bottom-0 origin-bottom translate-y-[calc(23px+16px)] rotate-180`
-        : `top-0 -translate-y-[calc(100%+23px+16px)]`,
+      `top-0 -translate-y-[calc(100%+8px+4px)]`,
     ]),
-    openGraphLinkToolbarContent: twMerge([`inline-flex h-full items-center gap-1`, overflow && `rotate-180`]),
+    openGraphLinkToolbarContent: twMerge([`inline-flex h-full items-center gap-1`]),
   };
 
   const getActiveFromNodeAlign = (type: AlignNames) => {
@@ -177,19 +160,17 @@ function EditorOpenGraphLinkToolBar({
     editor.update(() => {
       const node = $getNodeByKey(nodeKey) as OpenGraphLinkNode;
 
-      node.setIsActive(true, editor);
-
       switch (type) {
         case 'AlignLeft':
-          node.setAlign('start', editor);
+          node.setAlign('start');
 
           break;
         case 'AlignCenter':
-          node.setAlign('center', editor);
+          node.setAlign('center');
 
           break;
         case 'AlignRight':
-          node.setAlign('end', editor);
+          node.setAlign('end');
 
           break;
       }
@@ -207,17 +188,6 @@ function EditorOpenGraphLinkToolBar({
       openGraphLinkNode.remove();
     });
   };
-
-  useLayoutEffect(() => {
-    if (!editorOpenGraphLinktoolbarRef.current) return;
-
-    const openGraphLinkElement = editorOpenGraphLinktoolbarRef.current.parentElement!;
-    const openGraphLinkToolElement = editorOpenGraphLinktoolbarRef.current;
-
-    const isOverflow = openGraphLinkElement.offsetTop - 16 - 23 - openGraphLinkToolElement.offsetHeight < 0;
-
-    setOverflow(isOverflow);
-  }, [active, editor]);
 
   return active ? (
     <div ref={editorOpenGraphLinktoolbarRef} className={classNames.openGraphLinkToolbarWrapper}>

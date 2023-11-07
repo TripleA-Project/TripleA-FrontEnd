@@ -15,9 +15,9 @@ import { EditorRefPlugin } from '@lexical/react/LexicalEditorRefPlugin';
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
 import PlaceHolder from './PlaceHolder';
 import { OpenGraphLinkNode } from './Nodes/OpenGraphLinkNode';
-import { EditorInActiveUtil } from './util/inActiveNode';
 import { ImagePlugin, OpenGraphLinkPlugin, ToolbarPlugin } from './Plugin';
 import { ImageNode } from './Nodes/ImageNode';
+import { twMerge } from 'tailwind-merge';
 
 interface LexicalEditorProps {
   config: Parameters<typeof LexicalComposer>['0']['initialConfig'];
@@ -28,30 +28,11 @@ export type CleanupCommand = (() => void) | null;
 function LexicalEditor({ config }: LexicalEditorProps, ref: ForwardedRef<Editor>) {
   const editorRef = useRef<Editor>(null);
 
+  const classNames = twMerge([`relative`, config.editable && `flex-1 pt-[42px]`]);
+
   useImperativeHandle(ref, () => {
     return editorRef.current!;
   });
-
-  useEffect(() => {
-    if (!editorRef.current) return;
-
-    const handleClick = (e: MouseEvent) => {
-      if (!editorRef.current) return;
-
-      const target = e.target as HTMLElement;
-
-      if (config.editable) {
-        EditorInActiveUtil.inActiveLinkNode({ target, editor: editorRef.current });
-        EditorInActiveUtil.inActiveOpenGraphLinkNode({ target, editor: editorRef.current });
-      }
-    };
-
-    document.addEventListener('click', handleClick);
-
-    return () => {
-      document.removeEventListener('click', handleClick);
-    };
-  }, [config]);
 
   return (
     <LexicalComposer
@@ -62,7 +43,7 @@ function LexicalEditor({ config }: LexicalEditorProps, ref: ForwardedRef<Editor>
     >
       <EditorRefPlugin editorRef={editorRef} />
       <ToolbarPlugin />
-      <div className="relative flex-1 overflow-y-auto scrollbar-thin">
+      <div className={classNames}>
         <RichTextPlugin
           contentEditable={<ContentEditable spellCheck="false" />}
           placeholder={(isEditable) => (isEditable ? <PlaceHolder /> : null)}

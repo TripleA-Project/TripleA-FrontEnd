@@ -3,8 +3,10 @@ import { BiRedo, BiUndo } from 'react-icons/bi';
 import { AiOutlineBold, AiOutlineItalic } from 'react-icons/ai';
 import { MdAddLink, MdFormatAlignCenter, MdFormatAlignLeft, MdFormatAlignRight } from 'react-icons/md';
 import { BsImage, BsLink45Deg, BsListOl, BsListUl } from 'react-icons/bs';
+import { CgDisplayFullwidth } from 'react-icons/cg';
 import type { IconBaseProps, IconType } from 'react-icons';
 import type { FontToolbarNames, HistoryToolbarNames, ImageToolbarNames, LinkToolbarNames, ListToolbarNames } from './';
+import { ResizeWidth } from '../Lexical/util/toolbar';
 
 interface ToolbarIconProps extends IconBaseProps {
   active?: boolean;
@@ -25,7 +27,8 @@ type ToolbarNames =
   | LinkToolbarNames
   | AlignNames
   | ListToolbarNames
-  | ImageToolbarNames;
+  | ImageToolbarNames
+  | ResizeWidth;
 
 type ToolbarIconsType = Record<ToolbarNames, ToolbarIcon>;
 
@@ -143,6 +146,17 @@ export const ToolbarIcons: ToolbarIconsType = {
     return (
       <ToolbarIcon
         icon={BsImage}
+        active={active}
+        activeColor={activeColor}
+        nonActiveColor={nonActiveColor}
+        {...props}
+      />
+    );
+  },
+  FullWidth: ({ active, activeColor, nonActiveColor, ...props }) => {
+    return (
+      <ToolbarIcon
+        icon={CgDisplayFullwidth}
         active={active}
         activeColor={activeColor}
         nonActiveColor={nonActiveColor}

@@ -12,10 +12,7 @@ import type { CleanupCommand } from '../Lexical/LexicalEditor';
 
 export type LinkToolbarNames = 'Link' | 'OpenGraphLink';
 
-export type IsLinkCommandPayload = {
-  active: boolean;
-  nodeKey?: string;
-};
+export type IsLinkCommandPayload = boolean;
 
 export const LINK_INITIAL_URL = 'https://';
 export const IS_LINK_COMMAND = createCommand<IsLinkCommandPayload>('isLink');
@@ -44,8 +41,8 @@ export function LinkToolbar() {
       cleanupMergedLinkToolbarCommand = mergeRegister(
         editor.registerCommand<IsLinkCommandPayload>(
           IS_LINK_COMMAND,
-          ({ active, nodeKey }, editor) => {
-            setIsLink(active);
+          (payload) => {
+            setIsLink(payload);
 
             return false;
           },
