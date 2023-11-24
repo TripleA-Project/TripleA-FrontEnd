@@ -2,13 +2,15 @@
 
 import { useCallback, useEffect } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $getSelection, COMMAND_PRIORITY_CRITICAL } from 'lexical';
+import { $getNodeByKey, $getSelection, COMMAND_PRIORITY_CRITICAL, LexicalEditor } from 'lexical';
 import {
   type OpenGraphLinkNodeCommandPayload,
   INSERT_OPENGRAPH_LINKNODE_COMMAND,
   $createOpenGraphLinkNode,
+  OpenGraphLinkNode,
 } from '../Nodes/OpenGraphLinkNode';
 import $insertDecoratorNode from '../util/insertDecoratorNode';
+import { subToolbarActiveUtil } from '../util/subtoolbar';
 import type { CleanupCommand } from '../LexicalEditor';
 
 export function OpenGraphLinkPlugin() {
@@ -31,24 +33,53 @@ export function OpenGraphLinkPlugin() {
 
   useEffect(() => {
     let cleanupOpenGraphLinkNodeCommand: CleanupCommand = null;
+    let removeOpenGraphLinkNodeMutationListener: CleanupCommand = null;
 
     if (editor.isEditable()) {
-      if (editor._commands.get(INSERT_OPENGRAPH_LINKNODE_COMMAND)) return;
-      // command 등록
       cleanupOpenGraphLinkNodeCommand = editor.registerCommand(
         INSERT_OPENGRAPH_LINKNODE_COMMAND,
-        (payload, newEditor) => {
+        (payload) => {
           $addOpenGraphLink(payload);
 
           return false;
         },
         COMMAND_PRIORITY_CRITICAL,
       );
+
+      removeOpenGraphLinkNodeMutationListener = editor.registerMutationListener(OpenGraphLinkNode, (mutatedNodes) => {
+        let activeOpenGraphLinkNode: OpenGraphLinkNode | null = null;
+
+        for (let [key, mutate] of Array.from(mutatedNodes.entries())) {
+          editor.getEditorState().read(() => {
+            const openGraphLinkNode = $getNodeByKey(key) as OpenGraphLinkNode;
+            const isActive = openGraphLinkNode?.getIsActive();
+
+            switch (mutate) {
+              case 'created':
+              case 'updated':
+                if (isActive) {
+                  activeOpenGraphLinkNode = openGraphLinkNode;
+                }
+
+                break;
+              case 'destroyed':
+                break;
+            }
+          });
+        }
+
+        (activeOpenGraphLinkNode as OpenGraphLinkNode | null)
+          ? subToolbarActiveUtil.use('openGraphLink').active({ node: activeOpenGraphLinkNode!, editor })
+          : subToolbarActiveUtil.use('openGraphLink').unActive({ editor });
+      });
     }
 
     return () => {
       if (cleanupOpenGraphLinkNodeCommand) {
         cleanupOpenGraphLinkNodeCommand();
+      }
+      if (removeOpenGraphLinkNodeMutationListener) {
+        removeOpenGraphLinkNodeMutationListener();
       }
     };
   }, [editor, $addOpenGraphLink]);

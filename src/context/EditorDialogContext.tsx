@@ -1,9 +1,8 @@
 import { createContext, useState, useContext, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import OpenGraphLinkDialog, {
-  type OpenGraphLinkDialogProps,
-} from '@/components/Editor/Toolbar/Dialog/OpenGraphLinkDialog';
+import OpenGraphLinkDialog from '@/components/Editor/Toolbar/Dialog/OpenGraphLinkDialog';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import type { OpenGraphLinkDialogProps } from '@/components/Editor/Toolbar/Dialog/OpenGraphLinkDialog';
 
 interface EditorDialogPayload {
   openGraphLink: OpenGraphLinkDialogProps;

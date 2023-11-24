@@ -3,6 +3,7 @@
 import React from 'react';
 import LexicalEditor from '../../Lexical/LexicalEditor';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
+import { VIEWER_NAMESPACE } from '@/constants/editor';
 
 interface TripleANoticeViewerProps {
   initialEditorState: string;
@@ -20,7 +21,7 @@ function TripleANoticeViewer({ initialEditorState }: TripleANoticeViewerProps) {
     <div className="relative box-border w-full rounded-md border border-black p-4">
       <LexicalEditor
         config={{
-          namespace: 'triple-a-editor-viewer',
+          namespace: VIEWER_NAMESPACE,
           theme: {
             root: 'outline-none',
             text: {

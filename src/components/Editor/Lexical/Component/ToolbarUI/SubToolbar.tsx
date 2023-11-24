@@ -1,30 +1,25 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import Toolbar from './Toolbar';
-import { useCallback, useEffect, useState } from 'react';
-import { CleanupCommand } from '../../LexicalEditor';
 import { COMMAND_PRIORITY_EDITOR, createCommand } from 'lexical';
-import { LinkNode } from '@lexical/link';
-import { ImageNode } from '../../Nodes/ImageNode';
-import { ImageSubToolbar } from './SubToolbar/ImageSubToolbar';
-import { LinkSubToolbar } from './SubToolbar/LinkSubToolbar';
+import Toolbar from './Toolbar';
+import { LinkSubToolbar, type LinkSubToolbarPayload } from './SubToolbar/LinkSubToolbar';
+import { ImageSubToolbar, type ImageSubToolbarPayload } from './SubToolbar/ImageSubToolbar';
+import { OpenGraphLinkSubToolbar, type OpenGraphSubToolbarPayload } from './SubToolbar/OpenGraphLinkSubToolbar';
+import type { CleanupCommand } from '../../LexicalEditor';
 
-type SubToolbarType = 'link' | 'image' | 'nonActive';
+export type SubToolbarType = 'link' | 'image' | 'openGraphLink';
 
-interface SubToolbarPayload {
-  link?: {
-    url: string;
-    node: LinkNode;
-  };
-  image?: {
-    node: ImageNode;
-  };
+export interface SubToolbarPayload {
+  link?: LinkSubToolbarPayload;
+  image?: ImageSubToolbarPayload;
+  openGraphLink?: OpenGraphSubToolbarPayload;
 }
 
 interface SubToolbarCommandPayload {
   open: boolean;
-  payload?: SubToolbarPayload;
+  payload: SubToolbarPayload & { type: SubToolbarType };
 }
 
 const defaultPayload = {};
@@ -32,35 +27,33 @@ const defaultPayload = {};
 export function SubToolbar() {
   const [editor] = useLexicalComposerContext();
 
-  const [type, setType] = useState<SubToolbarType>('nonActive');
+  const [subToolbarOpen, setSubToobarOpen] = useState<Record<SubToolbarType, boolean>>({
+    link: false,
+    image: false,
+    openGraphLink: false,
+  });
   const [payload, setPayload] = useState<SubToolbarPayload>(defaultPayload);
 
-  const unActive = useCallback(() => {
-    setType('nonActive');
-    setPayload(defaultPayload);
-  }, []);
+  const shouldCloseSubToolbar = !subToolbarOpen.link && !subToolbarOpen.image && !subToolbarOpen.openGraphLink;
 
-  // const EditorSubToolbar = useCallback(() => {
-  //   switch (type) {
-  //     case 'link':
-  //       return <LinkSubToolbar url={payload.link!.url} node={payload.link!.node} />;
-  //     case 'image':
-  //       return <ImageSubToolbar node={payload.image!.node} />;
-  //     case 'nonActive':
-  //     default:
-  //       return null;
-  //   }
-  // }, [type, payload]);
   const EditorSubToolbar = () => {
-    switch (type) {
-      case 'link':
-        return <LinkSubToolbar url={payload.link!.url} node={payload.link!.node} />;
-      case 'image':
-        return <ImageSubToolbar node={payload.image!.node} />;
-      case 'nonActive':
-      default:
-        return null;
+    if (shouldCloseSubToolbar) {
+      return null;
     }
+
+    if (subToolbarOpen.link) {
+      return <LinkSubToolbar url={payload.link!.url} node={payload.link!.node} />;
+    }
+
+    if (subToolbarOpen.image) {
+      return <ImageSubToolbar node={payload.image!.node} />;
+    }
+
+    if (subToolbarOpen.openGraphLink) {
+      return <OpenGraphLinkSubToolbar node={payload.openGraphLink!.node} />;
+    }
+
+    return null;
   };
 
   useEffect(() => {
@@ -70,23 +63,17 @@ export function SubToolbar() {
       cleanupSubToolbarCommand = editor.registerCommand(
         SUB_TOOLBAR_COMMAND,
         ({ open, payload }) => {
-          if (open) {
-            if (payload?.link) {
-              setType('link');
-              setPayload({ link: { ...payload.link } });
+          setSubToobarOpen((prev) => ({
+            ...prev,
+            [payload.type]: open,
+          }));
 
-              return false;
-            }
-
-            if (payload?.image) {
-              setType('image');
-              setPayload({ image: { ...payload.image } });
-
-              return false;
-            }
-          }
-
-          unActive();
+          setPayload((prev) => ({
+            ...prev,
+            ...(payload?.link && { link: { ...payload.link } }),
+            ...(payload?.image && { image: { ...payload.image } }),
+            ...(payload?.openGraphLink && { openGraphLink: { ...payload.openGraphLink } }),
+          }));
 
           return false;
         },
@@ -99,10 +86,18 @@ export function SubToolbar() {
         cleanupSubToolbarCommand();
       }
     };
-  }, [editor, unActive]);
+  }, [editor]);
+
+  useEffect(() => {
+    if (shouldCloseSubToolbar) {
+      setPayload({ ...defaultPayload });
+    }
+  }, [subToolbarOpen, shouldCloseSubToolbar]);
 
   return (
-    <Toolbar className={`h-[30px] px-1 py-0.5 shadow-sm ${type === 'nonActive' ? 'opacity-0' : 'opacity-100'}`}>
+    <Toolbar
+      className={`box-border h-[40px] px-1 py-0.5 shadow-sm ${shouldCloseSubToolbar ? 'opacity-0' : 'opacity-100'}`}
+    >
       <EditorSubToolbar />
     </Toolbar>
   );

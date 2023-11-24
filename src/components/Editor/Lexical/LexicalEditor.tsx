@@ -1,6 +1,6 @@
 'use client';
 
-import { type ForwardedRef, forwardRef, useImperativeHandle, useRef, useEffect } from 'react';
+import { type ForwardedRef, forwardRef } from 'react';
 import { LexicalEditor as Editor } from 'lexical';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
@@ -11,12 +11,11 @@ import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
 import { ListNode, ListItemNode } from '@lexical/list';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin';
-import { EditorRefPlugin } from '@lexical/react/LexicalEditorRefPlugin';
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
 import PlaceHolder from './PlaceHolder';
 import { OpenGraphLinkNode } from './Nodes/OpenGraphLinkNode';
-import { ImagePlugin, OpenGraphLinkPlugin, ToolbarPlugin } from './Plugin';
 import { ImageNode } from './Nodes/ImageNode';
+import { ImagePlugin, OpenGraphLinkPlugin, ToolbarPlugin } from './Plugin';
 import { twMerge } from 'tailwind-merge';
 
 interface LexicalEditorProps {
@@ -26,13 +25,7 @@ interface LexicalEditorProps {
 export type CleanupCommand = (() => void) | null;
 
 function LexicalEditor({ config }: LexicalEditorProps, ref: ForwardedRef<Editor>) {
-  const editorRef = useRef<Editor>(null);
-
   const classNames = twMerge([`relative`, config.editable && `flex-1 pt-[42px]`]);
-
-  useImperativeHandle(ref, () => {
-    return editorRef.current!;
-  });
 
   return (
     <LexicalComposer
@@ -41,11 +34,10 @@ function LexicalEditor({ config }: LexicalEditorProps, ref: ForwardedRef<Editor>
         nodes: [LinkNode, OpenGraphLinkNode, ListNode, ListItemNode, ImageNode],
       }}
     >
-      <EditorRefPlugin editorRef={editorRef} />
       <ToolbarPlugin />
       <div className={classNames}>
         <RichTextPlugin
-          contentEditable={<ContentEditable spellCheck="false" />}
+          contentEditable={<ContentEditable spellCheck="false" data-lexical-namespace={config.namespace} />}
           placeholder={(isEditable) => (isEditable ? <PlaceHolder /> : null)}
           ErrorBoundary={LexicalErrorBoundary}
         />

@@ -2,19 +2,18 @@
 
 import { useEffect, useState } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { insertList, ListNode, ListItemNode, $isListNode, $isListItemNode } from '@lexical/list';
+import { insertList, ListItemNode } from '@lexical/list';
 import {
   $getSelection,
   COMMAND_PRIORITY_EDITOR,
   LexicalEditor,
-  $isRangeSelection,
   $createParagraphNode,
   ElementNode,
   LexicalNode,
-  RangeSelection,
   createCommand,
 } from 'lexical';
 import Toolbar from '../Lexical/Component/ToolbarUI/Toolbar';
+import { getListItemNodeFromSelection } from '../Lexical/util/toolbar';
 import type { CleanupCommand } from '../Lexical/LexicalEditor';
 
 export type ListToolbarNames = 'UnOrderedList' | 'OrderedList';
@@ -39,73 +38,24 @@ export function ListToolbar() {
     editor.update(() => {
       const selection = $getSelection();
 
-      if ($isRangeSelection(selection)) {
-        switch (type) {
-          case 'unorderedList':
-            const unorderedListItemNodeChildList = getUnOrderedListItemNodeChildFromRangeSelection(selection);
+      const tag = type === 'orderedList' ? 'ol' : 'ul';
+      const targetListItems = getListItemNodeFromSelection({ type: tag, selection });
 
-            if (unorderedListItemNodeChildList) {
-              unorderedListItemNodeChildList.forEach((node) => {
-                const listItemNode = node.getParent() as ListItemNode;
-                // const listNode = listItemNode.getParent() as ListNode;
+      const replaceListItemNode = (targetListItemNode: ListItemNode) => {
+        const paragraph = $createParagraphNode();
 
-                const paragraph = $createParagraphNode();
+        append(paragraph, targetListItemNode.getChildren());
+        targetListItemNode.insertAfter(paragraph);
 
-                append(paragraph, listItemNode.getChildren());
-                listItemNode.insertAfter(paragraph);
+        targetListItemNode.remove();
+      };
 
-                listItemNode.remove();
-              });
-            }
-
-            break;
-          case 'orderedList':
-            const orderedListItemNodeChildList = getOrderedListItemNodeChildFromRangeSelection(selection);
-
-            if (orderedListItemNodeChildList) {
-              orderedListItemNodeChildList.forEach((node) => {
-                const listItemNode = node.getParent() as ListItemNode;
-                // const listNode = listItemNode.getParent() as ListNode;
-
-                const paragraph = $createParagraphNode();
-
-                append(paragraph, listItemNode.getChildren());
-                listItemNode.insertAfter(paragraph);
-
-                listItemNode.remove();
-              });
-
-              return;
-            }
-
-            break;
-        }
+      if (targetListItems) {
+        targetListItems.forEach((node) => {
+          replaceListItemNode(node);
+        });
       }
     });
-
-    function getOrderedListItemNodeChildFromRangeSelection(selection: RangeSelection) {
-      const orderedListItemNodeChildList = selection
-        .getNodes()
-        .filter(
-          (node) =>
-            $isListItemNode(node.getParent()) &&
-            ((node.getParent() as ListItemNode).getParent() as ListNode).getTag() === 'ol',
-        );
-
-      return orderedListItemNodeChildList.length ? orderedListItemNodeChildList : null;
-    }
-
-    function getUnOrderedListItemNodeChildFromRangeSelection(selection: RangeSelection) {
-      const unorderedListItemNodeChildList = selection
-        .getNodes()
-        .filter(
-          (node) =>
-            $isListItemNode(node.getParent()) &&
-            ((node.getParent() as ListItemNode).getParent() as ListNode).getTag() === 'ul',
-        );
-
-      return unorderedListItemNodeChildList.length ? unorderedListItemNodeChildList : null;
-    }
   };
 
   const unorderedList = (e: React.MouseEvent) => {
@@ -127,7 +77,7 @@ export function ListToolbar() {
     if (editor.isEditable()) {
       cleanupUnorderedListCommand = editor.registerCommand(
         IS_UNOREDERED_LIST_COMMAND,
-        (payload, editor) => {
+        (payload) => {
           setIsUnorderedList(payload);
 
           return false;
@@ -137,7 +87,7 @@ export function ListToolbar() {
 
       cleanupOrderedListCommand = editor.registerCommand(
         IS_OREDERED_LIST_COMMAND,
-        (payload, editor) => {
+        (payload) => {
           setIsOrderedList(payload);
 
           return false;

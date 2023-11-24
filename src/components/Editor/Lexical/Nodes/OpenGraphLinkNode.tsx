@@ -11,7 +11,7 @@ import {
   $createNodeSelection,
 } from 'lexical';
 import EditorOpenGraphLink from '../Component/OpenGraphLink/EditorOpenGraphLink';
-import { DATASET_NAME_FOR_HANDLE } from '../util/toolbar';
+import { NODE_DATASET_NAME } from '../util/toolbar';
 
 export type OpenGraphLinkNodeAlign = 'start' | 'center' | 'end';
 
@@ -30,6 +30,11 @@ export interface OpenGraphLinkNodeCommandPayload {
   description?: string;
   align?: OpenGraphLinkNodeAlign;
   active?: boolean;
+}
+
+export interface ChangeOpenGraphLinkNodeAlignCommandPayload {
+  nodeKey: string;
+  align: OpenGraphLinkNodeAlign;
 }
 
 export class OpenGraphLinkNode extends DecoratorNode<ReactNode> {
@@ -86,8 +91,8 @@ export class OpenGraphLinkNode extends DecoratorNode<ReactNode> {
     element.className = `og-link box-border flex w-[calc(100%-16px)] select-none mx-2 mt-2 mb-6 ${this.getAlign()}`;
 
     if (_editor.isEditable()) {
-      element.dataset[DATASET_NAME_FOR_HANDLE.CAMEL_CASE_NODE_TYPE] = this.getType();
-      element.dataset[DATASET_NAME_FOR_HANDLE.CAMEL_CASE_KEY] = this.__key;
+      element.dataset[NODE_DATASET_NAME.CAMEL_CASE_NODE_TYPE] = this.getType();
+      element.dataset[NODE_DATASET_NAME.CAMEL_CASE_KEY] = this.__key;
 
       if (this.__active === true) {
         element.classList.add('active');
@@ -187,11 +192,10 @@ export class OpenGraphLinkNode extends DecoratorNode<ReactNode> {
   }
 }
 
-export const OPENGRAPH_LINKNODE_COMMAND_TYPE = 'insertOpenGraphLinkNode';
-
-export const INSERT_OPENGRAPH_LINKNODE_COMMAND = createCommand<OpenGraphLinkNodeCommandPayload>(
-  OPENGRAPH_LINKNODE_COMMAND_TYPE,
-);
+export const CHANGE_OPENGRAPHLINK_NODE_ALIGN =
+  createCommand<ChangeOpenGraphLinkNodeAlignCommandPayload>('changeOpenGraphLinkNodeAlign');
+export const INSERT_OPENGRAPH_LINKNODE_COMMAND =
+  createCommand<OpenGraphLinkNodeCommandPayload>('insertOpenGraphLinkNode');
 
 export function $createOpenGraphLinkNode({ url, title, ogImage, description }: OpenGraphLinkNodeCommandPayload) {
   const openGraphLinkNode = new OpenGraphLinkNode({ url, title, ogImage, description });

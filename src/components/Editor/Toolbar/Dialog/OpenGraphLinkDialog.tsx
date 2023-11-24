@@ -144,7 +144,7 @@ function OpenGraphLinkDialog(props: OpenGraphLinkDialogProps) {
   }, [result]);
 
   return (
-    <div className="fixed_inner fixed top-0 z-[2] flex h-full items-center justify-center bg-black/10">
+    <div className="fixed_inner fixed top-0 z-dimmed flex h-full items-center justify-center bg-black/10">
       {/* wrapper */}
       <form
         className="relative box-border w-[412px] rounded-lg border bg-white p-4 shadow-md"

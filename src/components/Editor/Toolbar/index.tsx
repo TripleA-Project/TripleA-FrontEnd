@@ -3,3 +3,4 @@ export * from './LinkToolbar';
 export * from './ListToolbar';
 export * from './HistoryToolbar';
 export * from './ImageToolbar';
+export * from './OpenGraphLinkToolbar';

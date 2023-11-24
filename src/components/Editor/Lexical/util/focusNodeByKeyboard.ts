@@ -32,11 +32,10 @@ enum KEY {
 }
 
 export class FocusNodeKeyboardUtil {
-  static allowedNode = [OpenGraphLinkNode, ImageNode];
-  static allowedType = [OpenGraphLinkNode.getType(), ImageNode.getType()];
-
   static canRegisterEvent(editor: LexicalEditor) {
-    return this.allowedNode.some((node) => editor.hasNode(node));
+    const allowedNode = getAllowedNode();
+
+    return allowedNode.some((node) => editor.hasNode(node));
   }
 
   static handleKeyboard({ e, editor, selection }: HandleKeyboardPayload) {
@@ -77,7 +76,6 @@ export class FocusNodeKeyboardUtil {
 
     /* nodeSelection */
     if ($isNodeSelection(selection)) {
-      console.log('nodeSelection');
       const allowedNode = selection.getNodes().find((node) => this.isAllowedNode(node)) as AllowedNodeType | undefined;
 
       if (allowedNode) {
@@ -122,7 +120,9 @@ export class FocusNodeKeyboardUtil {
   }
 
   private static isAllowedNode(node: LexicalNode | null | undefined): node is AllowedNodeType {
-    return this.allowedType.includes(node?.getType() ?? '');
+    const allowedType = getAllowedType();
+
+    return allowedType.includes(node?.getType() ?? '');
   }
 
   private static getSelectionPointNode(selection: RangeSelection) {
@@ -206,4 +206,12 @@ export class FocusNodeKeyboardUtil {
 
     return null;
   }
+}
+
+function getAllowedNode() {
+  return [OpenGraphLinkNode, ImageNode];
+}
+
+function getAllowedType() {
+  return [OpenGraphLinkNode.getType(), ImageNode.getType()];
 }

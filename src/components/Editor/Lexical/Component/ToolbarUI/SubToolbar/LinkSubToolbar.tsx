@@ -1,10 +1,16 @@
-import { LinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link';
-import { useEffect, useRef } from 'react';
-import Toolbar from '../Toolbar';
+import { useRef } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { LinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link';
+import Toolbar from '../Toolbar';
 import { AiOutlineCheck } from 'react-icons/ai';
 import { RiDeleteBin6Line } from 'react-icons/ri';
-import { IS_LINK_COMMAND } from '@/components/Editor/Toolbar';
+import { TOOLBAR_ELEMENT_ID, updateToolbar } from '../../../util/toolbar';
+import { subToolbarActiveUtil } from '../../../util/subtoolbar';
+
+export interface LinkSubToolbarPayload {
+  url: string;
+  node: LinkNode;
+}
 
 interface LinkSubToolbarProps {
   url: string;
@@ -35,18 +41,14 @@ export function LinkSubToolbar({ url, node }: LinkSubToolbarProps) {
   const remove = (e: React.MouseEvent) => {
     editor.update(() => {
       node.remove();
-      //editor.dispatchCommand(IS_LINK_COMMAND, { active: false });
     });
+
+    subToolbarActiveUtil.use('link').unActive({ editor });
+    updateToolbar({ editor });
   };
 
-  // useEffect(() => {
-  //   return () => {
-  //     editor.dispatchCommand(IS_LINK_COMMAND, { active: false });
-  //   };
-  // }, [editor]);
-
   return (
-    <Toolbar.GroupWrapper>
+    <Toolbar.GroupWrapper id={TOOLBAR_ELEMENT_ID.SUB_TOOLBAR}>
       <div>
         <label htmlFor="link-url" className="mr-2 text-xs font-bold text-[#1E1E1E]">
           링크 주소

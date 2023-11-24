@@ -11,7 +11,7 @@ import {
   createCommand,
 } from 'lexical';
 import ImageComponent from '../Component/Image/ImageComponent';
-import { DATASET_NAME_FOR_HANDLE } from '../util/toolbar';
+import { NODE_DATASET_NAME } from '../util/toolbar';
 
 export type ImageResizeFormat = 'full-width' | null;
 
@@ -34,7 +34,7 @@ interface ResizedImageCommandPayload {
   height: number;
 }
 
-interface ChangeImageNodeAlignCommandPayload {
+export interface ChangeImageNodeAlignCommandPayload {
   nodeKey: string;
   align: ImageNodeAlign;
 }
@@ -114,8 +114,8 @@ export class ImageNode extends DecoratorNode<ReactNode> {
     element.className = 'editor-image w-full max-w-[725px] flex box-border';
 
     if (_editor.isEditable()) {
-      element.dataset[DATASET_NAME_FOR_HANDLE.CAMEL_CASE_NODE_TYPE] = this.getType();
-      element.dataset[DATASET_NAME_FOR_HANDLE.CAMEL_CASE_KEY] = this.__key;
+      element.dataset[NODE_DATASET_NAME.CAMEL_CASE_NODE_TYPE] = this.getType();
+      element.dataset[NODE_DATASET_NAME.CAMEL_CASE_KEY] = this.__key;
       if (this.getIsActive() === true) {
         element.classList.add('active');
       }

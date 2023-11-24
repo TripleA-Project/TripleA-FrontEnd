@@ -16,6 +16,7 @@ import {
   KEY_DELETE_COMMAND,
   LexicalEditor,
   SELECTION_CHANGE_COMMAND,
+  createCommand,
 } from 'lexical';
 import Toolbar from '../Component/ToolbarUI/Toolbar';
 import {
@@ -31,17 +32,13 @@ import {
   IS_LINK_COMMAND,
 } from '../../Toolbar';
 import { EditorDialogContextProvider } from '@/context/EditorDialogContext';
-import { SUB_TOOLBAR_COMMAND, SubToolbar } from '../Component/ToolbarUI/SubToolbar';
-import { FocusNodeKeyboardUtil } from '../util/focusNodeByKeyboard';
+import { SubToolbar } from '../Component/ToolbarUI/SubToolbar';
 import { mergeRegister } from '@lexical/utils';
-import {
-  DATASET_NAME_FOR_HANDLE,
-  dispatchSubToolbarCommand,
-  hasActivedImage,
-  selectionHasLink,
-  selectionHasList,
-} from '../util/toolbar';
+import { NODE_DATASET_NAME, TOOLBAR_ELEMENT_ID, selectionHasLink, selectionHasList } from '../util/toolbar';
+import { subToolbarActiveUtil } from '../util/subtoolbar';
+import { FocusNodeKeyboardUtil } from '../util/focusNodeByKeyboard';
 import type { CleanupCommand } from '../LexicalEditor';
+import type { KnownNode } from '../util/beforeKnownNodeActive';
 
 export function ToolbarPlugin() {
   const [editor] = useLexicalComposerContext();
@@ -50,12 +47,11 @@ export function ToolbarPlugin() {
     const selection = $getSelection();
 
     const { has: hasLink, node: linkNode } = selectionHasLink({ selection });
-    const { has: hasImage, node: imageNode } = hasActivedImage({ editor });
+    hasLink
+      ? subToolbarActiveUtil.use('link').active({ node: linkNode!, editor })
+      : subToolbarActiveUtil.use('link').unActive({ editor });
+
     editor.dispatchCommand(IS_LINK_COMMAND, hasLink);
-    dispatchSubToolbarCommand(editor, {
-      linkPayload: { hasLink, linkNode },
-      imagePayload: { hasImage, imageNode },
-    });
 
     const { hasUnorderedList, hasOrderedList } = selectionHasList({ selection });
     editor.dispatchCommand(IS_UNOREDERED_LIST_COMMAND, hasUnorderedList);
@@ -68,26 +64,40 @@ export function ToolbarPlugin() {
   useEffect(() => {
     let cleanupSelectionChangeCommand: CleanupCommand = null;
     let cleanupMergedKeyboardCommand: CleanupCommand = null;
+    let cleanupUpdateToolbarCommand: CleanupCommand = null;
 
     if (!editor.isEditable()) return;
 
-    // mouse event
+    /*
+      click event
+      - 버블링 단계 이벤트
+      - 노드(ImageNode, OpenGraphLinkNode)가 아닌 
+        관련없는 다른 곳을 클릭했을 때
+        포커스(active 상태) 되지 않도록 하는 것을
+        전역적으로 적용하기 위함
+      - 노드 자체에서 클릭이벤트 발생시
+        beforeKnownNodeActive 유틸함수를 통해 
+        1개의 노드만 active되도록 이벤트 수행
+        (stopPropagation으로 인해 여기로 이벤트 전파되지 않음)
+    */
     const handleFocusOutNode = (e: MouseEvent) => {
-      const toolbar = editor.getRootElement()!.parentElement!.previousElementSibling!;
       const target = e.target as HTMLElement;
-      const activeNode = document.querySelector(`[data-${DATASET_NAME_FOR_HANDLE.NODE_TYPE}].active`);
+      const activeNode = document.querySelector(`[data-${NODE_DATASET_NAME.NODE_TYPE}].active`);
 
-      if (activeNode && !activeNode?.contains(target) && !toolbar.contains(target)) {
-        editor.update(() => {
-          const key = (activeNode as HTMLElement).dataset[DATASET_NAME_FOR_HANDLE.CAMEL_CASE_KEY];
-          const node = $getNodeByKey(key!);
+      if (activeNode && !activeNode?.contains(target)) {
+        const toolbarContainsTarget =
+          target.closest(`#${TOOLBAR_ELEMENT_ID.TOOLBAR}`) || target.closest(`#${TOOLBAR_ELEMENT_ID.SUB_TOOLBAR}`);
 
-          if (node?.setIsActive) {
-            node.setIsActive(false, editor);
-          }
+        if (!toolbarContainsTarget) {
+          editor.update(() => {
+            const key = (activeNode as HTMLElement).dataset[NODE_DATASET_NAME.CAMEL_CASE_KEY];
 
-          editor.dispatchCommand(SUB_TOOLBAR_COMMAND, { open: false });
-        });
+            if (key) {
+              const node = $getNodeByKey<KnownNode>(key)!;
+              node.setIsActive(false);
+            }
+          });
+        }
       }
     };
 
@@ -104,17 +114,28 @@ export function ToolbarPlugin() {
       COMMAND_PRIORITY_EDITOR,
     );
 
+    cleanupUpdateToolbarCommand = editor.registerCommand(
+      UPDATE_TOOLBAR_COMMAND,
+      (payload) => {
+        $updateToolbar();
+
+        return false;
+      },
+      COMMAND_PRIORITY_EDITOR,
+    );
+
     if (FocusNodeKeyboardUtil.canRegisterEvent(editor)) {
       const keyboardHandler = (e: KeyboardEvent, editor: LexicalEditor) => {
         const selection = $getSelection();
 
         const isHandled = FocusNodeKeyboardUtil.handleKeyboard({ e, editor, selection });
-        if (isHandled === true) {
+        if (isHandled) {
           e.preventDefault();
         }
 
         return isHandled;
       };
+
       cleanupMergedKeyboardCommand = mergeRegister(
         editor.registerCommand(KEY_BACKSPACE_COMMAND, keyboardHandler, COMMAND_PRIORITY_CRITICAL),
         editor.registerCommand(KEY_DELETE_COMMAND, keyboardHandler, COMMAND_PRIORITY_CRITICAL),
@@ -135,11 +156,15 @@ export function ToolbarPlugin() {
       if (cleanupMergedKeyboardCommand) {
         cleanupMergedKeyboardCommand();
       }
+
+      if (cleanupUpdateToolbarCommand) {
+        cleanupUpdateToolbarCommand();
+      }
     };
   }, [editor, $updateToolbar]);
 
   return editor.isEditable() ? (
-    <div className="z-[1]">
+    <div className="sticky top-[53px] z-toolbar bg-white" id={TOOLBAR_ELEMENT_ID.TOOLBAR}>
       <Toolbar>
         <HistoryToolbar />
         <FontToolbar />
@@ -153,3 +178,5 @@ export function ToolbarPlugin() {
     </div>
   ) : null;
 }
+
+export const UPDATE_TOOLBAR_COMMAND = createCommand('updateToolbar');

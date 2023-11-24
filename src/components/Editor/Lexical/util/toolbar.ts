@@ -1,9 +1,11 @@
+import { GridSelection, LexicalEditor, LexicalNode, NodeSelection, RangeSelection } from 'lexical';
 import { $isLinkNode, LinkNode } from '@lexical/link';
-import { ListNode, $isListNode, $isListItemNode } from '@lexical/list';
+import { ListNode, ListItemNode, $isListNode, $isListItemNode } from '@lexical/list';
+import { ImageNode } from '../Nodes/ImageNode';
 import { $filter } from '@lexical/utils';
-import { $getNodeByKey, GridSelection, LexicalEditor, LexicalNode, NodeSelection, RangeSelection } from 'lexical';
-import { ImageNode, ImageNodeAlign } from '../Nodes/ImageNode';
-import { SUB_TOOLBAR_COMMAND } from '../Component/ToolbarUI/SubToolbar';
+import { FindByLexicalEditor } from './editorStateRead';
+import { UPDATE_TOOLBAR_COMMAND } from '../Plugin';
+import { COMMAND_EMPTY_PAYLOAD } from '@/constants/editor';
 
 type EditorSelection = RangeSelection | NodeSelection | GridSelection | null;
 
@@ -20,18 +22,12 @@ interface FindResult<T = LexicalNode> {
   node?: T;
 }
 
-interface DispatchCommandPayload {
-  linkPayload: {
-    hasLink: FindResult<LinkNode>['has'];
-    linkNode: FindResult<LinkNode>['node'];
-  };
-  imagePayload: {
-    hasImage: FindResult<ImageNode>['has'];
-    imageNode: FindResult<ImageNode>['node'];
-  };
+export const enum TOOLBAR_ELEMENT_ID {
+  TOOLBAR = 'editor-toolbar',
+  SUB_TOOLBAR = 'editor-sub-toolbar',
 }
 
-export enum DATASET_NAME_FOR_HANDLE {
+export const enum NODE_DATASET_NAME {
   NODE_TYPE = 'lexical-node-type',
   CAMEL_CASE_NODE_TYPE = 'lexicalNodeType',
   KEY = 'lexical-key',
@@ -78,6 +74,32 @@ export function selectionHasList({ selection }: FindAtSelectionPayload): {
   };
 }
 
+export function getListItemNodeFromSelection({
+  type,
+  selection,
+}: { type: ListNode['__tag'] } & FindAtSelectionPayload) {
+  if (!selection) return null;
+
+  const targetListItemNodes = $filter<ListItemNode>(selection.getNodes(), (node) => {
+    if ($isListItemNode(node)) {
+      const parent = node.getParent();
+
+      return $isListNode(parent) && parent.__tag === type ? node : null;
+    }
+
+    const parent = node.getParent();
+    if ($isListItemNode(parent)) {
+      const ancestor = parent.getParent();
+
+      return $isListNode(ancestor) && ancestor.__tag === type ? parent : null;
+    }
+
+    return null;
+  });
+
+  return targetListItemNodes.length ? targetListItemNodes : null;
+}
+
 export function selectionHasLink({ selection }: FindAtSelectionPayload): FindResult<LinkNode> {
   if (selection) {
     const linkNodes = $filter(selection.getNodes(), (node) => {
@@ -102,24 +124,22 @@ export function selectionHasLink({ selection }: FindAtSelectionPayload): FindRes
 }
 
 export function hasActivedImage({ editor }: FindAtDomPayload): FindResult<ImageNode> {
+  const { findNodeByKey } = FindByLexicalEditor.getInstance({ editor });
+
   const activedImageNode = document.querySelector(
-    `[data-${DATASET_NAME_FOR_HANDLE.NODE_TYPE}="${ImageNode.getType()}"].active`,
+    `[data-${NODE_DATASET_NAME.NODE_TYPE}="${ImageNode.getType()}"].active`,
   );
+
   if (activedImageNode) {
-    const key = (activedImageNode as HTMLElement).dataset[DATASET_NAME_FOR_HANDLE.CAMEL_CASE_KEY];
+    const key = (activedImageNode as HTMLElement).dataset[NODE_DATASET_NAME.CAMEL_CASE_KEY];
 
     if (key) {
-      const hasActivedImageNodeResult: FindResult<ImageNode> = {
+      const result = findNodeByKey<ImageNode>(key).transform((node) => ({
         has: true,
-      };
+        node,
+      }));
 
-      editor.getEditorState().read(() => {
-        const activedImageNode = $getNodeByKey(key);
-
-        hasActivedImageNodeResult.node = activedImageNode as ImageNode;
-      });
-
-      return hasActivedImageNodeResult;
+      return result ?? { has: false };
     }
 
     return { has: false };
@@ -128,38 +148,6 @@ export function hasActivedImage({ editor }: FindAtDomPayload): FindResult<ImageN
   return { has: false };
 }
 
-export function dispatchSubToolbarCommand(
-  editor: LexicalEditor,
-  { linkPayload, imagePayload }: DispatchCommandPayload,
-) {
-  if (linkPayload.hasLink && linkPayload.linkNode) {
-    editor.dispatchCommand(SUB_TOOLBAR_COMMAND, {
-      open: true,
-      payload: {
-        link: {
-          url: linkPayload.linkNode.getURL(),
-          node: linkPayload.linkNode,
-        },
-      },
-    });
-
-    return;
-  }
-
-  if (imagePayload.hasImage && imagePayload.imageNode) {
-    editor.dispatchCommand(SUB_TOOLBAR_COMMAND, {
-      open: true,
-      payload: {
-        image: {
-          node: imagePayload.imageNode,
-        },
-      },
-    });
-
-    return;
-  }
-
-  editor.dispatchCommand(SUB_TOOLBAR_COMMAND, {
-    open: false,
-  });
+export function updateToolbar({ editor }: { editor: LexicalEditor }) {
+  editor.dispatchCommand(UPDATE_TOOLBAR_COMMAND, COMMAND_EMPTY_PAYLOAD);
 }

@@ -1,4 +1,5 @@
 import TripleANoticeEditor from '@/components/Editor/Notice/TripleANoticeEditor';
+import PostNoticeHeader from '@/components/Layout/Header/PostNoticeHeader';
 import { Metadata } from 'next';
 import { ToastContainer } from 'react-toastify';
 
@@ -12,9 +13,12 @@ export const metadata: Metadata = {
 
 export default function NoticePostPage() {
   return (
-    <div className="box-border px-4">
-      <TripleANoticeEditor />
-      <ToastContainer position="bottom-center" newestOnTop={true} />
-    </div>
+    <>
+      <PostNoticeHeader />
+      <div className="box-border px-4">
+        <TripleANoticeEditor />
+        <ToastContainer position="bottom-center" newestOnTop={true} />
+      </div>
+    </>
   );
 }

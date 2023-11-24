@@ -1,13 +1,19 @@
 'use client';
 
-import { useLayoutEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { twMerge } from 'tailwind-merge';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $getNodeByKey, $setSelection, type EditorConfig, LexicalEditor } from 'lexical';
-import { ImageNode, ImageNodeCommandPayload } from '../../Nodes/ImageNode';
-import { Resizable, ResizableProps } from 're-resizable';
-import { DATASET_NAME_FOR_HANDLE } from '../../util/toolbar';
+import { EditorConfig, $setSelection, LexicalEditor, COMMAND_PRIORITY_EDITOR } from 'lexical';
+import { ImageNode, ImageNodeCommandPayload, RESIZED_IMAGE_COMMAND } from '../../Nodes/ImageNode';
+import { Resizable, ResizableProps, Size, ResizeDirection } from 're-resizable';
+import { useDocumentResizeEditorNodeCallback } from '@/hooks/useDocumentResizeEditorNodeCallback';
+import { useFindByLexicalEditor } from '@/hooks/useFindLexicalEditor';
+import beforeKnownNodeActive from '../../util/beforeKnownNodeActive';
+// import type { EditorConfig } from 'lexical';
+import type { CleanupCommand } from '../../LexicalEditor';
+
+type ResizableDirection = Exclude<ResizeDirection, 'top' | 'bottom' | 'left' | 'right'>;
 
 interface ImageComponentProps extends ImageNodeCommandPayload {
   editor: LexicalEditor;
@@ -16,30 +22,28 @@ interface ImageComponentProps extends ImageNodeCommandPayload {
   nodeKey: string;
 }
 
+/* Image Component */
 function ImageComponent({ src, alt, width, height, editor, config, nodeKey, active }: ImageComponentProps) {
+  const { findNodeByKey } = useFindByLexicalEditor({ editor });
+
   const imageWrapperRef = useRef<HTMLDivElement>(null);
 
   const handleClick = (e: React.MouseEvent) => {
+    if (!editor.isEditable()) return;
+    if (!imageWrapperRef?.current) return;
+
     editor.update(() => {
-      const activedImageNode = document.querySelector(
-        `[data-${DATASET_NAME_FOR_HANDLE.NODE_TYPE}=${ImageNode.getType()}].active`,
-      );
-      if (activedImageNode) {
-        const key = (activedImageNode as HTMLElement).dataset[DATASET_NAME_FOR_HANDLE.CAMEL_CASE_KEY];
+      beforeKnownNodeActive({ compareTargetElement: imageWrapperRef.current! });
 
-        if (key) {
-          const node = $getNodeByKey(key) as ImageNode;
-          node.setIsActive(false);
-        }
+      const imageNode = findNodeByKey<ImageNode>(nodeKey).node;
+
+      if (imageNode && imageNode.getIsActive() === false) {
+        imageNode.setIsActive(true);
+        $setSelection(imageNode.createSelfNodeSelection());
       }
-
-      const node = $getNodeByKey(nodeKey) as ImageNode;
-
-      node.setIsActive(true);
-
-      $setSelection(node.createSelfNodeSelection());
     });
 
+    // click 이벤트 전파로 인해 nodeSelection 에서 selection이 변경되는 것을 방지
     e.stopPropagation();
   };
 
@@ -52,13 +56,16 @@ function ImageComponent({ src, alt, width, height, editor, config, nodeKey, acti
   return (
     <div ref={imageWrapperRef} className={imgWrapperClassNames} onClick={handleClick}>
       <Image width={width} height={height} src={src} alt={alt} className="max-w-full" />
-      <ResizeImage active={active} nodeKey={nodeKey} src={src} width={width} height={height} />
+      {editor.isEditable() ? (
+        <ResizeImage active={active} nodeKey={nodeKey} src={src} width={width} height={height} />
+      ) : null}
     </div>
   );
 }
 
 export default ImageComponent;
 
+/* Resize Image Component */
 function ResizeImage({
   active,
   nodeKey,
@@ -73,43 +80,160 @@ function ResizeImage({
   height: number;
 }) {
   const [editor] = useLexicalComposerContext();
+  const { findNodeByKey } = useFindByLexicalEditor({ editor });
+  const { registerCallback } = useDocumentResizeEditorNodeCallback<ImageNode>({ nodeKey, editor });
+
+  const [size, setSize] = useState<Size>({ width, height });
 
   const imgRef = useRef<HTMLImageElement>(null);
+  const sizeResultRef = useRef<Size>({ width, height });
 
-  const maxSize = getMaxSize();
+  /* handler */
+  const handleResizing: ResizableProps['onResize'] = (e, direction, ref, delta) => {
+    const result = {
+      width: width + delta.width,
+      height: height + delta.height,
+    };
 
-  const resizeComponentClassNames = twMerge([
-    `outline outline-2 outline-orange-500 !absolute !z-[2] !top-0 !box-content`,
-    !active && `hidden`,
-  ]);
+    ref.style.width = `${result.width}px`;
+    ref.style.height = `${result.height}px`;
 
-  const pointClassNames = {
-    topLeft: twMerge([
-      `!-left-1 !-top-1 !box-border !h-2 !w-2 !border !border-orange-500 bg-white hover:!bg-orange-500`,
-      `active:bg-orange-500`,
-    ]),
-    topRight: twMerge([
-      `!-right-1 !-top-1 !box-border !h-2 !w-2 !border !border-orange-500 bg-white hover:!bg-orange-500`,
-      `active:bg-orange-500`,
-    ]),
-    bottomLeft: twMerge([
-      `!-left-1 !-bottom-1 !box-border !h-2 !w-2 !border !border-orange-500 bg-white hover:!bg-orange-500`,
-      `active:bg-orange-500`,
-    ]),
-    bottomRight: twMerge([
-      `!-right-1 !-bottom-1 !box-border !h-2 !w-2 !border !border-orange-500 bg-white hover:!bg-orange-500`,
-      `active:bg-orange-500`,
-    ]),
+    sizeResultRef.current = {
+      ...result,
+    };
   };
 
-  const enableConfig: ResizableProps['enable'] = {
-    topLeft: true,
-    topRight: true,
-    bottomLeft: true,
-    bottomRight: true,
+  const handleResizeStop: ResizableProps['onResizeStop'] = (e, direction, ref, delta) => {
+    const imageNode = findNodeByKey<ImageNode>(nodeKey).node;
+
+    if (!imageNode) return;
+
+    editor.update(() => {
+      imageNode.setSize({
+        width: sizeResultRef.current.width as number,
+        height: sizeResultRef.current.height as number,
+      });
+    });
+
+    setSize({
+      ...sizeResultRef.current,
+    });
   };
 
-  function getMaxSize() {
+  /* effect */
+  useLayoutEffect(() => {
+    if (!imgRef.current) return;
+
+    const resizableElement = imgRef.current.parentElement;
+    if (!resizableElement) return;
+
+    const handleResizeCallback = (node: ImageNode) => {
+      const { width, height } = node.getSize();
+
+      // console.log(`%c[Resize: image] width:${width} height:${height}`, `background-color: violet; color:#fff;`);
+
+      if (sizeResultRef.current) {
+        sizeResultRef.current = {
+          width,
+          height,
+        };
+      }
+
+      setSize({ width, height });
+    };
+
+    registerCallback(handleResizeCallback);
+  }, []); /* eslint-disable-line */
+
+  useEffect(() => {
+    let cleanupResizedImageCommand: CleanupCommand = null;
+
+    if (!editor.isEditable()) return;
+
+    cleanupResizedImageCommand = editor.registerCommand(
+      RESIZED_IMAGE_COMMAND,
+      ({ nodeKey: targetNodeKey, width, height }) => {
+        if (nodeKey !== targetNodeKey) return false;
+
+        if (sizeResultRef.current) {
+          sizeResultRef.current = {
+            width,
+            height,
+          };
+        }
+
+        setSize({
+          width,
+          height,
+        });
+
+        return false;
+      },
+      COMMAND_PRIORITY_EDITOR,
+    );
+
+    return () => {
+      if (cleanupResizedImageCommand) {
+        cleanupResizedImageCommand();
+      }
+    };
+  }, [editor, nodeKey]);
+
+  return (
+    <Resizable
+      {...ComponentConfig.resizableComponent.classNames({ active })}
+      {...ComponentConfig.resizableComponent.sizes({ size, editor })}
+      lockAspectRatio={true}
+      enable={ComponentConfig.resizableComponent.enable}
+      onResize={handleResizing}
+      onResizeStop={handleResizeStop}
+    >
+      <Image ref={imgRef} className="opacity-[0.3]" src={src} alt="resize image" fill />
+    </Resizable>
+  );
+}
+
+/* helper */
+const ComponentUtil = {
+  getClassNames({ active }: { active: boolean }) {
+    return {
+      resizable: getResizeComponentClassNames({ active }),
+      point: getPointClassNames(),
+    };
+
+    function getResizeComponentClassNames({ active }: { active: boolean }) {
+      return twMerge([
+        `outline outline-2 outline-orange-500 !absolute !top-0 !box-content z-component`,
+        !active && `hidden`,
+      ]);
+    }
+
+    function getPointClassNames(): Record<ResizableDirection, string> {
+      const pointCommonClassNames = `!box-border !h-2 !w-2 !border !border-orange-500 bg-white`;
+      const pointHoverClassNames = `hover:!bg-orange-500`;
+      const pointActiveClassNames = `active:bg-orange-500`;
+
+      const common = [pointCommonClassNames, pointHoverClassNames, pointActiveClassNames];
+
+      const pointPositionClassNames: Record<ResizableDirection, string> = {
+        topLeft: `!-left-1 !-top-1`,
+        topRight: `!-right-1 !-top-1`,
+        bottomLeft: `!-left-1 !-bottom-1`,
+        bottomRight: `!-right-1 !-bottom-1`,
+      };
+
+      return {
+        topLeft: twMerge([...common, pointPositionClassNames.topLeft]),
+        topRight: twMerge([...common, pointPositionClassNames.topRight]),
+        bottomLeft: twMerge([...common, pointPositionClassNames.bottomLeft]),
+        bottomRight: twMerge([...common, pointPositionClassNames.bottomRight]),
+      };
+    }
+  },
+  canResize() {
+    return document.body.clientWidth >= ImageNode.MAX_WIDTH;
+  },
+  getResizableMaxSize({ size, editor }: { size: Size; editor: LexicalEditor }) {
     const rootElement = editor.getRootElement()!;
     const rootPadding = {
       left: Number(getComputedStyle(rootElement).paddingLeft.replace('px', '')),
@@ -117,56 +241,48 @@ function ResizeImage({
     };
 
     const maxWidth = Number((rootElement.clientWidth - (rootPadding.left + rootPadding.right)).toFixed(0));
+    const width = Number(size.width);
+    const height = Number(size.height);
 
     return {
-      width: maxWidth,
-      height: Number((maxWidth * (height / width)).toFixed(0)),
+      maxWidth: maxWidth,
+      maxHeight: Number((maxWidth * (height / width)).toFixed(0)),
     };
-  }
+  },
+};
 
-  const handleResizeStop: ResizableProps['onResizeStop'] = (e, direction, ref, delta) => {
-    editor.update(() => {
-      const imageNode = $getNodeByKey(nodeKey) as ImageNode;
+const ComponentConfig = {
+  resizableComponent: {
+    get enable(): ResizableProps['enable'] {
+      return ComponentUtil.canResize()
+        ? {
+            topLeft: true,
+            topRight: true,
+            bottomLeft: true,
+            bottomRight: true,
+          }
+        : false;
+    },
+    classNames({ active }: { active: boolean }): {
+      className: ResizableProps['className'];
+      handleClasses: ResizableProps['handleClasses'];
+    } {
+      const classNames = ComponentUtil.getClassNames({ active });
 
-      const { width, height } = imageNode.getSize();
-
-      const targetWidth = width + delta.width;
-      const targetHeight = height + delta.height;
-
-      console.log({ width, height });
-      console.log({ delta });
-      console.log({ targetWidth, targetHeight });
-
-      imageNode.setSize({
-        width: targetWidth,
-        height: targetHeight,
-      });
-    });
-  };
-
-  useLayoutEffect(() => {
-    if (!imgRef?.current) return;
-
-    const resizableElement = imgRef.current.parentElement;
-
-    if (resizableElement) {
-      resizableElement.style.width = `${width}px`;
-      resizableElement.style.height = `${height}px`;
-    }
-  }, [width, height]);
-
-  return (
-    <Resizable
-      className={resizeComponentClassNames}
-      defaultSize={{ width, height }}
-      lockAspectRatio={true}
-      maxWidth={maxSize.width}
-      maxHeight={maxSize.height}
-      enable={active ? enableConfig : false}
-      handleClasses={pointClassNames}
-      onResizeStop={handleResizeStop}
-    >
-      <Image ref={imgRef} className="opacity-[0.3]" src={src} alt="resize image" fill />
-    </Resizable>
-  );
-}
+      return {
+        className: classNames.resizable,
+        handleClasses: classNames.point,
+      };
+    },
+    sizes({ size, editor }: { size: Size; editor: LexicalEditor }): {
+      size: ResizableProps['size'];
+      maxWidth: ResizableProps['maxWidth'];
+      maxHeight: ResizableProps['maxHeight'];
+    } {
+      return {
+        size,
+        ...ComponentUtil.getResizableMaxSize({ size, editor }),
+      };
+    },
+  },
+};

@@ -6,7 +6,7 @@ import { BsImage, BsLink45Deg, BsListOl, BsListUl } from 'react-icons/bs';
 import { CgDisplayFullwidth } from 'react-icons/cg';
 import type { IconBaseProps, IconType } from 'react-icons';
 import type { FontToolbarNames, HistoryToolbarNames, ImageToolbarNames, LinkToolbarNames, ListToolbarNames } from './';
-import { ResizeWidth } from '../Lexical/util/toolbar';
+import type { ResizeWidth } from '../Lexical/util/toolbar';
 
 interface ToolbarIconProps extends IconBaseProps {
   active?: boolean;
@@ -20,7 +20,6 @@ interface ToolbarIcon {
 }
 
 export type AlignNames = 'AlignLeft' | 'AlignCenter' | 'AlignRight';
-
 type ToolbarNames =
   | HistoryToolbarNames
   | FontToolbarNames
@@ -29,8 +28,11 @@ type ToolbarNames =
   | ListToolbarNames
   | ImageToolbarNames
   | ResizeWidth;
-
 type ToolbarIconsType = Record<ToolbarNames, ToolbarIcon>;
+export type ToolbarIconsKey = ToolbarNames;
+export type PickToolbarIconsKey<T extends ToolbarIconsKey> = T extends ToolbarIconsKey
+  ? Extract<ToolbarIconsKey, T>
+  : never;
 
 export const ToolbarIcons: ToolbarIconsType = {
   Undo: ({ active, activeColor, nonActiveColor, ...props }) => {

@@ -1,18 +1,11 @@
 'use client';
 
 import { useCallback, useEffect } from 'react';
-import { $getNodeByKey, $getSelection, COMMAND_PRIORITY_EDITOR, createCommand } from 'lexical';
+import { $getNodeByKey, $getSelection, COMMAND_PRIORITY_EDITOR, LexicalEditor, createCommand } from 'lexical';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import {
-  $createImageNode,
-  CHANGE_IMAGE_NODE_ALIGN,
-  CHANGE_IMAGE_RESIZE_FORMAT,
-  INSERT_IMAGE_COMMAND,
-  ImageNode,
-  ImageNodeCommandPayload,
-  RESIZED_IMAGE_COMMAND,
-} from '../Nodes/ImageNode';
+import { $createImageNode, INSERT_IMAGE_COMMAND, ImageNode, ImageNodeCommandPayload } from '../Nodes/ImageNode';
 import $insertDecoratorNode from '../util/insertDecoratorNode';
+import { subToolbarActiveUtil } from '../util/subtoolbar';
 import type { CleanupCommand } from '../LexicalEditor';
 
 export function ImagePlugin() {
@@ -44,27 +37,30 @@ export function ImagePlugin() {
       );
 
       removeImageNodeMutationListener = editor.registerMutationListener(ImageNode, (mutatedNodes) => {
+        let activeImageNode: ImageNode | null = null;
+
         for (let [key, mutate] of Array.from(mutatedNodes.entries())) {
           editor.getEditorState().read(() => {
-            console.log('image', { mutate });
-            if (mutate === 'updated') {
-              const imageNode = $getNodeByKey(key) as ImageNode;
+            const imageNode = $getNodeByKey(key) as ImageNode;
+            const isActive = imageNode?.getIsActive();
 
-              editor.dispatchCommand(RESIZED_IMAGE_COMMAND, {
-                nodeKey: key,
-                ...imageNode.getSize(),
-              });
-              editor.dispatchCommand(CHANGE_IMAGE_NODE_ALIGN, {
-                nodeKey: key,
-                align: imageNode.getAlign(),
-              });
-              editor.dispatchCommand(CHANGE_IMAGE_RESIZE_FORMAT, {
-                nodeKey: key,
-                resizeFormat: imageNode.getResizeFormat(),
-              });
+            switch (mutate) {
+              case 'created':
+              case 'updated':
+                if (isActive) {
+                  activeImageNode = imageNode;
+                }
+
+                break;
+              case 'destroyed':
+                break;
             }
           });
         }
+
+        (activeImageNode as ImageNode | null)
+          ? subToolbarActiveUtil.use('image').active({ node: activeImageNode!, editor })
+          : subToolbarActiveUtil.use('image').unActive({ editor });
       });
     }
 

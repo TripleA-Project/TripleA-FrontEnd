@@ -1,15 +1,17 @@
 'use client';
 
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import Image from 'next/image';
 import styled from '@emotion/styled';
 import { twMerge } from 'tailwind-merge';
+import { LexicalEditor, $setSelection } from 'lexical';
+import { OpenGraphLinkNode } from '../../Nodes/OpenGraphLinkNode';
 import SpeechBalloon from '@/components/UI/Message/SpeechBalloon';
 import { RiDeleteBin6Line } from 'react-icons/ri';
-import { type EditorConfig, LexicalEditor, $getNodeByKey, $setSelection } from 'lexical';
-import { OpenGraphLinkNode } from '../../Nodes/OpenGraphLinkNode';
-import { AlignNames, ToolbarIcons } from '@/components/Editor/Toolbar/ToolbarIcons';
-import { DATASET_NAME_FOR_HANDLE } from '../../util/toolbar';
+import { OpenGraphLinkAlignToolbar } from '@/components/Editor/Toolbar';
+import beforeKnownNodeActive from '../../util/beforeKnownNodeActive';
+import { useFindByLexicalEditor } from '@/hooks/useFindLexicalEditor';
+import type { EditorConfig } from 'lexical';
 
 interface EditorOpenGraphLinkProps {
   editor: LexicalEditor;
@@ -24,34 +26,29 @@ interface EditorOpenGraphLinkProps {
   active: boolean;
 }
 
-const ALIGN_OPTIONS: AlignNames[] = ['AlignLeft', 'AlignCenter', 'AlignRight'];
-
 function EditorOpenGraphLink({ editor, active, config, nodeKey, openGraph }: EditorOpenGraphLinkProps) {
+  const { findNodeByKey } = useFindByLexicalEditor({ editor });
+
   const editable = editor.isEditable();
   const openGraphLinkRef = useRef<HTMLDivElement>(null);
 
   const handleClick = (e: React.MouseEvent) => {
-    editor.update(() => {
-      const activedOpenGraphLinkNode = document.querySelector(
-        `[data-${DATASET_NAME_FOR_HANDLE.NODE_TYPE}=${OpenGraphLinkNode.getType()}].active`,
-      );
-      if (activedOpenGraphLinkNode) {
-        const key = (activedOpenGraphLinkNode as HTMLElement).dataset[DATASET_NAME_FOR_HANDLE.CAMEL_CASE_KEY];
+    if (!editor.isEditable()) return;
+    if (!openGraphLinkRef?.current) return;
 
-        if (key) {
-          const node = $getNodeByKey(key) as OpenGraphLinkNode;
-          node.setIsActive(false);
-        }
+    editor.update(() => {
+      beforeKnownNodeActive({ compareTargetElement: openGraphLinkRef.current! });
+
+      const targetOpenGrphLinkNode = findNodeByKey<OpenGraphLinkNode>(nodeKey).node;
+
+      if (targetOpenGrphLinkNode && targetOpenGrphLinkNode.getIsActive() === false) {
+        targetOpenGrphLinkNode.setIsActive(true);
+        $setSelection(targetOpenGrphLinkNode.createSelfNodeSelection());
       }
 
-      const node = $getNodeByKey(nodeKey) as OpenGraphLinkNode;
-
-      node.setIsActive(true);
-
-      $setSelection(node.createSelfNodeSelection());
+      // click 이벤트 전파로 인해 node Selection 에서 selection이 변경되는 것을 방지
+      e.stopPropagation();
     });
-
-    e.stopPropagation();
   };
 
   return (
@@ -102,6 +99,10 @@ function EditorOpenGraphLinkToolBar({
   editor: LexicalEditor;
   nodeKey: string;
 }) {
+  const { findNodeByKey } = useFindByLexicalEditor({ editor });
+
+  const openGraphLinkNode = findNodeByKey<OpenGraphLinkNode>(nodeKey).node!;
+
   const editorOpenGraphLinktoolbarRef = useRef<HTMLDivElement>(null);
   const toolbarContentRef = useRef<HTMLDivElement>(null);
 
@@ -113,102 +114,25 @@ function EditorOpenGraphLinkToolBar({
     openGraphLinkToolbarContent: twMerge([`inline-flex h-full items-center gap-1`]),
   };
 
-  const getActiveFromNodeAlign = (type: AlignNames) => {
-    let result = false;
-
-    editor.getEditorState().read(() => {
-      const node = $getNodeByKey(nodeKey) as OpenGraphLinkNode | null;
-      if (!node) {
-        return;
-      }
-
-      switch (type) {
-        case 'AlignLeft':
-          result = node.getAlign() === 'start';
-
-          break;
-        case 'AlignCenter':
-          result = node.getAlign() === 'center';
-
-          break;
-        case 'AlignRight':
-          result = node.getAlign() === 'end';
-
-          break;
-      }
-    });
-
-    return result;
-  };
-
-  const getAlignButtonTitle = (type: AlignNames) => {
-    switch (type) {
-      case 'AlignLeft':
-        return '왼쪽으로 정렬';
-      case 'AlignCenter':
-        return '중앙으로 정렬';
-      case 'AlignRight':
-        return '오른쪽으로 정렬';
-    }
-  };
-
-  const align = (e: React.MouseEvent, type: AlignNames) => {
-    e.stopPropagation();
-
-    if (!nodeKey) return;
-
-    editor.update(() => {
-      const node = $getNodeByKey(nodeKey) as OpenGraphLinkNode;
-
-      switch (type) {
-        case 'AlignLeft':
-          node.setAlign('start');
-
-          break;
-        case 'AlignCenter':
-          node.setAlign('center');
-
-          break;
-        case 'AlignRight':
-          node.setAlign('end');
-
-          break;
-      }
-    });
-  };
-
   const removeOpenGraphLinkNode = (e: React.MouseEvent) => {
     e.stopPropagation();
 
-    if (!nodeKey) return;
+    const targetOpenGraphLinkNode = findNodeByKey<OpenGraphLinkNode>(nodeKey).node;
 
-    editor.update(() => {
-      const openGraphLinkNode = $getNodeByKey(nodeKey) as OpenGraphLinkNode;
-
-      openGraphLinkNode.remove();
-    });
+    if (targetOpenGraphLinkNode) {
+      editor.update(() => {
+        targetOpenGraphLinkNode.remove();
+      });
+    }
   };
 
   return active ? (
     <div ref={editorOpenGraphLinktoolbarRef} className={classNames.openGraphLinkToolbarWrapper}>
       <SpeechBalloon ballonBorderColor="#f6893b" tailBorderColor="#f6893b" className="pointer-events-auto bg-white">
         <div ref={toolbarContentRef} className={classNames.openGraphLinkToolbarContent}>
-          {ALIGN_OPTIONS.map((alignType) => {
-            const AlignIcon = ToolbarIcons[alignType];
-
-            return (
-              <button
-                key={alignType}
-                className="shrink-0 align-top"
-                onClick={(e) => align(e, alignType)}
-                title={getAlignButtonTitle(alignType)}
-              >
-                <AlignIcon active={getActiveFromNodeAlign(alignType)} />
-              </button>
-            );
-          })}
+          <OpenGraphLinkAlignToolbar node={openGraphLinkNode} />
           <button className="shrink-0 align-top" title="openGraph 링크 삭제" onClick={removeOpenGraphLinkNode}>
-            <RiDeleteBin6Line className="text-xl text-black" />
+            <RiDeleteBin6Line className="text-lg text-black" />
           </button>
         </div>
       </SpeechBalloon>

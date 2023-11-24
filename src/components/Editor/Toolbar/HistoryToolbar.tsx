@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { CAN_REDO_COMMAND, CAN_UNDO_COMMAND, COMMAND_PRIORITY_CRITICAL, REDO_COMMAND, UNDO_COMMAND } from 'lexical';
 import Toolbar from '../Lexical/Component/ToolbarUI/Toolbar';
+import { COMMAND_EMPTY_PAYLOAD } from '@/constants/editor';
 
 export type HistoryToolbarNames = 'Undo' | 'Redo';
 
@@ -13,14 +14,12 @@ export function HistoryToolbar() {
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
 
-  const undo = () => {
-    // @ts-ignore
-    editor.dispatchCommand(UNDO_COMMAND);
+  const undo = (e: React.MouseEvent) => {
+    editor.dispatchCommand(UNDO_COMMAND, COMMAND_EMPTY_PAYLOAD);
   };
 
-  const redo = () => {
-    // @ts-ignore
-    editor.dispatchCommand(REDO_COMMAND);
+  const redo = (e: React.MouseEvent) => {
+    editor.dispatchCommand(REDO_COMMAND, COMMAND_EMPTY_PAYLOAD);
   };
 
   useEffect(() => {
