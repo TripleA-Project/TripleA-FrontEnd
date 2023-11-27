@@ -1,9 +1,9 @@
 import dayjs from 'dayjs';
 import { type HistogramData, type LineData, type Time } from 'lightweight-charts';
-import { getSymbolStock } from './stock';
+import { getSymbolStock, getV2SymbolStock } from './stock';
 import { getSentimentGrade } from '@/util/getSentimentGrade';
 import { SentimentGrade, type SentimentGradeLabel } from '@/constants/sentimentGrade';
-import { GetSymbolStockPayload, type GetSymbolStockSearchParam } from '@/interfaces/Dto/Stock';
+import { GetSymbolStockPayload, GetSymbolStockV2Payload, type GetSymbolStockSearchParam } from '@/interfaces/Dto/Stock';
 import { MEMBERSHIP } from '@/interfaces/User';
 
 export interface GetChartDataRequest extends GetSymbolStockSearchParam {}
@@ -58,9 +58,30 @@ export async function getSymbolChartData({
   };
 }
 
-export function createChartData(
-  payload?: GetSymbolStockPayload['charts'] | null,
-): Omit<GetChartDataPayload, 'membership'> | null {
+export async function getV2SymbolChartData({
+  symbol,
+  startDate,
+  endDate,
+  resampleFreq,
+}: GetChartDataRequest): Promise<GetChartDataResponse> {
+  const { data: symbolStockV2Payload } = await getV2SymbolStock({ symbol, startDate, endDate, resampleFreq });
+
+  if (symbolStockV2Payload.status === 401) throw symbolStockV2Payload;
+
+  const v2ChartData = createV2ChartData({
+    price: symbolStockV2Payload.data?.charts,
+    meta: symbolStockV2Payload.data?.buzzDataList,
+  });
+
+  return {
+    membership: symbolStockV2Payload.data?.membership as keyof typeof MEMBERSHIP,
+    symbol: symbolStockV2Payload.data?.symbol ?? 'symbol',
+    companyName: symbolStockV2Payload.data?.companyName ?? symbolStockV2Payload.data?.symbol ?? 'company',
+    payload: v2ChartData,
+  };
+}
+
+export function createChartData(payload?: GetSymbolStockPayload['charts'] | null): GetChartDataPayload | null {
   if (!payload || payload.length === 0) return null;
 
   const lineData: LineData[] = [];
@@ -83,4 +104,48 @@ export function createChartData(
   });
 
   return { lineData, buzzData, sentimentData };
+}
+
+export function createV2ChartData(payload?: {
+  price: GetSymbolStockV2Payload['charts'];
+  meta: GetSymbolStockV2Payload['buzzDataList'];
+}): GetChartDataPayload | null {
+  if (!payload) return null;
+
+  let lineData: LineData[] = [];
+  let buzzData: HistogramData[] = [];
+  let sentimentData: SentimentData[] = [];
+
+  if (payload.price && payload.price.length) {
+    payload.price.forEach(({ date, close }) => {
+      const parsedDate = dayjs(date).format('YYYY-MM-DD');
+
+      lineData.push({
+        time: parsedDate,
+        value: close,
+      });
+    });
+  }
+
+  if (payload.meta && payload.meta.length) {
+    payload.meta.forEach(({ publishedDate, sentiment, count }) => {
+      const parsedDate = dayjs(publishedDate).format('YYYY-MM-DD');
+
+      const { label, color } = SentimentGrade[getSentimentGrade(sentiment)];
+
+      sentimentData.push({
+        time: parsedDate,
+        value: label,
+        color,
+      });
+
+      buzzData.push({
+        time: parsedDate,
+        value: count,
+        color,
+      });
+    });
+  }
+
+  return { lineData, sentimentData, buzzData };
 }
