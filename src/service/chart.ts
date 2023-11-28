@@ -58,9 +58,7 @@ export async function getSymbolChartData({
   };
 }
 
-export function createChartData(
-  payload?: GetSymbolStockPayload['charts'] | null,
-): Omit<GetChartDataPayload, 'membership'> | null {
+export function createChartData(payload?: GetSymbolStockPayload['charts'] | null): GetChartDataPayload | null {
   if (!payload || payload.length === 0) return null;
 
   const lineData: LineData[] = [];
