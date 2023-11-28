@@ -2,7 +2,6 @@
 
 import { Suspense, useEffect, useState } from 'react';
 import { CalenderDate } from '../Calendar/MuiCalendar';
-import dayjs from 'dayjs';
 import { ToastContainer } from 'react-toastify';
 import HistoryNewsListFetcher from './HistoryNewsListFetcher';
 import { ProfilePayload } from '@/interfaces/Dto/User';
@@ -14,16 +13,21 @@ import HistoryNewsListLoading from './Loading/HistoryNewsListLoading';
 import SelectedDateText from './SelectedDateText';
 import HistoryNewsList, { type HistoryNewsFilter } from '../News/HistoryNews/HistoryNewsList';
 import { syncCookie } from '@/util/cookies';
+import { getInitialDate } from './helper/calendar';
 
-interface TestPageProps {
+interface HistoryPageProps {
   user?: ProfilePayload;
   history?: HistoryPayload;
+  year: number;
+  month: number;
 }
 
-function HistoryPage({ user, history }: TestPageProps) {
+function HistoryPage({ user, history, year, month }: HistoryPageProps) {
+  const initialDate = getInitialDate({ year, month });
+
   const [date, setDate] = useState<CalenderDate>({
-    selectedDate: dayjs(),
-    startDate: dayjs(),
+    selectedDate: initialDate,
+    startDate: initialDate,
     endDate: null,
   });
 

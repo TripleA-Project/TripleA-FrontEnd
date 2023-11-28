@@ -30,7 +30,7 @@ function createErrorMeta({
         icon: <NotificationIcons.Error className="text-4xl" />,
         title: '혜택 소진',
         content: `
-          AI분석 이용량(일 10회)을 
+          AI분석 이용량을 
           모두 사용했습니다.
           내일 다시 이용해주세요.
         `,

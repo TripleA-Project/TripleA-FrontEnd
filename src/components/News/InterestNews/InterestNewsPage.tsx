@@ -1,8 +1,8 @@
 'use client';
 
 import { useMemo, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { useIsFetching } from '@tanstack/react-query';
-import { ToastContainer } from 'react-toastify';
 import { FiExternalLink } from 'react-icons/fi';
 import CategoryChip from '@/components/UI/Chip/CategoryChip';
 import SymbolChip from '@/components/UI/Chip/SymbolChip';
@@ -10,13 +10,14 @@ import FitPage from '@/components/Layout/FitPage';
 import MuiSpinner from '@/components/UI/Spinner/MuiSpinner';
 import InfinityNewsList, { genLinkHashId } from './InfinityNewsList';
 import InterestNewsPageTimeout from '@/components/ErrorBoundary/ErrorFallback/InterestNews/Timeout';
-import InterestNewsUnauthorized from '@/components/ErrorBoundary/ErrorFallback/InterestNews/Unauthorized';
 import InterestNewsPageInternalServerError from '@/components/ErrorBoundary/ErrorFallback/InterestNews/InternalServerError';
 import PreventOutsideScroll from '@/components/PreventOutsideScroll';
 import { useLikes } from '@/hooks/useLikes';
 import { Category } from '@/interfaces/Category';
 
 function InterestNewsPage() {
+  const { push } = useRouter();
+
   const { likedSymbols, likedCategories, loginRequired, status } = useLikes();
 
   const isFetching = useIsFetching(['likedSymbolList']);
@@ -64,7 +65,40 @@ function InterestNewsPage() {
 
   if (status === 'error') {
     if (loginRequired) {
-      return <InterestNewsUnauthorized />;
+      /*
+        - 기존 메인 최신 뉴스 탭에서
+        관심 뉴스 탭 클릭 시
+        로그인 하지 않은 경우,
+        관심 뉴스 페이지를 렌더링하지 않고
+        로그인 팝업을 보여주던 것과
+        동일한 레이아웃을 제공
+        (
+          기존 피그마에서는 
+          직접 관련뉴스 탭으로 이동한 경우 
+          로그인 하지 않은 경우에 대한 구현물이 없어, 
+          기존 임의로 다른 UI를 제공하던 것을
+          해당 방식으로 변경
+        )
+
+        - 뉴스 탭에서의 api 커스텀 hook과
+          관심 뉴스에서의 api 커스텀 hook이 동일하므로,
+          관심 뉴스 api 커스텀 hook에서 에러가 발생한 경우
+          뉴스탭에서도 동일한 에러가 발생할 것임
+
+        - 일반적인 흐름으로는
+          탭 버튼을 직접 클릭하고
+          검사 이후 유효한 경우 이동되기 때문에
+          해당 로직이 실행되지 않지만,
+          주소창에 직접 입력하거나
+          주소를 공유해서 이동할 경우 발생할 수 있음
+      */
+      push('/');
+
+      const interestTab = document.getElementById('news-tab__interest');
+
+      interestTab?.click();
+
+      return null;
     }
 
     return <InterestNewsPageInternalServerError />;
@@ -175,14 +209,6 @@ function InterestNewsPage() {
             ))
           : null}
       </div>
-      <ToastContainer
-        position="bottom-center"
-        autoClose={3000}
-        hideProgressBar
-        newestOnTop={true}
-        pauseOnFocusLoss={false}
-        pauseOnHover={false}
-      />
     </>
   );
 }

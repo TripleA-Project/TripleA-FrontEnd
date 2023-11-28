@@ -1,12 +1,12 @@
 'use client';
 
-import { ChartData, GetSymbolStockResponse, ResampleFrequency } from '@/interfaces/Dto/Stock';
-import { MEMBERSHIP } from '@/interfaces/User';
+import React from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { TIMEOUT_CODE } from '@/service/axios';
 import { getSymbolStock } from '@/service/stock';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosError, HttpStatusCode } from 'axios';
-import React from 'react';
+import { MEMBERSHIP } from '@/interfaces/User';
+import type { ChartData, ResampleFrequency } from '@/interfaces/Dto/Stock';
 
 type UseChartStatus = 'loading' | 'fetching' | 'success' | 'error' | 'timeout';
 
@@ -29,7 +29,7 @@ interface UseChartOption {
   cacheTime?: number;
 }
 
-function useChart({
+export function useChart({
   symbolName,
   resample,
   startDate,
@@ -64,9 +64,9 @@ function useChart({
         return response.data;
       },
       suspense,
+      ...(useErrorBoundary && { useErrorBoundary: true }),
       ...(staleTime && { staleTime }),
       ...(cacheTime && { cacheTime }),
-      ...(useErrorBoundary && { useErrorBoundary: true }),
     },
   );
 
@@ -169,6 +169,9 @@ function useChart({
       chart() {
         return queryClient.invalidateQueries(['symbolChart', symbolName, resample]);
       },
+      allResample() {
+        return queryClient.invalidateQueries(['symbolChart', symbolName]);
+      },
     },
     removeQuery: {
       chart() {
@@ -179,5 +182,3 @@ function useChart({
 
   return result;
 }
-
-export default useChart;

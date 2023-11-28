@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
+import { useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { setMainPageTab, usePageTab } from '@/redux/slice/pageTabSlice';
 import { ErrorNotification } from '@/components/Notification';
@@ -12,12 +11,36 @@ import { twMerge } from 'tailwind-merge';
 import type { MainPageNewsTab } from '.';
 
 function Tabs() {
+  const { push } = useRouter();
+
   const searchParams = useSearchParams();
   const queryStringTab = (searchParams.get('tab') || 'latestNews') as MainPageNewsTab;
 
+  const { likedSymbols, likedCategories, status, loginRequired } = useLikes();
   const { dispatch, pageTabs } = usePageTab();
 
-  const selectedTab = queryStringTab !== pageTabs.mainPageTab ? queryStringTab : pageTabs.mainPageTab;
+  const [openSetInterestModal, setOpenSetInterestModal] = useState(false);
+  const [notification, setNotification] = useState<{
+    active: boolean;
+    dimHeight: number;
+    content: string;
+    buttonText: string;
+    linkURL: string;
+  }>({
+    active: false,
+    dimHeight: 0,
+    content: '',
+    buttonText: '',
+    linkURL: '',
+  });
+
+  const ref = useRef<HTMLDivElement>(null);
+
+  const selectedTab = notification.active
+    ? pageTabs.mainPageTab
+    : queryStringTab !== pageTabs.mainPageTab
+    ? queryStringTab
+    : pageTabs.mainPageTab;
 
   const activeTabClassNames = {
     content: 'text-black',
@@ -50,34 +73,16 @@ function Tabs() {
     },
   };
 
-  const ref = useRef<HTMLDivElement>(null);
-
-  const { push } = useRouter();
-  const { likedSymbols, likedCategories, status, loginRequired } = useLikes();
-
-  const [openSetInterestModal, setOpenSetInterestModal] = useState(false);
-  const [notification, setNotification] = useState<{
-    active: boolean;
-    dimHeight: number;
-    content: string;
-    buttonText: string;
-    linkURL: string;
-  }>({
-    active: false,
-    dimHeight: 0,
-    content: '',
-    buttonText: '',
-    linkURL: '',
-  });
-
   function getDimHeight() {
     if (!ref.current) return 0;
 
     return ref.current.getBoundingClientRect().bottom + 4;
   }
 
-  useEffect(() => {
-    switch (pageTabs.mainPageTab) {
+  function tab(tabName: MainPageNewsTab) {
+    dispatch(setMainPageTab(tabName));
+
+    switch (tabName) {
       case 'latestNews':
         setNotification((prev) => ({
           ...prev,
@@ -87,6 +92,8 @@ function Tabs() {
           buttonText: '',
           linkURL: '',
         }));
+
+        push('/');
 
         return;
       case 'interestNews':
@@ -118,29 +125,22 @@ function Tabs() {
 
         push('/?tab=interestNews');
 
-      default:
         return;
     }
-  }, [pageTabs.mainPageTab]); /* eslint-disable-line */
+  }
 
   return (
     <>
       <div ref={ref} className={classNames.tabContainer}>
-        <Link
-          href={'/'}
-          onClick={() => {
-            dispatch(setMainPageTab('latestNews'));
-          }}
-        >
-          <div className={classNames.latestNewsTab.content}>
-            전체 뉴스
-            <div className={classNames.latestNewsTab.bottomLine} />
-          </div>
-        </Link>
+        <div className={classNames.latestNewsTab.content} onClick={() => tab('latestNews')}>
+          전체 뉴스
+          <div className={classNames.latestNewsTab.bottomLine} />
+        </div>
         <div
+          id="news-tab__interest"
           className={classNames.interestNewsTab.content}
           onClick={() => {
-            dispatch(setMainPageTab('interestNews'));
+            tab('interestNews');
           }}
         >
           관심 뉴스

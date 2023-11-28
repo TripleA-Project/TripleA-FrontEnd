@@ -1,5 +1,6 @@
 'use client';
 
+import { useLayoutEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { setChartPageHomeTab, usePageTab } from '@/redux/slice/pageTabSlice';
 import { twMerge } from 'tailwind-merge';
@@ -45,7 +46,7 @@ function Tabs() {
     },
   };
 
-  const tab = (tabName: ChartHomeTab) => {
+  function tab(tabName: ChartHomeTab) {
     dispatch(setChartPageHomeTab(tabName));
 
     switch (tabName) {
@@ -58,7 +59,13 @@ function Tabs() {
 
         return;
     }
-  };
+  }
+
+  useLayoutEffect(() => {
+    if (queryStringTab !== pageTabs.chartPageHomeTab) {
+      tab(selectedTab);
+    }
+  }, [selectedTab]); /* eslint-disable-line */
 
   return (
     <>

@@ -8,8 +8,8 @@ import RecentSearch from './RecentSearch';
 import { searchCategory } from '@/service/category';
 import { searchSymbol } from '@/service/symbol';
 import { isCategoryKeyword, isSymbolKeyword, setRecentSearchLocalStorage } from '@/util/autocomplete';
-import { type SearchedSymbol } from '@/interfaces/Symbol';
-import { type Category } from '@/interfaces/Category';
+import type { SearchedSymbol } from '@/interfaces/Symbol';
+import type { Category } from '@/interfaces/Category';
 
 interface AutoCompleteProps {
   keyword: string;

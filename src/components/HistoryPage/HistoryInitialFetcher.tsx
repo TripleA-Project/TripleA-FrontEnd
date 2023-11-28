@@ -1,5 +1,4 @@
 import React, { cloneElement } from 'react';
-import dayjs from 'dayjs';
 import { AxiosError, HttpStatusCode } from 'axios';
 import Timeout from '../ErrorBoundary/ErrorFallback/common/Timeout';
 import HistoryUnauthorized from '../ErrorBoundary/ErrorFallback/History/Unauthorized';
@@ -7,14 +6,18 @@ import HistoryInternalServerError from '../ErrorBoundary/ErrorFallback/History/I
 import { getProfile } from '@/service/user';
 import { getNewsHistory } from '@/service/news';
 import { TIMEOUT_CODE } from '@/service/axios';
-import { type APIResponse } from '@/interfaces/Dto/Core';
-import { type CalenderDate } from '../Calendar/MuiCalendar';
+import { getInitialDate } from './helper/calendar';
+import type { APIResponse } from '@/interfaces/Dto/Core';
 
 interface HistoryInitialFetcherProps {
+  year: number;
+  month: number;
   children: React.ReactElement;
 }
 
-async function HistoryInitialFetcher({ children }: HistoryInitialFetcherProps) {
+async function HistoryInitialFetcher({ year, month, children }: HistoryInitialFetcherProps) {
+  const targetDate = getInitialDate({ year, month });
+
   const userResponse = await getProfile().catch((err) => {
     return err as AxiosError;
   });
@@ -29,13 +32,9 @@ async function HistoryInitialFetcher({ children }: HistoryInitialFetcherProps) {
     return <HistoryInternalServerError />;
   }
 
-  const initialDate: CalenderDate = { selectedDate: dayjs(), startDate: dayjs(), endDate: null };
-
   const historyResponse = await getNewsHistory({
-    year: Number(
-      initialDate.startDate ? initialDate.startDate.format('YYYY') : initialDate.selectedDate!.format('YYYY'),
-    ),
-    month: Number(initialDate.startDate ? initialDate.startDate.format('M') : initialDate.selectedDate!.format('M')),
+    year: Number(targetDate.format('YYYY')),
+    month: Number(targetDate.format('M')),
   }).catch((err) => {
     return err as AxiosError;
   });

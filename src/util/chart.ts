@@ -15,6 +15,17 @@ export const DeltaPriceColor = {
   MINUS: '#759DEB',
 } as const;
 
+export interface DataMinMaxReturnType<T extends LineData | HistogramData> {
+  min: {
+    target?: T;
+    value: number;
+  };
+  max: {
+    target?: T;
+    value: number;
+  };
+}
+
 export interface PriceInfo {
   delta: { type: keyof typeof DeltaPriceType; value: number; percent: number };
   close: number;

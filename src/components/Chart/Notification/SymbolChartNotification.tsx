@@ -10,9 +10,11 @@ interface SymbolChartNotificationProps {
 }
 
 function getNotificationType(user?: ProfilePayload): keyof typeof LockNotificationTemplate | undefined {
-  if (user?.membership === 'BASIC') {
-    return 'Chart';
-  }
+  // if (user?.membership === 'BASIC') {
+  //   return 'Chart';
+  // }
+
+  return undefined;
 }
 
 function SymbolChartNotification({ user }: SymbolChartNotificationProps) {

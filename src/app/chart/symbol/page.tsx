@@ -3,7 +3,7 @@ import SymbolChartPage from '@/components/Chart/SymbolChartPage';
 import SymbolChartFetcher from '@/components/Chart/SymbolChartFetcher';
 import NotFound from '@/components/NotFound';
 import BackButtonHeader from '@/components/Layout/Header/BackButtonHeader';
-import type { ResampleFrequency } from '@/interfaces/Dto/Stock';
+import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -50,11 +50,15 @@ function SymbolChart({ searchParams }: PageProps) {
     );
   }
 
+  if (!searchParams.resample) {
+    redirect(`/chart/symbol?name=${name}&resample=daily`);
+  }
+
   return (
     <>
       {/* @ts-expect-error server component */}
       <SymbolChartFetcher symbol={name} resample={resample}>
-        <SymbolChartPage resample={resample as ResampleFrequency} />
+        <SymbolChartPage />
       </SymbolChartFetcher>
     </>
   );
