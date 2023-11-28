@@ -13,7 +13,7 @@ import ChartLoading from './ChartLoding';
 import ChartEmpty from './ChartEmpty';
 import { DeltaPriceColor, getChartDate, getPriceInfo } from '@/util/chart';
 import { createChartData } from '@/service/chart';
-import { useChart, useV2Chart } from '@/hooks/useChart';
+import { useChart } from '@/hooks/useChart';
 import { setChartPayload, useChartSource } from '@/redux/slice/chartSourceSlice';
 import { usePageTab } from '@/redux/slice/pageTabSlice';
 import { ChartAreaLeaveEvent } from './constants/event';
@@ -53,28 +53,13 @@ function Chart({ matchedSymbol }: ChartProps) {
       (캐시된 값을 보여주면서 
       api 요청를 재 요청, 이후 값으로 갱신되지 않도록 함)
   */
-  // const {
-  //   charts: chartData,
-  //   status,
-  //   empty,
-  //   refetchChart,
-  //   invalidateQuery,
-  // } = useChart({
-  //   symbolName: requestSymbolName,
-  //   resample: pageTabs.symbolChartPageResampleFrequencyTab,
-  //   startDate: startDate.format('YYYY-MM-DD'),
-  //   endDate: endDate.format('YYYY-MM-DD'),
-  //   staleTime: 1000 * 60 * 10,
-  //   cacheTime: 0,
-  // });
-
   const {
     charts: chartData,
     status,
     empty,
     refetchChart,
     invalidateQuery,
-  } = useV2Chart({
+  } = useChart({
     symbolName: requestSymbolName,
     resample: pageTabs.symbolChartPageResampleFrequencyTab,
     startDate: startDate.format('YYYY-MM-DD'),

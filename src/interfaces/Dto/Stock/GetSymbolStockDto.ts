@@ -30,18 +30,3 @@ export interface GetSymbolStockPayload {
 }
 
 export interface GetSymbolStockResponse extends APIResponse<GetSymbolStockPayload> {}
-
-// v2
-export interface BuzzAndSentimentData {
-  sentiment: number;
-  count: number;
-  positiveCount: number;
-  negativeCount: number;
-  publishedDate: string;
-}
-
-export interface GetSymbolStockV2Payload extends GetSymbolStockPayload {
-  buzzDataList?: BuzzAndSentimentData[];
-}
-
-export interface GetSymbolStockV2Response extends APIResponse<GetSymbolStockV2Payload> {}

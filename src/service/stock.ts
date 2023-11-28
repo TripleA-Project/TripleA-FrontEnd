@@ -4,7 +4,6 @@ import {
   type GetStockMarketIndexResponse,
   type GetSymbolStockRequestConfig,
   type GetSymbolStockResponse,
-  GetSymbolStockV2Response,
 } from '@/interfaces/Dto/Stock';
 
 /**
@@ -43,17 +42,4 @@ export async function getSymbolStock({
   } as GetSymbolStockRequestConfig);
 
   return getSymbolStockResponse;
-}
-
-export async function getV2SymbolStock({ symbol, startDate, endDate, resampleFreq }: GetSymbolStockSearchParam) {
-  const getV2SymbolStockResponse = await axiosInstance.get<GetSymbolStockV2Response>('/api/auth/v2/symbol', {
-    params: {
-      symbol,
-      startDate,
-      endDate,
-      resampleFreq,
-    },
-  } as GetSymbolStockRequestConfig);
-
-  return getV2SymbolStockResponse;
 }
