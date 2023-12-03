@@ -10,6 +10,13 @@ export enum MEMBERSHIP {
   'PREMIUM' = 'PREMIUM',
 }
 
+export const MEMBER_ROLE = {
+  ADMIN: 'ADMIN',
+  USER: 'USER',
+} as const;
+
+export type MEMBER_ROLE = (typeof MEMBER_ROLE)['ADMIN'] | (typeof MEMBER_ROLE)['USER'];
+
 export interface User {
   email: string;
   fullName: string;

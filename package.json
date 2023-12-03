@@ -29,6 +29,7 @@
     "eslint-config-next": "13.4.3",
     "lightweight-charts": "^4.0.1",
     "lodash": "^4.17.21",
+    "msw": "^2.0.9",
     "next": "^13.4.19",
     "postcss": "8.4.23",
     "react": "18.2.0",
@@ -49,7 +50,6 @@
   "devDependencies": {
     "@types/lodash": "^4.14.195",
     "@types/uuid": "^9.0.2",
-    "msw": "^1.2.2",
     "prettier": "^2.8.8",
     "prettier-plugin-tailwindcss": "^0.4.1",
     "tailwind-scrollbar": "^3.0.4"
