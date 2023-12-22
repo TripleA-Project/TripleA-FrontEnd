@@ -1,4 +1,3 @@
-import { AxiosRequestConfig } from 'axios';
 import { APIResponse } from '../Core';
 
 export interface DeleteUserRequest {
