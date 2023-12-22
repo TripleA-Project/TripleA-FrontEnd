@@ -30,10 +30,16 @@ export async function generateMetadata({ params, searchParams }: NewsDetailPageP
   let thumbnailURL = '/bgLogo.png';
 
   if (data.thumbnail && data.thumbnail !== '' && data.thumbnail !== 'null') {
-    const { status: thumbnailStatus } = await axios.get(data.thumbnail);
+    try {
+      const { status: thumbnailStatus } = await axios.get(data.thumbnail);
 
-    if (thumbnailStatus === HttpStatusCode.Ok) {
-      thumbnailURL = data.thumbnail;
+      if (thumbnailStatus === HttpStatusCode.Ok) {
+        thumbnailURL = data.thumbnail;
+      }
+    } catch (e) {
+      // 403 에러 등 에러가 발생할 경우에는
+      // 기본 thumbnailURL 적용되면 되기때문에
+      // 별도 에러처리를 하지 않아도 됨
     }
   }
 
