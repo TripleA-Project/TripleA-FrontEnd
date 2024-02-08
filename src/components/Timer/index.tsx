@@ -13,7 +13,7 @@ function Timer({ minute, className, ...props }: TimerProps) {
   const [time, setTime] = useState(minute * 60);
 
   useLayoutEffect(() => {
-    const timerWorker = new Worker('./timerWorker.js');
+    const timerWorker = new Worker('/timerWorker.js');
     timerWorkerAPI = timerWorker;
 
     timerInit(minute);

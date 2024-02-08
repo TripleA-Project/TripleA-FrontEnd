@@ -6,6 +6,8 @@ import { Noto_Sans } from 'next/font/google';
 import Page from '@/components/Layout/Page';
 import Navbar from '@/components/Layout/Navbar';
 import Footer from '@/components/Layout/Footer';
+import SetupClientMSW from '@/components/MSW/SetupClientMSW';
+import SetupServerMSW from '@/components/MSW/SetupServerMSW';
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -37,6 +39,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <body
         className={`${notoSans.className} min-h-screen overflow-auto scrollbar-thin scrollbar-thumb-[#DBDEE1] scrollbar-thumb-rounded-lg`}
       >
+        <SetupServerMSW />
+        <SetupClientMSW />
         <ReduxProvider>
           <ReactQueryProvider>
             <Page>{children}</Page>

@@ -4,6 +4,7 @@ import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { useFormContext } from 'react-hook-form';
+import { AxiosError } from 'axios';
 import { MdOutlineArrowBackIosNew } from 'react-icons/md';
 import { UseStepFormContext } from '../StepForm';
 import FormTitle from '../FormTitle';
@@ -111,7 +112,17 @@ function TermsForm() {
         return;
       }
     } catch (err) {
-      toastNotify('error', '회원가입에 실패했습니다');
+      if (err instanceof AxiosError) {
+        const { response } = err;
+
+        if (response) {
+          toastNotify('error', '회원가입에 실패했습니다');
+
+          return;
+        }
+      }
+
+      replace('/');
     }
   };
 
