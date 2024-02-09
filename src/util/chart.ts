@@ -1,7 +1,10 @@
 import dayjs from 'dayjs';
+import weekday from 'dayjs/plugin/weekday';
 import { type HistogramData, type LineData, type Time } from 'lightweight-charts';
 import { type ResampleFrequency } from '@/interfaces/Dto/Stock';
 import { type SymbolPrice } from '@/interfaces/Symbol';
+
+dayjs.extend(weekday);
 
 export const DeltaPriceType = {
   NO_CHANGE: '--',
@@ -98,29 +101,29 @@ export function getChartDate({ resample }: { resample: ResampleFrequency }) {
   switch (resample) {
     case 'daily':
       /* 
-        startDate : 1달전
+        startDate : 오늘 기준 26일 전
         endDate : 오늘 
       */
       return {
-        startDate: today.set('month', today.get('month') - 1).set('date', 1),
+        startDate: today.subtract(26, 'days'),
         endDate: today.clone(),
       };
     case 'weekly':
       /* 
-        startDate : 3달전 1일
+        startDate : 오늘 기준 26주전 월요일
         endDate : 오늘
       */
       return {
-        startDate: today.set('month', today.get('month') - 3).set('date', 1),
+        startDate: today.subtract(26, 'weeks').weekday(1),
         endDate: today.clone(),
       };
     case 'monthly':
       /* 
-        startDate : 현재 년도 1월 1일
+        startDate : 오늘 기준 26개월전 1일
         endDate : 오늘 
       */
       return {
-        startDate: dayjs(`${today.get('year')}-01-01`),
+        startDate: today.subtract(26, 'months').date(1),
         endDate: today.clone(),
       };
     case 'annually':
