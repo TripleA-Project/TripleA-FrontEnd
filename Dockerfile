@@ -10,7 +10,7 @@ COPY . /app
 WORKDIR /app
 
 # 애플리케이션 종속성 설치
-RUN npm install -g yarn
+RUN command -v yarn >/dev/null 2>&1 || { npm install -g yarn; }
 RUN yarn
 
 # 환경변수
