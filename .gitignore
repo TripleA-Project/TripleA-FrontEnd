@@ -5,9 +5,6 @@
 /.pnp
 .pnp.js
 
-# docker
-Dockerfile
-
 # react email
 /react-email-starter
 
