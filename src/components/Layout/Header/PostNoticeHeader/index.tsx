@@ -9,6 +9,8 @@ import { AppLogos } from '@/components/Icons';
 import { useLexicalEditor } from '@/hooks/useLexicalEditor';
 import { toastNotify } from '@/util/toastNotify';
 import { EDITOR_NAMESPACE } from '@/constants/editor';
+import { createNotice } from '@/service/admin';
+import { useRouter } from 'next/navigation';
 
 interface NoticeFormData {
   title: string;
@@ -17,10 +19,12 @@ interface NoticeFormData {
 
 function PostNoticeHeader() {
   return createPortal(
-    <Header fixed headerClassName="border-b border-b-[#E5E7EC] shadow-[0px_1px_4px_-2px_rgba(0,0,0,.3)]">
-      <AppLogos.Orange className="shrink-0" />
-      <NoticeForm />
-    </Header>,
+    (
+      <Header fixed headerClassName="border-b border-b-[#E5E7EC] shadow-[0px_1px_4px_-2px_rgba(0,0,0,.3)]">
+        <AppLogos.Orange className="shrink-0" />
+        <NoticeForm />
+      </Header>
+    ) as any,
     document.body,
   );
 }
@@ -36,6 +40,8 @@ function NoticeForm() {
   } = useForm<NoticeFormData>();
 
   const { editor, getEditorContent } = useLexicalEditor({ namespace: EDITOR_NAMESPACE });
+
+  const { replace } = useRouter();
 
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -59,20 +65,19 @@ function NoticeForm() {
   };
 
   const onCancel = async (e: React.MouseEvent) => {
-    console.log('작성 취소');
-    // [TODO] 작성 취소
+    replace('/notice');
   };
 
   const onSubmit = async (data: NoticeFormData) => {
     editor?.blur();
 
-    console.log('[submit]', { data });
+    try {
+      await createNotice({ title: data.title, content: data.content });
 
-    /*
-      [TODO]
-      백엔드 완료시
-      백엔드에 데이터 전송(api)
-    */
+      replace('/notice');
+    } catch (error) {
+      toastNotify('error', '공지사항 작성에 실패했습니다.');
+    }
   };
 
   const onInvalid = async (errors: FieldErrors<NoticeFormData>) => {
