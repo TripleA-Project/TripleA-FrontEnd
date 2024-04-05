@@ -66,5 +66,8 @@
   },
   "msw": {
     "workerDirectory": "public"
+  },
+  "resolutions": {
+    "@types/react": "18.2.6"
   }
 }

@@ -24,7 +24,7 @@ function PostNoticeHeader() {
         <AppLogos.Orange className="shrink-0" />
         <NoticeForm />
       </Header>
-    ) as any,
+    ),
     document.body,
   );
 }
