@@ -1,18 +1,17 @@
 import {
   $isRangeSelection,
-  GridSelection,
   LexicalEditor,
-  NodeSelection,
   RangeSelection,
   $isNodeSelection,
   $setSelection,
   LexicalNode,
+  BaseSelection,
 } from 'lexical';
 import { $isAtNodeEnd } from '@lexical/selection';
 import { OpenGraphLinkNode } from '../Nodes/OpenGraphLinkNode';
 import { ImageNode } from '../Nodes/ImageNode';
 
-type EditorSelection = RangeSelection | NodeSelection | GridSelection | null;
+type EditorSelection = BaseSelection | null;
 
 type AllowedNodeType = ImageNode | OpenGraphLinkNode;
 

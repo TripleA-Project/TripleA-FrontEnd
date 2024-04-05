@@ -1,4 +1,4 @@
-import { GridSelection, LexicalEditor, LexicalNode, NodeSelection, RangeSelection } from 'lexical';
+import { BaseSelection, LexicalEditor, LexicalNode } from 'lexical';
 import { $isLinkNode, LinkNode } from '@lexical/link';
 import { ListNode, ListItemNode, $isListNode, $isListItemNode } from '@lexical/list';
 import { ImageNode } from '../Nodes/ImageNode';
@@ -7,7 +7,7 @@ import { FindByLexicalEditor } from './editorStateRead';
 import { UPDATE_TOOLBAR_COMMAND } from '../Plugin';
 import { COMMAND_EMPTY_PAYLOAD } from '@/constants/editor';
 
-type EditorSelection = RangeSelection | NodeSelection | GridSelection | null;
+type EditorSelection = BaseSelection | null;
 
 interface FindAtSelectionPayload {
   selection: EditorSelection;

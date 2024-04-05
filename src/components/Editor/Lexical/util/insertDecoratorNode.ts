@@ -1,4 +1,4 @@
-import { $isRangeSelection, GridSelection, NodeSelection, RangeSelection } from 'lexical';
+import { $isRangeSelection, BaseSelection } from 'lexical';
 import { ImageNode } from '../Nodes/ImageNode';
 import { OpenGraphLinkNode } from '../Nodes/OpenGraphLinkNode';
 import { $isAtNodeEnd } from '@lexical/selection';
@@ -8,7 +8,7 @@ function $insertDecoratorNode({
   selection,
 }: {
   node: ImageNode | OpenGraphLinkNode;
-  selection: RangeSelection | NodeSelection | GridSelection | null;
+  selection: BaseSelection | null;
 }) {
   if ($isRangeSelection(selection)) {
     const isCollapsed = selection.isCollapsed();

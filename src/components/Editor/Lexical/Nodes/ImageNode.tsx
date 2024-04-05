@@ -51,6 +51,7 @@ export class ImageNode extends DecoratorNode<ReactNode> {
   __height: number;
   __active: boolean;
   __align: ImageNodeAlign;
+  __resizeFormat: ImageResizeFormat;
 
   maxSize: { width: number; height: number };
   ratio: {
@@ -79,6 +80,8 @@ export class ImageNode extends DecoratorNode<ReactNode> {
       width: width / height,
       height: height / width,
     };
+
+    this.__resizeFormat = null;
   }
 
   static MAX_WIDTH = 725;
