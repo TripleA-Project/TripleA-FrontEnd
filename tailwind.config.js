@@ -27,6 +27,11 @@ module.exports = {
       colors: {
         error: '#F60606',
       },
+      zIndex: {
+        dimmed: 10,
+        toolbar: 3,
+        component: 2,
+      },
       animation: {
         clock: 'rotate-clock 4s forwards infinite',
         clockTop: 'clock-top-fill 4s linear forwards infinite',

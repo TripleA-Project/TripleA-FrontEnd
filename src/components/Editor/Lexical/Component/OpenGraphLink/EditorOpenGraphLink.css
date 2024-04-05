@@ -1,0 +1,32 @@
+.og-link:not(.view) .og::after {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  content: '';
+  background-color: transparent;
+  pointer-events: none;
+}
+
+.og-link:not(.view).og-link:not(.active) .og:hover::after {
+  outline: thick double #dedede;
+}
+
+.og-link:not(.view).active .og::after {
+  outline: solid #f6893b;
+  outline-offset: 4px;
+}
+
+.og-link.start {
+  justify-content: start;
+}
+
+.og-link.center {
+  justify-content: center;
+}
+
+.og-link.end {
+  justify-content: end;
+}

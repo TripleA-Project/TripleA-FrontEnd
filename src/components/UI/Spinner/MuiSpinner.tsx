@@ -1,15 +1,30 @@
 'use client';
 
-import React from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 import { CircularProgress, CircularProgressProps, circularProgressClasses } from '@mui/material';
 
 function MuiSpinner(props: CircularProgressProps) {
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    if (!wrapperRef.current) return;
+
+    const target = wrapperRef.current.children[0];
+
+    if (target) {
+      wrapperRef.current.style.width = `${target.clientWidth}px`;
+      wrapperRef.current.style.height = `${target.clientHeight}px`;
+    }
+  }, []);
+
   return (
-    <div className="relative inline-block">
+    <div ref={wrapperRef} className="relative inline-block">
       <CircularProgress
         variant="determinate"
         sx={{
           color: () => '#dcdcde',
+          position: 'absolute',
+          left: 0,
         }}
         size={40}
         thickness={4}

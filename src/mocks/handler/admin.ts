@@ -1,6 +1,7 @@
 import { AdminEmailAuthRequest, AdminEmailAuthResponse } from '@/interfaces/Dto/Admin/AdminEmailAuthDto';
 import { AdminEmailVerifyRequest, AdminEmailVerifyResponse } from '@/interfaces/Dto/Admin/AdminEmailVerifyDto';
 import { ChangeUserRoleRequest, ChangeUserRoleResponse } from '@/interfaces/Dto/Admin/ChangeUserRoleDto';
+import { CreateNoticeRequest, CreateNoticeResponse } from '@/interfaces/Dto/Admin/CreateNoticeDto';
 import { DeleteUserRequest, DeleteUserResponse } from '@/interfaces/Dto/Admin/DeleteUserDto';
 import { GetNumOfSiteUsersRequest, GetNumOfSiteUsersResponse } from '@/interfaces/Dto/Admin/GetNumOfSiteUsersDto';
 import { GetSiteUsersRequest, GetSiteUsersResponse } from '@/interfaces/Dto/Admin/GetSiteUsersDto';
@@ -176,6 +177,23 @@ export const adminHandler = [
               changeMembershipDate: null,
             },
           ],
+        },
+        { status: HttpStatusCode.Ok },
+      );
+    },
+  ),
+  http.post<PathParams, CreateNoticeRequest, CreateNoticeResponse>(
+    getURL(adminPath.createNotice),
+    async ({ request }) => {
+      const { title, content } = await request.json();
+
+      console.log({ title, content });
+
+      return HttpResponse.json(
+        {
+          status: HttpStatusCode.Ok,
+          msg: '성공',
+          data: '공지사항 작성완료',
         },
         { status: HttpStatusCode.Ok },
       );

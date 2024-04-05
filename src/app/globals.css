@@ -3,6 +3,8 @@
 @tailwind utilities;
 @import url('animate.css');
 @import url('react-toastify/dist/ReactToastify.css');
+@import '../components/Editor/Lexical/Component/OpenGraphLink/EditorOpenGraphLink.css';
+@import '../components/Editor/Lexical/Component/Image/ImageNode.css';
 
 @layer components {
   .input {

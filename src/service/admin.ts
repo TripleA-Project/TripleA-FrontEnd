@@ -11,6 +11,7 @@ import {
   SearchSiteUserRequestConfig,
   SearchSiteUserResponse,
 } from '@/interfaces/Dto/Admin/SearchSiteUserDto';
+import { CreateNoticeRequest, CreateNoticeResponse } from '@/interfaces/Dto/Admin/CreateNoticeDto';
 
 /**
  * [Admin] 관리자 인증 메일 발송 API (POST)
@@ -109,6 +110,18 @@ export async function searchSiteUser({ type, content }: SearchSiteUserRequest) {
   return res;
 }
 
+export async function createNotice({ title, content }: CreateNoticeRequest) {
+  const res = await axiosInstance.post<any, AxiosResponse<CreateNoticeResponse>, CreateNoticeRequest>(
+    adminPath.createNotice,
+    {
+      title,
+      content,
+    },
+  );
+
+  return res;
+}
+
 export const adminPath = {
   sendAdminAuthEmail: `/api/admin/email`,
   adminEmailVerify: `/api/admin/email/verify`,
@@ -117,4 +130,7 @@ export const adminPath = {
   deleteUser: `/api/admin/user/delete`,
   numOfSiteUsers: `/api/admin/user/list/length`,
   searchSiteUser: `/api/admin/user/list/search`,
+  createNotice: `/api/admin/notice/save`,
+  deleteNotice: (id?: number) => `/api/admin/notice/delete/${id ?? ':id'}`,
+  updateNotice: `/api/admin/notice/update`,
 } as const;
