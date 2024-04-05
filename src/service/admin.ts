@@ -117,4 +117,7 @@ export const adminPath = {
   deleteUser: `/api/admin/user/delete`,
   numOfSiteUsers: `/api/admin/user/list/length`,
   searchSiteUser: `/api/admin/user/list/search`,
+  createNotice: `/api/admin/notice/save`,
+  deleteNotice: (id?: number) => `/api/admin/notice/delete/${id ?? ':id'}`,
+  updateNotice: `/api/admin/notice/update`,
 } as const;
