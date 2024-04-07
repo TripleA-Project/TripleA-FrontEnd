@@ -16,6 +16,10 @@ const shouldHiddenPaths = [
   '/mypage/membership/with-drawal',
 ];
 
+const isAdminPath = (path: string) => {
+  return path.startsWith('/admin/');
+};
+
 function Navbar() {
   const pathName = usePathname();
   const today = dayjs();
@@ -51,7 +55,7 @@ function Navbar() {
     },
   };
 
-  return !shouldHiddenPaths.includes(pathName!) ? (
+  return !shouldHiddenPaths.includes(pathName) && !isAdminPath(pathName) ? (
     <nav className={`fixed_inner fixed bottom-0 z-10 w-full bg-white !p-0`}>
       <ul className="mx-auto box-border flex max-w-screen-pc items-center justify-between px-8 py-3 mobile:min-w-[390px]">
         <li>
