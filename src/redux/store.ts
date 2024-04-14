@@ -5,6 +5,9 @@ import categoryReducer from './slice/categorySlice';
 import newsListFilterReducer from './slice/newsListFilterSlice';
 import pageTabReducer from './slice/pageTabSlice';
 import chartSourceReducer from './slice/chartSourceSlice';
+import adminUserFilterReducer from './slice/adminUserSearchSlice';
+import adminUserListReducer from './slice/adminUserListSlice';
+import modalReducer from './slice/modalSlice';
 
 const rootReducer = combineReducers({
   search: searchReducer,
@@ -13,6 +16,9 @@ const rootReducer = combineReducers({
   pageTab: pageTabReducer,
   chartSource: chartSourceReducer,
   newsListFilter: newsListFilterReducer,
+  adminUserSearch: adminUserFilterReducer,
+  adminUserList: adminUserListReducer,
+  modal: modalReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;
