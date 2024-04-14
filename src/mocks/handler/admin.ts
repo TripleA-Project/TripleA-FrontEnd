@@ -10,7 +10,8 @@ import { APIResponse } from '@/interfaces/Dto/Core';
 import { adminPath } from '@/service/admin';
 import { getURL } from '@/util/url';
 import { HttpStatusCode } from 'axios';
-import { PathParams, http, HttpResponse, StrictRequest } from 'msw';
+import { PathParams, http, HttpResponse } from 'msw';
+import { siteUser } from '../db/siteUser';
 
 export const adminHandler = [
   http.post<PathParams<string>, AdminEmailAuthRequest, AdminEmailAuthResponse>(
@@ -57,18 +58,7 @@ export const adminHandler = [
       {
         status: HttpStatusCode.Ok,
         msg: '성공',
-        data: [
-          {
-            id: 1,
-            createdAt: '2023-11-30T15:03:58.32791+09:00',
-            email: 'testUser@email.com',
-            fullName: 'test',
-            newsLetter: true,
-            membership: 'PREMIUM',
-            memberRole: 'USER',
-            changeMembershipDate: null,
-          },
-        ],
+        data: [...siteUser],
       },
       { status: HttpStatusCode.Ok },
     );
@@ -89,6 +79,12 @@ export const adminHandler = [
         );
       }
 
+      const targetUser = siteUser.find((user) => user.email === email);
+
+      if (targetUser) {
+        targetUser.memberRole = 'ADMIN';
+      }
+
       return HttpResponse.json(
         {
           status: HttpStatusCode.Ok,
@@ -100,7 +96,7 @@ export const adminHandler = [
     },
   ),
   http.post<PathParams<'id'>, DeleteUserRequest, DeleteUserResponse>(
-    getURL(`${adminPath.deleteUser}/:id`),
+    getURL(adminPath.deleteUser()),
     async ({ params }) => {
       const { id } = params;
 
@@ -114,6 +110,20 @@ export const adminHandler = [
           { status: HttpStatusCode.BadRequest },
         );
       }
+
+      const targetUserIndex = siteUser.findIndex((user) => user.id === Number(id));
+
+      if (targetUserIndex === -1) {
+        return HttpResponse.json(
+          {
+            status: HttpStatusCode.NotFound,
+            msg: '유저를 찾을 수 없습니다',
+          },
+          { status: HttpStatusCode.NotFound },
+        );
+      }
+
+      siteUser.splice(targetUserIndex, 1);
 
       return HttpResponse.json(
         {
@@ -161,22 +171,18 @@ export const adminHandler = [
         );
       }
 
+      const matchedUser = siteUser.filter((user) => {
+        if (type === 'email') return user.email.search(content) > -1;
+        if (type === 'fullName') return user.fullName.search(content) > -1;
+
+        return user.membership === content;
+      });
+
       return HttpResponse.json(
         {
           status: HttpStatusCode.Ok,
           msg: '성공',
-          data: [
-            {
-              id: 2,
-              createdAt: '2023-12-01T13:14:09+09:00',
-              email: 'test@test.com',
-              fullName: 'test',
-              newsLetter: false,
-              membership: 'BASIC',
-              memberRole: 'USER',
-              changeMembershipDate: null,
-            },
-          ],
+          data: matchedUser.length ? [...matchedUser] : [],
         },
         { status: HttpStatusCode.Ok },
       );

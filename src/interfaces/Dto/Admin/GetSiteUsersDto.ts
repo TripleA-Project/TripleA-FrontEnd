@@ -5,7 +5,7 @@ import { APIResponse } from '../Core';
 export interface GetSiteUsersRequest {}
 
 export type SiteUser = Omit<User, 'emailVerified'> &
-  ProfilePayload & {
+  Omit<ProfilePayload, 'nextPaymentDate'> & {
     id: number;
     createdAt: string;
     changeMembershipDate?: string | null;

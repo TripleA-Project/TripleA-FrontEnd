@@ -77,7 +77,7 @@ export async function changeUserRole({ email, role }: ChangeUserRoleRequest) {
  * `id` 유저 아이디 [**number**]
  */
 export async function deleteUser({ id }: DeleteUserRequest) {
-  const res = await axiosInstance.post<AxiosResponse<DeleteUserResponse>>(`${adminPath.deleteUser}/${id}`, {});
+  const res = await axiosInstance.post<AxiosResponse<DeleteUserResponse>>(adminPath.deleteUser(id), {});
 
   return res;
 }
@@ -127,7 +127,7 @@ export const adminPath = {
   adminEmailVerify: `/api/admin/email/verify`,
   siteUsers: `/api/admin/user/list`,
   changeUserRole: `/api/admin/user/role`,
-  deleteUser: `/api/admin/user/delete`,
+  deleteUser: (id?: number) => `/api/admin/user/delete/${id ?? ':id'}`,
   numOfSiteUsers: `/api/admin/user/list/length`,
   searchSiteUser: `/api/admin/user/list/search`,
   createNotice: `/api/admin/notice/save`,
