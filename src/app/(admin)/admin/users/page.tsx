@@ -5,8 +5,8 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: 'Triple A | 유저 관리',
-  description: 'Triple A 유저 관리',
+  title: 'Triple A 관리자 | 유저 관리',
+  description: 'Triple A 관리자 | 유저 관리',
 };
 
 export default function AdminUsersPage() {

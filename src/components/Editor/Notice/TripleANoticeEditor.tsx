@@ -59,8 +59,8 @@ function TripleANoticeEditor({ editable = true, initialEditorState }: TripleAEdi
   }, [editor, editable]);
 
   return (
-    <div className="mt-5">
-      <div className="relative box-border flex min-h-[500px] w-full shrink-0 flex-col border-2 border-[#eee] bg-white">
+    <div>
+      <div className="relative box-border flex min-h-[500px] w-full shrink-0 flex-col border-2 border-t-0 border-[#eee] bg-white">
         <LexicalEditor
           config={{
             namespace: EDITOR_NAMESPACE,

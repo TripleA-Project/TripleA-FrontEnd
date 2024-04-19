@@ -11,14 +11,14 @@ import {
   SearchSiteUserRequestConfig,
   SearchSiteUserResponse,
 } from '@/interfaces/Dto/Admin/SearchSiteUserDto';
-import { CreateNoticeRequest, CreateNoticeResponse } from '@/interfaces/Dto/Admin/CreateNoticeDto';
+import { API_ROUTE_PATH } from '@/constants/routePath';
 
 /**
  * [Admin] 관리자 인증 메일 발송 API (POST)
  */
 export async function sendAdminAuthEmail() {
   const res = await axiosInstance.post<any, AxiosResponse<AdminEmailAuthResponse>, AdminEmailAuthRequest>(
-    adminPath.sendAdminAuthEmail,
+    API_ROUTE_PATH.ADMIN.AUTH.SEND_ADMIN_AUTH_EMAIL,
   );
 
   return res;
@@ -33,7 +33,7 @@ export async function sendAdminAuthEmail() {
  */
 export async function adminEmailVerify({ email, code }: AdminEmailVerifyRequest) {
   const res = await axiosInstance.post<any, AxiosResponse<AdminEmailVerifyResponse>, AdminEmailVerifyRequest>(
-    adminPath.adminEmailVerify,
+    API_ROUTE_PATH.ADMIN.AUTH.ADMIN_EMAIL_VERIFY,
     {
       email,
       code,
@@ -47,7 +47,7 @@ export async function adminEmailVerify({ email, code }: AdminEmailVerifyRequest)
  * [Admin] 사이트 유저리스트 API (GET)
  */
 export async function getSiteUsers() {
-  const res = await axiosInstance.get<GetSiteUsersResponse>(adminPath.siteUsers);
+  const res = await axiosInstance.get<GetSiteUsersResponse>(API_ROUTE_PATH.ADMIN.GET_SITE_USERS);
 
   return res;
 }
@@ -61,7 +61,7 @@ export async function getSiteUsers() {
  */
 export async function changeUserRole({ email, role }: ChangeUserRoleRequest) {
   const res = await axiosInstance.post<any, AxiosResponse<ChangeUserRoleResponse>, ChangeUserRoleRequest>(
-    adminPath.changeUserRole,
+    API_ROUTE_PATH.ADMIN.MANAGE_USER.CHANGE_USER_ROLE,
     {
       email,
       role,
@@ -77,7 +77,10 @@ export async function changeUserRole({ email, role }: ChangeUserRoleRequest) {
  * `id` 유저 아이디 [**number**]
  */
 export async function deleteUser({ id }: DeleteUserRequest) {
-  const res = await axiosInstance.post<AxiosResponse<DeleteUserResponse>>(adminPath.deleteUser(id), {});
+  const res = await axiosInstance.post<AxiosResponse<DeleteUserResponse>>(
+    API_ROUTE_PATH.ADMIN.MANAGE_USER.DELETE_USER(id),
+    {},
+  );
 
   return res;
 }
@@ -86,7 +89,7 @@ export async function deleteUser({ id }: DeleteUserRequest) {
  * [Admin] 사이트 유저 수 API (GET)
  */
 export async function getNumOfSiteUsers() {
-  const res = await axiosInstance.get<GetNumOfSiteUsersResponse>(adminPath.numOfSiteUsers);
+  const res = await axiosInstance.get<GetNumOfSiteUsersResponse>(API_ROUTE_PATH.ADMIN.GET_SITE_USERS_NUMS);
 
   return res;
 }
@@ -100,7 +103,7 @@ export async function getNumOfSiteUsers() {
  *
  */
 export async function searchSiteUser({ type, content }: SearchSiteUserRequest) {
-  const res = await axiosInstance.get<SearchSiteUserResponse>(adminPath.searchSiteUser, {
+  const res = await axiosInstance.get<SearchSiteUserResponse>(API_ROUTE_PATH.ADMIN.SEARCH, {
     params: {
       type,
       content,
@@ -109,28 +112,3 @@ export async function searchSiteUser({ type, content }: SearchSiteUserRequest) {
 
   return res;
 }
-
-export async function createNotice({ title, content }: CreateNoticeRequest) {
-  const res = await axiosInstance.post<any, AxiosResponse<CreateNoticeResponse>, CreateNoticeRequest>(
-    adminPath.createNotice,
-    {
-      title,
-      content,
-    },
-  );
-
-  return res;
-}
-
-export const adminPath = {
-  sendAdminAuthEmail: `/api/admin/email`,
-  adminEmailVerify: `/api/admin/email/verify`,
-  siteUsers: `/api/admin/user/list`,
-  changeUserRole: `/api/admin/user/role`,
-  deleteUser: (id?: number) => `/api/admin/user/delete/${id ?? ':id'}`,
-  numOfSiteUsers: `/api/admin/user/list/length`,
-  searchSiteUser: `/api/admin/user/list/search`,
-  createNotice: `/api/admin/notice/save`,
-  deleteNotice: (id?: number) => `/api/admin/notice/delete/${id ?? ':id'}`,
-  updateNotice: `/api/admin/notice/update`,
-} as const;

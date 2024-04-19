@@ -1,12 +1,12 @@
 'use client';
 
+import { Task, useParallelProgress } from '@/hooks/progress/useParallelProgress';
 import { useContext } from 'react';
-import { Task, useParallelProgress } from './useParallelProgress';
-import ProgressContext, { ProgressContextState } from './context';
+import ProgressContext, { ProgressContextState } from './Context';
 
 export interface ProgressViewProps {
   taskList: Task[];
-  onDone: () => void;
+  onDone?: ProgressContextState['onDone'];
   onClose: () => void;
 }
 

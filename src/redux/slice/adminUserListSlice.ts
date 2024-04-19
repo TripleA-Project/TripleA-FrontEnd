@@ -31,6 +31,46 @@ export const adminUserListSlice = createSlice({
 
       state.users = [...users];
     },
+    updateUsers: (
+      state: AdminUserListState,
+      actions: PayloadAction<Partial<Omit<SiteUser, 'email'> & { email: SiteUser['email'] }>[]>,
+    ) => {
+      const targetUsers = actions.payload;
+
+      const users = [...state.users];
+      const defaultUsers = [...state.defaultUsers];
+
+      for (const { email, ...targetUser } of targetUsers) {
+        const userIdx = users.findIndex((user) => user.email === email);
+        const defaultUserIdx = defaultUsers.findIndex((user) => user.email === email);
+
+        if (userIdx > -1) {
+          users[userIdx] = {
+            ...users[userIdx],
+            ...targetUser,
+          };
+        }
+
+        if (defaultUserIdx > -1) {
+          defaultUsers[defaultUserIdx] = {
+            ...defaultUsers[defaultUserIdx],
+            ...targetUser,
+          };
+        }
+      }
+
+      state.users = [...users];
+      state.defaultUsers = [...defaultUsers];
+    },
+    deleteUsers: (state: AdminUserListState, actions: PayloadAction<SiteUser['id'][]>) => {
+      const targetUserIds = actions.payload;
+
+      const users = [...state.users];
+      const defaultUsers = [...state.defaultUsers];
+
+      state.users = users.filter((user) => !targetUserIds.includes(user.id));
+      state.defaultUsers = defaultUsers.filter((user) => !targetUserIds.includes(user.id));
+    },
     resetUsers: (state: AdminUserListState) => {
       state.users = [...state.defaultUsers];
     },
@@ -46,8 +86,16 @@ export const adminUserListSlice = createSlice({
   },
 });
 
-export const { setDefaultUsers, setUsers, resetUsers, selectUser, unSelectUser, clearSelectedUsers } =
-  adminUserListSlice.actions;
+export const {
+  setDefaultUsers,
+  setUsers,
+  updateUsers,
+  deleteUsers,
+  resetUsers,
+  selectUser,
+  unSelectUser,
+  clearSelectedUsers,
+} = adminUserListSlice.actions;
 
 export function useAdminUserList() {
   const users = useSelector((state: RootState) => state.adminUserList.users);

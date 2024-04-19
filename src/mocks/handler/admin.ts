@@ -1,21 +1,20 @@
 import { AdminEmailAuthRequest, AdminEmailAuthResponse } from '@/interfaces/Dto/Admin/AdminEmailAuthDto';
 import { AdminEmailVerifyRequest, AdminEmailVerifyResponse } from '@/interfaces/Dto/Admin/AdminEmailVerifyDto';
 import { ChangeUserRoleRequest, ChangeUserRoleResponse } from '@/interfaces/Dto/Admin/ChangeUserRoleDto';
-import { CreateNoticeRequest, CreateNoticeResponse } from '@/interfaces/Dto/Admin/CreateNoticeDto';
 import { DeleteUserRequest, DeleteUserResponse } from '@/interfaces/Dto/Admin/DeleteUserDto';
 import { GetNumOfSiteUsersRequest, GetNumOfSiteUsersResponse } from '@/interfaces/Dto/Admin/GetNumOfSiteUsersDto';
 import { GetSiteUsersRequest, GetSiteUsersResponse } from '@/interfaces/Dto/Admin/GetSiteUsersDto';
-import { SearchSiteUserRequest, SearchSiteUserResponse } from '@/interfaces/Dto/Admin/SearchSiteUserDto';
+import { SearchSiteUserResponse } from '@/interfaces/Dto/Admin/SearchSiteUserDto';
 import { APIResponse } from '@/interfaces/Dto/Core';
-import { adminPath } from '@/service/admin';
 import { getURL } from '@/util/url';
 import { HttpStatusCode } from 'axios';
-import { PathParams, http, HttpResponse } from 'msw';
+import { PathParams, http, HttpResponse, DefaultBodyType } from 'msw';
 import { siteUser } from '../db/siteUser';
+import { API_ROUTE_PATH } from '@/constants/routePath';
 
 export const adminHandler = [
   http.post<PathParams<string>, AdminEmailAuthRequest, AdminEmailAuthResponse>(
-    getURL(adminPath.sendAdminAuthEmail),
+    getURL(API_ROUTE_PATH.ADMIN.AUTH.SEND_ADMIN_AUTH_EMAIL),
     async () => {
       return HttpResponse.json(
         {
@@ -28,7 +27,7 @@ export const adminHandler = [
     },
   ),
   http.post<PathParams<string>, AdminEmailVerifyRequest, AdminEmailVerifyResponse>(
-    getURL(adminPath.adminEmailVerify),
+    getURL(API_ROUTE_PATH.ADMIN.AUTH.ADMIN_EMAIL_VERIFY),
     async ({ request }) => {
       const { email, code } = await request.json();
 
@@ -53,18 +52,21 @@ export const adminHandler = [
       );
     },
   ),
-  http.get<PathParams<string>, GetSiteUsersRequest, GetSiteUsersResponse>(getURL(adminPath.siteUsers), async () => {
-    return HttpResponse.json(
-      {
-        status: HttpStatusCode.Ok,
-        msg: '성공',
-        data: [...siteUser],
-      },
-      { status: HttpStatusCode.Ok },
-    );
-  }),
+  http.get<PathParams<string>, GetSiteUsersRequest, GetSiteUsersResponse>(
+    getURL(API_ROUTE_PATH.ADMIN.GET_SITE_USERS),
+    async () => {
+      return HttpResponse.json(
+        {
+          status: HttpStatusCode.Ok,
+          msg: '성공',
+          data: [...siteUser],
+        },
+        { status: HttpStatusCode.Ok },
+      );
+    },
+  ),
   http.post<PathParams<string>, ChangeUserRoleRequest, ChangeUserRoleResponse>(
-    getURL(adminPath.changeUserRole),
+    getURL(API_ROUTE_PATH.ADMIN.MANAGE_USER.CHANGE_USER_ROLE),
     async ({ request }) => {
       const { email, role } = await request.json();
 
@@ -82,7 +84,7 @@ export const adminHandler = [
       const targetUser = siteUser.find((user) => user.email === email);
 
       if (targetUser) {
-        targetUser.memberRole = 'ADMIN';
+        targetUser.memberRole = role;
       }
 
       return HttpResponse.json(
@@ -95,8 +97,8 @@ export const adminHandler = [
       );
     },
   ),
-  http.post<PathParams<'id'>, DeleteUserRequest, DeleteUserResponse>(
-    getURL(adminPath.deleteUser()),
+  http.post<{ id: string }, DeleteUserRequest, DeleteUserResponse>(
+    getURL(API_ROUTE_PATH.ADMIN.MANAGE_USER.DELETE_USER()),
     async ({ params }) => {
       const { id } = params;
 
@@ -135,8 +137,8 @@ export const adminHandler = [
       );
     },
   ),
-  http.get<PathParams<string>, GetNumOfSiteUsersRequest, GetNumOfSiteUsersResponse>(
-    getURL(adminPath.numOfSiteUsers),
+  http.get<PathParams, GetNumOfSiteUsersRequest, GetNumOfSiteUsersResponse>(
+    getURL(API_ROUTE_PATH.ADMIN.GET_SITE_USERS_NUMS),
     async () => {
       return HttpResponse.json(
         {
@@ -152,8 +154,8 @@ export const adminHandler = [
       );
     },
   ),
-  http.get<PathParams<string>, undefined, SearchSiteUserResponse | APIResponse>(
-    getURL(adminPath.searchSiteUser),
+  http.get<PathParams, DefaultBodyType, SearchSiteUserResponse | APIResponse>(
+    getURL(API_ROUTE_PATH.ADMIN.SEARCH),
     async ({ request }) => {
       const url = new URL(request.url);
 
@@ -174,8 +176,10 @@ export const adminHandler = [
       const matchedUser = siteUser.filter((user) => {
         if (type === 'email') return user.email.search(content) > -1;
         if (type === 'fullName') return user.fullName.search(content) > -1;
+        if (type === 'membership') return user.membership === content;
+        if (type === 'memberRole') return user.memberRole === content;
 
-        return user.membership === content;
+        return false;
       });
 
       return HttpResponse.json(
@@ -183,23 +187,6 @@ export const adminHandler = [
           status: HttpStatusCode.Ok,
           msg: '성공',
           data: matchedUser.length ? [...matchedUser] : [],
-        },
-        { status: HttpStatusCode.Ok },
-      );
-    },
-  ),
-  http.post<PathParams, CreateNoticeRequest, CreateNoticeResponse>(
-    getURL(adminPath.createNotice),
-    async ({ request }) => {
-      const { title, content } = await request.json();
-
-      console.log({ title, content });
-
-      return HttpResponse.json(
-        {
-          status: HttpStatusCode.Ok,
-          msg: '성공',
-          data: '공지사항 작성완료',
         },
         { status: HttpStatusCode.Ok },
       );

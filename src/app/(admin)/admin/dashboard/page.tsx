@@ -9,8 +9,8 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: 'Triple A | 통계',
-  description: 'Triple A 통계',
+  title: 'Triple A 관리자 | 유저 통계',
+  description: 'Triple A 관리자 | 유저 통계',
 };
 
 function AdminDashBoard() {

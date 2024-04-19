@@ -5,14 +5,16 @@ import { createPortal } from 'react-dom';
 import UserManageModalWrapper from './UserManageModalWrapper';
 import Button from '@/components/Button/Button';
 import { deleteUser } from '@/service/admin';
-import { useQueryClient } from '@tanstack/react-query';
-import { clearSelectedUsers } from '@/redux/slice/adminUserListSlice';
+import { clearSelectedUsers, deleteUsers } from '@/redux/slice/adminUserListSlice';
+import { useEffect } from 'react';
 import ProgressView, {
   ProgressDoneViewProps,
   ProgressIdleViewProps,
+  ProgressViewProps,
   ProgressWorkingViewProps,
-} from '../progress/ProgressView';
-import { useEffect } from 'react';
+} from '@/components/ProgressView';
+import { DeleteUserResponse } from '@/interfaces/Dto/Admin/DeleteUserDto';
+import { AxiosRequestConfig, AxiosResponse } from 'axios';
 
 function DeleteUserModal() {
   const { modal } = useModal('admin:deleteUser');
@@ -32,16 +34,20 @@ function DeleteUserModal() {
 export default DeleteUserModal;
 
 const DeleteUserModalContent = () => {
-  const queryClient = useQueryClient();
-
   const { modal, closeModal, dispatch } = useModal('admin:deleteUser');
 
-  const onDone = () => {
-    queryClient.invalidateQueries({
-      queryKey: ['siteUser'],
+  const onDone: NonNullable<ProgressViewProps['onDone']> = ({ completedTaskResult }) => {
+    const targetUserIdsPayload = (completedTaskResult as AxiosResponse<DeleteUserResponse>[]).map((result) => {
+      const config = result.config as AxiosRequestConfig;
+
+      return Number(config.url!.replace('/api/admin/user/delete/', ''));
     });
 
-    dispatch(clearSelectedUsers());
+    dispatch(deleteUsers(targetUserIdsPayload));
+
+    setTimeout(() => {
+      dispatch(clearSelectedUsers());
+    }, 0);
   };
 
   return (
@@ -88,9 +94,9 @@ function DeleteUserProgressWorking({ endTaskResult, totalTaskResult }: ProgressW
   );
 }
 
-function DeleteUserProgressDone({ onDone, onClose }: ProgressDoneViewProps) {
+function DeleteUserProgressDone({ completedTaskResult, failTaskResult, onDone, onClose }: ProgressDoneViewProps) {
   useEffect(() => {
-    onDone();
+    onDone && onDone({ completedTaskResult, failTaskResult });
   }, []); /* eslint-disable-line */
 
   return (

@@ -2,7 +2,7 @@ import { AxiosRequestConfig } from 'axios';
 import { APIResponse } from '../Core';
 import { SiteUser } from './GetSiteUsersDto';
 
-export type SearchType = Extract<keyof SiteUser, 'email' | 'fullName' | 'membership'>;
+export type SearchType = Extract<keyof SiteUser, 'email' | 'fullName' | 'membership' | 'memberRole'>;
 
 export type SearchSiteUserRequest<T extends SearchType = SearchType> = T extends SearchType
   ? T extends 'email'
@@ -11,6 +11,8 @@ export type SearchSiteUserRequest<T extends SearchType = SearchType> = T extends
     ? { type: 'fullName'; content: SiteUser['fullName'] }
     : T extends 'membership'
     ? { type: 'membership'; content: SiteUser['membership'] }
+    : T extends 'memberRole'
+    ? { type: 'memberRole'; content: SiteUser['memberRole'] }
     : never
   : never;
 

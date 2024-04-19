@@ -7,12 +7,15 @@ import { useCallback } from 'react';
 export type DefaultModalType = 'modal:default';
 export type SelectedUserModalType = 'selected:user';
 export type AdminModalType = 'admin:deleteUser' | 'admin:asAdmin' | 'admin:asUser';
-export type ModalType = DefaultModalType | SelectedUserModalType | AdminModalType;
+export type AdminNoticeType = 'admin:deleteNotice';
+export type ModalType = DefaultModalType | SelectedUserModalType | AdminModalType | AdminNoticeType;
 
 type ModalPayload<T> = T extends DefaultModalType
   ? any
   : T extends AdminModalType
   ? { selectedUsers: SiteUser[] }
+  : T extends AdminNoticeType
+  ? { noticeId: number }
   : T extends SelectedUserModalType
   ? { selectedUsers: SiteUser[] }
   : never;

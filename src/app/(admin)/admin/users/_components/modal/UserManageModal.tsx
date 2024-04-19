@@ -1,4 +1,5 @@
 import AsAdminModal from './AsAdminModal';
+import AsUserModal from './AsUserModal';
 import DeleteUserModal from './DeleteUserModal';
 
 function UserManageModal() {
@@ -6,6 +7,7 @@ function UserManageModal() {
     <>
       <DeleteUserModal />
       <AsAdminModal />
+      <AsUserModal />
     </>
   );
 }

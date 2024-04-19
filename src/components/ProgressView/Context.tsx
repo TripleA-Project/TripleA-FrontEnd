@@ -1,7 +1,10 @@
+import { UseParallelProgressReturn } from '@/hooks/progress/useParallelProgress';
 import { createContext } from 'react';
-import { UseParallelProgressReturn } from './useParallelProgress';
 
-export type ProgressContextState = UseParallelProgressReturn & { onDone: () => void; onClose: () => void };
+export type ProgressContextState = UseParallelProgressReturn & {
+  onDone?: (tasks: Pick<UseParallelProgressReturn, 'completedTaskResult' | 'failTaskResult'>) => void;
+  onClose: () => void;
+};
 
 const ProgressContext = createContext<ProgressContextState>({
   totalTaskResult: [],
@@ -10,7 +13,7 @@ const ProgressContext = createContext<ProgressContextState>({
   failTaskResult: [],
   completedTaskResult: [],
   taskStatus: 'idle',
-  onDone: () => {},
+  onDone: undefined,
   onClose: () => {},
 });
 

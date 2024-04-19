@@ -3,16 +3,18 @@
 import { useModal } from '@/redux/slice/modalSlice';
 import { createPortal } from 'react-dom';
 import UserManageModalWrapper from './UserManageModalWrapper';
-import ProgressView, {
-  ProgressDoneViewProps,
-  ProgressIdleViewProps,
-  ProgressWorkingViewProps,
-} from '../progress/ProgressView';
-import { useQueryClient } from '@tanstack/react-query';
-import { clearSelectedUsers } from '@/redux/slice/adminUserListSlice';
+import { clearSelectedUsers, updateUsers } from '@/redux/slice/adminUserListSlice';
 import { changeUserRole } from '@/service/admin';
 import Button from '@/components/Button/Button';
 import { useEffect } from 'react';
+import ProgressView, {
+  ProgressDoneViewProps,
+  ProgressIdleViewProps,
+  ProgressViewProps,
+  ProgressWorkingViewProps,
+} from '@/components/ProgressView';
+import { AxiosResponse } from 'axios';
+import { ChangeUserRoleRequest, ChangeUserRoleResponse } from '@/interfaces/Dto/Admin/ChangeUserRoleDto';
 
 function AsUserModal() {
   const { modal } = useModal('admin:asUser');
@@ -32,16 +34,23 @@ function AsUserModal() {
 export default AsUserModal;
 
 const AsUserModalContent = () => {
-  const queryClient = useQueryClient();
-
   const { modal, closeModal, dispatch } = useModal('admin:asUser');
 
-  const onDone = () => {
-    queryClient.invalidateQueries({
-      queryKey: ['siteUser'],
+  const onDone: NonNullable<ProgressViewProps['onDone']> = ({ completedTaskResult }) => {
+    const targetUsersPayload = (completedTaskResult as AxiosResponse<ChangeUserRoleResponse>[]).map((result) => {
+      const { email, role: memberRole } = JSON.parse(result.config.data) as ChangeUserRoleRequest;
+
+      return {
+        email,
+        memberRole,
+      };
     });
 
-    dispatch(clearSelectedUsers());
+    dispatch(updateUsers(targetUsersPayload));
+
+    setTimeout(() => {
+      dispatch(clearSelectedUsers());
+    }, 0);
   };
 
   return (
@@ -88,9 +97,9 @@ function AsUserProgressWorking({ endTaskResult, totalTaskResult }: ProgressWorki
   );
 }
 
-function AsUserProgressDone({ onDone, onClose }: ProgressDoneViewProps) {
+function AsUserProgressDone({ completedTaskResult, failTaskResult, onDone, onClose }: ProgressDoneViewProps) {
   useEffect(() => {
-    onDone();
+    onDone && onDone({ completedTaskResult, failTaskResult });
   }, []); /* eslint-disable-line */
 
   return (

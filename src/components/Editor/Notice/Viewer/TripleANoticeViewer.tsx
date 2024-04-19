@@ -18,7 +18,7 @@ function TripleANoticeViewer({ initialEditorState }: TripleANoticeViewerProps) {
   };
 
   return (
-    <div className="relative box-border w-full rounded-md border border-black p-4">
+    <div className="relative box-border w-full">
       <LexicalEditor
         config={{
           namespace: VIEWER_NAMESPACE,
