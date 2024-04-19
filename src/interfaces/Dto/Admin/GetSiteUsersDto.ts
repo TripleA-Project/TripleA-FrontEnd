@@ -7,7 +7,7 @@ export interface GetSiteUsersRequest {}
 export type SiteUser = Omit<User, 'emailVerified'> &
   Omit<ProfilePayload, 'nextPaymentDate'> & {
     id: number;
-    createdAt: string;
+    createAt: string;
     changeMembershipDate?: string | null;
   };
 

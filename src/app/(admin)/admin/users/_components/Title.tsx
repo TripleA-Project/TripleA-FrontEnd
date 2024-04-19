@@ -1,15 +1,36 @@
 'use client';
 
-import { useAdminUserSearch } from '@/redux/slice/adminUserSearchSlice';
+import { AdminUserSearch, useAdminUserSearch } from '@/redux/slice/adminUserSearchSlice';
 import ResetSearch from './ResetSearch';
 import React from 'react';
 import { twMerge } from 'tailwind-merge';
-import { MEMBERSHIP } from '@/interfaces/User';
+import { MEMBERSHIP, MEMBER_ROLE } from '@/interfaces/User';
+
+const memberRoleLabel = {
+  USER: '유저',
+  ADMIN: '관리자',
+} as const;
 
 const membershipLabel = {
   BASIC: '일반 회원',
   PREMIUM: '구독 회원',
 } as const;
+
+function getTitle(searchState: AdminUserSearch) {
+  if (searchState.recent) {
+    if (searchState.recent.type === 'memberRole') {
+      return memberRoleLabel[searchState.recent.value as keyof typeof MEMBER_ROLE];
+    }
+
+    if (searchState.recent.type === 'membership') {
+      return membershipLabel[searchState.recent.value as keyof typeof MEMBERSHIP];
+    }
+
+    return searchState.recent.value;
+  }
+
+  return '';
+}
 
 function AdminUsersTitle() {
   const { search } = useAdminUserSearch();
@@ -19,7 +40,7 @@ function AdminUsersTitle() {
       <Wrapper>
         <SectionTitle className="flex w-full shrink-0 gap-1">
           <span className="max-w-full overflow-hidden text-ellipsis rounded-lg bg-gray-100 px-1">
-            {search.type === 'membership' ? membershipLabel[search.recent as keyof typeof MEMBERSHIP] : search.recent}
+            {getTitle(search)}
           </span>
           <span className="shrink-0">검색 결과</span>
         </SectionTitle>

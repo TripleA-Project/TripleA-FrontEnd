@@ -15,6 +15,19 @@ function ResetUsers() {
   const { searchStatus } = useAdminUserSearchStatus();
   const { dispatch } = useAdminUserList();
 
+  const getLabel = () => {
+    switch (search.recent!.type) {
+      case 'email':
+        return '이메일';
+      case 'fullName':
+        return '이름';
+      case 'memberRole':
+        return '권한';
+      case 'membership':
+        return '멤버십';
+    }
+  };
+
   const resetUserList = () => {
     if (searchStatus === 'loading') {
       toastNotify('error', '검색 이후 초기화가 가능합니다.');
@@ -25,9 +38,7 @@ function ResetUsers() {
     dispatch(
       setSearch({
         ...search,
-        type: 'email',
-        value: '',
-        recent: '',
+        recent: null,
       }),
     );
     dispatch(setSearchStatus('idle'));
@@ -42,7 +53,8 @@ function ResetUsers() {
       textColorTheme="white"
       onClick={resetUserList}
     >
-      <span>{search.type} 검색결과 초기화</span>
+      <span>{`"${getLabel()}"`}&nbsp;</span>
+      <span>검색결과 초기화</span>
     </Button>
   ) : null;
 }

@@ -164,7 +164,7 @@ export function ToolbarPlugin() {
   }, [editor, $updateToolbar]);
 
   return editor.isEditable() ? (
-    <div className="sticky top-[53px] z-toolbar bg-white" id={TOOLBAR_ELEMENT_ID.TOOLBAR}>
+    <div className="sticky top-[143px] z-toolbar border-t-2 border-[#eee] bg-white" id={TOOLBAR_ELEMENT_ID.TOOLBAR}>
       <Toolbar>
         <HistoryToolbar />
         <FontToolbar />

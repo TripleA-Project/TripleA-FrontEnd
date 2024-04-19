@@ -8,6 +8,8 @@ import Navbar from '@/components/Layout/Navbar';
 import Footer from '@/components/Layout/Footer';
 import SetupClientMSW from '@/components/MSW/SetupClientMSW';
 import SetupServerMSW from '@/components/MSW/SetupServerMSW';
+import DomainHeader from './_layouts/header/DomainHeader';
+import NavigationEvents from './_layouts/NavigationEvents';
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -43,6 +45,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <SetupClientMSW />
         <ReduxProvider>
           <ReactQueryProvider>
+            <NavigationEvents />
+            <DomainHeader />
             <Page>{children}</Page>
             <Navbar />
             <Footer />

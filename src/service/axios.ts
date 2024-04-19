@@ -30,8 +30,6 @@ function createAxiosInstance() {
       if (typeof window === 'undefined') {
         const cookies = await getCookies();
 
-        console.log({ cookies });
-
         const cookie = cookies.length
           ? cookies
               .map(({ name, value }, idx, arr) => `${name}=${idx === arr.length - 1 ? value : `${value} `}`)

@@ -6,7 +6,10 @@ import { SearchSiteUserRequest } from '@/interfaces/Dto/Admin/SearchSiteUserDto'
 export interface AdminUserSearch {
   type: SearchSiteUserRequest['type'];
   value: string;
-  recent: string;
+  recent: {
+    type: SearchSiteUserRequest['type'];
+    value: string;
+  } | null;
 }
 
 interface AdminUserSearchState {
@@ -18,7 +21,7 @@ const initialState: AdminUserSearchState = {
   search: {
     type: 'email',
     value: '',
-    recent: '',
+    recent: null,
   },
   status: 'idle',
 };

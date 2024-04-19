@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { MdOutlineContentPaste, MdOutlineSettings } from 'react-icons/md';
 import { HorizontalLine } from '../UI/DivideLine';
 import AllTermsModal from './AllTermsModal';
+import { ROUTE_PATH } from '@/constants/routePath';
+import { AppLogos } from '../Icons';
 
 function MyPageMenu() {
   const [termsModalOpen, setTermsModalOpen] = useState(false);
@@ -13,6 +15,9 @@ function MyPageMenu() {
     <div>
       <HorizontalLine />
       <div className="box-border flex flex-col justify-center gap-5 px-5 py-[34px]">
+        <Link href={ROUTE_PATH.NOTICE.LIST} className="flex items-center gap-3.5 font-semibold text-[#5B6267]">
+          <AppLogos.Gray /> 공지사항
+        </Link>
         <div
           onClick={() => setTermsModalOpen(true)}
           className="flex cursor-pointer items-center gap-3.5 text-[#5B6267]"

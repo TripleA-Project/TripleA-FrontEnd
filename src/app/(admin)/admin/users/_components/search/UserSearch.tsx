@@ -1,8 +1,8 @@
 'use client';
 
 import {
+  AdminUserSearch,
   setSearch,
-  setSearchStatus,
   useAdminUserSearch,
   useAdminUserSearchStatus,
 } from '@/redux/slice/adminUserSearchSlice';
@@ -14,8 +14,8 @@ import { SearchFormData } from '../userTable/UserTableContainer';
 import { MutationObserverBaseResult, useMutation } from '@tanstack/react-query';
 import { searchSiteUser } from '@/service/admin';
 import { SearchSiteUserRequest } from '@/interfaces/Dto/Admin/SearchSiteUserDto';
-import { resetUsers, setUsers, useAdminUserList } from '@/redux/slice/adminUserListSlice';
-import { MEMBERSHIP } from '@/interfaces/User';
+import { setUsers, useAdminUserList } from '@/redux/slice/adminUserListSlice';
+import { MEMBERSHIP, MEMBER_ROLE } from '@/interfaces/User';
 import Button from '@/components/Button/Button';
 import { SearchIcon } from '@/components/Icons/SearchIcon';
 import { toastNotify } from '@/util/toastNotify';
@@ -24,15 +24,33 @@ export interface UserSearchProps {
   onSearch: (status: MutationObserverBaseResult['status']) => void;
 }
 
-function UserSearch({ onSearch }: UserSearchProps) {
-  const { search: searchState } = useAdminUserSearch();
-  const { control, handleSubmit } = useForm<SearchFormData>({
-    ...(searchState.type === 'membership' && {
-      values: {
+function getFormInitialValues(type: AdminUserSearch['type']) {
+  switch (type) {
+    case 'memberRole':
+      return {
+        searchType: 'memberRole',
+        searchValue: 'USER',
+      };
+    case 'membership':
+      return {
         searchType: 'membership',
         searchValue: 'BASIC',
-      },
-    }),
+      };
+    case 'email':
+    case 'fullName':
+    default:
+      return {
+        searchType: type ?? 'email',
+        searchValue: '',
+      };
+  }
+}
+function UserSearch({ onSearch }: UserSearchProps) {
+  const { search: searchState } = useAdminUserSearch();
+  const { control, handleSubmit, resetField } = useForm<SearchFormData>({
+    values: {
+      ...(getFormInitialValues(searchState.type) as any),
+    },
   });
 
   const { dispatch } = useAdminUserList();
@@ -54,16 +72,15 @@ function UserSearch({ onSearch }: UserSearchProps) {
     }
 
     if (!searchValue) {
-      dispatch(
-        setSearch({
-          ...search,
-          type: 'email',
-          value: '',
-          recent: '',
-        }),
-      );
-      dispatch(setSearchStatus('idle'));
-      dispatch(resetUsers());
+      if (searchType === 'email') {
+        toastNotify('error', '이메일을 입력해주세요.');
+        return;
+      }
+
+      if (searchType === 'fullName') {
+        toastNotify('error', '이름을 입력해주세요.');
+        return;
+      }
 
       return;
     }
@@ -74,9 +91,16 @@ function UserSearch({ onSearch }: UserSearchProps) {
       setSearch({
         ...searchState,
         value: '',
-        recent: searchValue,
+        recent: {
+          type: searchType,
+          value: searchValue,
+        },
       }),
     );
+
+    if (searchType !== 'membership' && searchType !== 'memberRole') {
+      resetField('searchValue');
+    }
   };
 
   useEffect(() => {
@@ -128,6 +152,7 @@ UserSearch.SearchTypeSelect = function AdminUserSearchTypeSelect({
     { label: '이메일', value: 'email' },
     { label: '이름', value: 'fullName' },
     { label: '멤버십', value: 'membership' },
+    { label: '권한', value: 'memberRole' },
   ];
 
   const handleChange =
@@ -143,7 +168,7 @@ UserSearch.SearchTypeSelect = function AdminUserSearchTypeSelect({
         setSearch({
           ...search,
           type: value,
-          value: value === 'membership' ? 'BASIC' : '',
+          value: getFormInitialValues(value).searchValue,
         }),
       );
     };
@@ -205,9 +230,15 @@ UserSearch.SearchInput = function UserSearchInput({
     }
   };
 
-  return search.type === 'membership' ? (
-    <UserSearch.MembershipSelect control={control} />
-  ) : (
+  if (search.type === 'memberRole') {
+    return <UserSearch.MemberRoleSelect control={control} />;
+  }
+
+  if (search.type === 'membership') {
+    return <UserSearch.MembershipSelect control={control} />;
+  }
+
+  return (
     <Controller
       name="searchValue"
       control={control}
@@ -223,6 +254,57 @@ UserSearch.SearchInput = function UserSearchInput({
           disabled={!search.type || searchStatus === 'loading'}
           aria-label="description"
           autoComplete="off"
+        />
+      )}
+    />
+  );
+};
+
+UserSearch.MemberRoleSelect = function UserMemberRoleSelect({
+  control,
+}: {
+  control: Control<SearchFormData, any, SearchFormData>;
+}) {
+  const { search, dispatch } = useAdminUserSearch();
+  const { searchStatus } = useAdminUserSearchStatus();
+
+  const selectRef = useRef<any>(null);
+
+  const options: Array<{ label: string; value: keyof typeof MEMBER_ROLE }> = [
+    { label: '유저', value: 'USER' },
+    { label: '관리자', value: 'ADMIN' },
+  ];
+
+  const handleChange =
+    (field: ControllerRenderProps<SearchFormData, 'searchValue'>) =>
+    (e: SingleValue<{ label: string; value: keyof typeof MEMBER_ROLE }>) => {
+      const value = e!.value as any;
+
+      field.onChange(value);
+
+      selectRef.current?.blur();
+
+      dispatch(
+        setSearch({
+          ...search,
+          value,
+        }),
+      );
+    };
+
+  return (
+    <Controller
+      name="searchValue"
+      control={control}
+      render={({ field }) => (
+        <Select
+          ref={selectRef}
+          className="text-xs"
+          isSearchable={false}
+          defaultValue={options[0]}
+          options={options}
+          onChange={handleChange(field)}
+          isDisabled={searchStatus === 'loading'}
         />
       )}
     />

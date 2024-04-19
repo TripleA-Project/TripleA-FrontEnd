@@ -3,7 +3,7 @@ import { SiteUser } from '@/interfaces/Dto/Admin/GetSiteUsersDto';
 export const siteUser: SiteUser[] = [
   {
     id: 1,
-    createdAt: '2023-11-30T15:03:58.32791+09:00',
+    createAt: '2023-11-30T15:03:58.32791+09:00',
     email: 'rla7360@gmail.com',
     fullName: 'rla7360',
     newsLetter: true,
@@ -13,7 +13,7 @@ export const siteUser: SiteUser[] = [
   },
   {
     id: 2,
-    createdAt: '2023-12-01T13:14:09+09:00',
+    createAt: '2023-12-01T13:14:09+09:00',
     email: 'test1@basic.com',
     fullName: 'test1',
     newsLetter: false,
@@ -23,7 +23,7 @@ export const siteUser: SiteUser[] = [
   },
   {
     id: 3,
-    createdAt: '2023-12-01T13:14:01+09:00',
+    createAt: '2023-12-01T13:14:01+09:00',
     email: 'test2@premium.com',
     fullName: 'test2',
     newsLetter: false,
@@ -33,7 +33,7 @@ export const siteUser: SiteUser[] = [
   },
   {
     id: 4,
-    createdAt: '2023-12-01T13:14:01+09:00',
+    createAt: '2023-12-01T13:14:01+09:00',
     email: 'test3@premium.com',
     fullName: 'test3',
     newsLetter: false,
@@ -43,7 +43,7 @@ export const siteUser: SiteUser[] = [
   },
   {
     id: 5,
-    createdAt: '2024-01-01T01:00:50+09:00',
+    createAt: '2024-01-01T01:00:50+09:00',
     email: 'test4@premium.com',
     fullName: 'test4',
     newsLetter: false,
@@ -53,7 +53,7 @@ export const siteUser: SiteUser[] = [
   },
   {
     id: 6,
-    createdAt: '2024-01-01T14:00:00+09:00',
+    createAt: '2024-01-01T14:00:00+09:00',
     email: 'test5@basic.com',
     fullName: 'test5',
     newsLetter: false,

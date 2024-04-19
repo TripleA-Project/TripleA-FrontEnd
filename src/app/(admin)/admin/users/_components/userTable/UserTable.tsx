@@ -60,7 +60,7 @@ function UserTable({ userList, withCheckBox = true }: UserTableProps) {
       <TableBody className="relative">
         <UserTableSearching />
         {Array.from(userList)
-          .sort((a, b) => dayjs(b.createdAt).diff(dayjs(a.createdAt)))
+          .sort((a, b) => dayjs(b.createAt).diff(dayjs(a.createAt)))
           .map((user) => {
             return (
               <StyledTableRow key={user.email}>
@@ -74,7 +74,7 @@ function UserTable({ userList, withCheckBox = true }: UserTableProps) {
                 <StyledTableCell align="center">{user.fullName}</StyledTableCell>
                 <StyledTableCell align="center">{membershipLabel[user.membership]}</StyledTableCell>
                 <StyledTableCell align="center">{user.memberRole === 'ADMIN' ? `✅` : ''}</StyledTableCell>
-                <StyledTableCell align="center">{dayjs(user.createdAt).format('YYYY-MM-DD HH:mm:ss')}</StyledTableCell>
+                <StyledTableCell align="center">{dayjs(user.createAt).format('YYYY-MM-DD HH:mm:ss')}</StyledTableCell>
               </StyledTableRow>
             );
           })}

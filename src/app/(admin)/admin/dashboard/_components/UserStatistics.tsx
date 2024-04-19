@@ -22,19 +22,21 @@ ChartJS.register(BarElement, Tooltip, CategoryScale, LinearScale);
 
 function UserStatistics() {
   const { data } = useQuery(['statistics'], () => getNumOfSiteUsers(), {
+    enabled: typeof window !== 'undefined',
     suspense: true,
     select(res) {
       return res.data.data;
     },
     refetchOnWindowFocus: false,
+    retry: 0,
   });
 
   const labels = ['전체 유저', '일반 유저', '구독 유저'];
   const colors = [labelColors.totalUserLength, labelColors.basicUserLength, labelColors.premiumLength];
 
-  return (
+  return data ? (
     <>
-      <UserStatistics.StatisticsList numOfUsers={data!} />
+      <UserStatistics.StatisticsList numOfUsers={data} />
       <div className="relative flex h-[360px] items-center justify-center sm:h-[440px]">
         <UserStatistics.BarChart
           labels={labels}
@@ -43,7 +45,7 @@ function UserStatistics() {
         />
       </div>
     </>
-  );
+  ) : null;
 }
 
 export default UserStatistics;
