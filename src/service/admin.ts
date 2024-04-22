@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios';
 import { axiosInstance } from './axios';
-import { AdminEmailAuthRequest, AdminEmailAuthResponse } from '@/interfaces/Dto/Admin/AdminEmailAuthDto';
+import { AdminEmailAuthResponse } from '@/interfaces/Dto/Admin/AdminEmailAuthDto';
 import { AdminEmailVerifyRequest, AdminEmailVerifyResponse } from '@/interfaces/Dto/Admin/AdminEmailVerifyDto';
 import { GetSiteUsersResponse } from '@/interfaces/Dto/Admin/GetSiteUsersDto';
 import { ChangeUserRoleRequest, ChangeUserRoleResponse } from '@/interfaces/Dto/Admin/ChangeUserRoleDto';
@@ -17,7 +17,7 @@ import { API_ROUTE_PATH } from '@/constants/routePath';
  * [Admin] 관리자 인증 메일 발송 API (POST)
  */
 export async function sendAdminAuthEmail() {
-  const res = await axiosInstance.post<any, AxiosResponse<AdminEmailAuthResponse>, AdminEmailAuthRequest>(
+  const res = await axiosInstance.post<any, AxiosResponse<AdminEmailAuthResponse>>(
     API_ROUTE_PATH.ADMIN.AUTH.SEND_ADMIN_AUTH_EMAIL,
   );
 

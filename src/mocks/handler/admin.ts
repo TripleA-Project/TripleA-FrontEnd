@@ -42,6 +42,19 @@ export const adminHandler = [
         );
       }
 
+      const testMockCode = 'testemailcode';
+
+      if (testMockCode !== code) {
+        return HttpResponse.json(
+          {
+            status: HttpStatusCode.BadRequest,
+            msg: '유효한 코드가 아닙니다.',
+            data: 'badRequest',
+          },
+          { status: HttpStatusCode.BadRequest },
+        );
+      }
+
       return HttpResponse.json(
         {
           status: HttpStatusCode.Ok,

@@ -8,10 +8,8 @@ import Button from '@/components/Button/Button';
 import { type UseStepFormContext } from '../StepForm';
 import { verifyEmail, verifyEmailSend } from '@/service/auth';
 import { type APIResponse } from '@/interfaces/Dto/Core';
-import { type FormData } from '@/interfaces/FormData';
 import TimerInput from '@/components/Input/StepFormInput/TimerInput';
 import { timerReset, timerStart } from '@/components/Timer';
-import { useTimer } from '@/hooks/useTimer';
 
 export interface EmailVerifyForm {
   code: string;

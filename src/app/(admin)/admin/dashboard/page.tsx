@@ -20,11 +20,13 @@ function AdminDashBoard() {
       <ErrorBoundary FallbackComponent={DashBoardErrorBoundary}>
         <Suspense
           fallback={
-            <div className="box-border flex h-[calc(100vh-131px)] w-full items-center justify-center p-page px-4">
-              <div className="flex w-full items-center justify-center">
-                <MuiSpinner />
+            <>
+              <div className="box-border flex h-[calc(100vh-131px)] w-full items-center justify-center p-page px-4">
+                <div className="flex w-full items-center justify-center">
+                  <MuiSpinner />
+                </div>
               </div>
-            </div>
+            </>
           }
         >
           <UserStatistics />

@@ -17,6 +17,7 @@ export default function Logout() {
       await deleteCookie('accessToken');
       await deleteCookie('refreshToken');
       await deleteCookie('autoLogin');
+      await deleteCookie('verifiedToken');
 
       queryClient.removeQueries();
 

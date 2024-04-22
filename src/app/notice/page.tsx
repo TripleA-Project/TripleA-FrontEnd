@@ -31,7 +31,13 @@ export default async function NoticePage() {
       const { response } = error as AxiosError<APIResponse>;
 
       if (response?.data.status === HttpStatusCode.Unauthorized) {
-        return <NoticeUnauthorized />;
+        return (
+          <NoticeUnauthorized
+            redirectTo={{
+              domain: 'noticeList',
+            }}
+          />
+        );
       }
     }
 

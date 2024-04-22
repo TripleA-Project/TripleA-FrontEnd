@@ -1,4 +1,10 @@
 export const API_ROUTE_PATH = {
+  LOGIN: `/api/login`,
+  LOGOUT: `/api/auth/logout`,
+  REQUEST_ACCESS_TOKEN: '/api/refresh',
+  USER: {
+    PROFILE: `/api/auth/user/me`,
+  },
   ADMIN: {
     GET_SITE_USERS: `/api/admin/user/list`,
     GET_SITE_USERS_NUMS: `/api/admin/user/list/length`,
@@ -24,6 +30,12 @@ export const API_ROUTE_PATH = {
 };
 
 export const ROUTE_PATH = {
+  LOGIN: (continuePath?: string) =>
+    continuePath ? `/login?continueURL=${encodeURIComponent(continuePath)}` : '/login',
+  LOGOUT: `/logout`,
+  ADMIN: {
+    DASH_BOARD: '/admin/dashboard',
+  },
   NOTICE: {
     LIST: `/notice`,
     DETAIL: (id: number) => `/notice/${id}`,

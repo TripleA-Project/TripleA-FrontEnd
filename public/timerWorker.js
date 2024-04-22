@@ -17,18 +17,18 @@ self.addEventListener('message', (e) => {
     case 'timerStart':
       if (interval) clearInterval(interval);
 
-      self.postMessage({ currentTime: time });
+      self.postMessage({ currentTime: time < 0 ? 0 : time });
 
-      if (time === 0) {
+      if (time <= 0) {
         return;
       }
 
       interval = setInterval(() => {
         time -= 1;
 
-        self.postMessage({ currentTime: time });
+        self.postMessage({ currentTime: time < 0 ? 0 : time });
 
-        if (time === 0) clearInterval(interval);
+        if (time <= 0) clearInterval(interval);
       }, 1000);
 
       return;
