@@ -7,11 +7,18 @@ import FitPage from '@/components/Layout/FitPage';
 import { NotificationIcons } from '@/components/Notification/NotificationIcons';
 import { ROUTE_PATH } from '@/constants/routePath';
 
-function NoticeUnauthorized() {
+interface NoticeUnauthorizedProps {
+  redirectTo: { domain: 'noticeList' | 'noticeDetail'; withId?: number };
+}
+
+function NoticeUnauthorized({ redirectTo }: NoticeUnauthorizedProps) {
   const content = `
     공지사항을 보시려면
     로그인을 해주세요
   `;
+
+  const redirectURL =
+    redirectTo.domain === 'noticeList' ? ROUTE_PATH.NOTICE.LIST : ROUTE_PATH.NOTICE.DETAIL(redirectTo.withId ?? 1);
 
   return (
     <FitPage>
@@ -26,7 +33,7 @@ function NoticeUnauthorized() {
               __html: content.trim().replaceAll('\n', '<br />'),
             }}
           />
-          <Link href={`/login?continueURL=${ROUTE_PATH.NOTICE.LIST}`} className="w-full">
+          <Link href={`/login?continueURL=${redirectURL}`} className="w-full">
             <Button bgColorTheme="orange" textColorTheme="white" fullWidth>
               로그인 하러가기
             </Button>

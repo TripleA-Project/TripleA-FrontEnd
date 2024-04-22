@@ -3,6 +3,9 @@ import { getNoticeDetail } from '@/service/notice';
 import { Metadata } from 'next';
 import NoticeDetailTitle from '../_components/NoticeDetailTitle';
 import DeleteNoticeModal from '@/components/Modal/DeleteNoticeModal';
+import { AxiosError, HttpStatusCode } from 'axios';
+import { APIResponse } from '@/interfaces/Dto/Core';
+import NoticeUnauthorized from '../_components/NoticeUnauthorized';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -53,6 +56,14 @@ export default async function NoticeDetailViewPage({ params }: NoticeViewPagePro
       </div>
     );
   } catch (error) {
+    if (error instanceof AxiosError) {
+      const { response } = error as AxiosError<APIResponse>;
+
+      if (response?.status === HttpStatusCode.Unauthorized) {
+        return <NoticeUnauthorized redirectTo={{ domain: 'noticeDetail', withId: Number(params.articleId) }} />;
+      }
+    }
+
     return (
       <div className="box-border px-4">
         <div className="flex h-[400px] w-full items-center justify-center font-bold">게시글을 찾을 수 없습니다.</div>

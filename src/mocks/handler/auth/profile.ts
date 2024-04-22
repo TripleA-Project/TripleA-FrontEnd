@@ -1,16 +1,16 @@
 import { API_ROUTE_PATH } from '@/constants/routePath';
-import { GetNoticeListResponse } from '@/interfaces/Dto/Notice/GetNoticeListDto';
-import { notice } from '@/mocks/db/notice';
+import { ProfileResponse } from '@/interfaces/Dto/User';
+import { users } from '@/mocks/db/user';
+import jwt from 'jsonwebtoken';
 import { getURL } from '@/util/url';
 import { HttpStatusCode } from 'axios';
-import { DefaultBodyType, HttpResponse, http } from 'msw';
-import jwt from 'jsonwebtoken';
-import { users } from '@/mocks/db/user';
-import { mockJwtSecret } from '../auth/login';
+import dayjs from 'dayjs';
+import { DefaultBodyType, HttpResponse, PathParams, http } from 'msw';
+import { mockJwtSecret } from './login';
 import { JwtAuthToken } from '@/interfaces/User';
 
-export const getNoticeList = http.get<any, DefaultBodyType, GetNoticeListResponse>(
-  getURL(API_ROUTE_PATH.NOTICE.GET_NOTICE_LIST),
+export const profile = http.get<PathParams, DefaultBodyType, ProfileResponse>(
+  getURL(API_ROUTE_PATH.USER.PROFILE),
   async ({ request }) => {
     const authorization = request.headers.get('Authorization');
 
@@ -43,6 +43,25 @@ export const getNoticeList = http.get<any, DefaultBodyType, GetNoticeListRespons
           },
         );
       }
+
+      const { email, fullName, membership, memberRole } = user;
+
+      return HttpResponse.json(
+        {
+          status: HttpStatusCode.Ok,
+          msg: '유저 조회 성공',
+          data: {
+            email,
+            fullName,
+            membership,
+            memberRole,
+            nextPaymentDate: dayjs().add(1, 'months').toDate().toISOString(),
+          },
+        },
+        {
+          status: HttpStatusCode.Ok,
+        },
+      );
     } catch (error) {
       return HttpResponse.json(
         {
@@ -54,16 +73,5 @@ export const getNoticeList = http.get<any, DefaultBodyType, GetNoticeListRespons
         },
       );
     }
-
-    const noticeList = notice;
-
-    return HttpResponse.json(
-      {
-        status: HttpStatusCode.Ok,
-        msg: '성공',
-        data: [...noticeList],
-      },
-      { status: HttpStatusCode.Ok },
-    );
   },
 );

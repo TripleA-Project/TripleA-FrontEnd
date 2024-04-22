@@ -21,7 +21,7 @@ function NoticeList({ noticeList }: NoticeListProps) {
           <span className="font-bold">등록된 공지사항이 없습니다.</span>
         </div>
       ) : (
-        noticeList.map(({ id, title }, index) => <NoticeRow key={id} index={index} id={id} title={title} />)
+        noticeList.map(({ id, title }, index) => <NoticeRow key={id} index={index} noticeId={id} noticeTitle={title} />)
       )}
     </div>
   );
@@ -76,7 +76,7 @@ const NoticeListHeader = () => {
   );
 };
 
-const NoticeRow = ({ index, id, title }: { index: number; id: number; title: string }) => {
+const NoticeRow = ({ index, noticeId, noticeTitle }: { index: number; noticeId: number; noticeTitle: string }) => {
   const pathname = usePathname();
   const { push } = useRouter();
 
@@ -86,10 +86,13 @@ const NoticeRow = ({ index, id, title }: { index: number; id: number; title: str
   };
 
   return (
-    <Row onClick={navigateNoticeDetail(id)} className="cursor-pointer transition-colors duration-200 hover:bg-gray-200">
+    <Row
+      onClick={navigateNoticeDetail(noticeId)}
+      className="cursor-pointer transition-colors duration-200 hover:bg-gray-200"
+    >
       <Column className={`flex grow-[1] items-center justify-center`}>{index + 1}</Column>
       <Column className={`flex grow-[9] items-center overflow-hidden`}>
-        <span className="overflow-hidden text-ellipsis whitespace-nowrap">{title}</span>
+        <span className="overflow-hidden text-ellipsis whitespace-nowrap">{noticeTitle}</span>
       </Column>
     </Row>
   );
