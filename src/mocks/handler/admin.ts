@@ -4,16 +4,17 @@ import { ChangeUserRoleRequest, ChangeUserRoleResponse } from '@/interfaces/Dto/
 import { DeleteUserRequest, DeleteUserResponse } from '@/interfaces/Dto/Admin/DeleteUserDto';
 import { GetNumOfSiteUsersRequest, GetNumOfSiteUsersResponse } from '@/interfaces/Dto/Admin/GetNumOfSiteUsersDto';
 import { GetSiteUsersRequest, GetSiteUsersResponse } from '@/interfaces/Dto/Admin/GetSiteUsersDto';
-import { SearchSiteUserRequest, SearchSiteUserResponse } from '@/interfaces/Dto/Admin/SearchSiteUserDto';
+import { SearchSiteUserResponse } from '@/interfaces/Dto/Admin/SearchSiteUserDto';
 import { APIResponse } from '@/interfaces/Dto/Core';
-import { adminPath } from '@/service/admin';
 import { getURL } from '@/util/url';
 import { HttpStatusCode } from 'axios';
-import { PathParams, http, HttpResponse, StrictRequest } from 'msw';
+import { PathParams, http, HttpResponse, DefaultBodyType } from 'msw';
+import { siteUser } from '../db/siteUser';
+import { API_ROUTE_PATH } from '@/constants/routePath';
 
 export const adminHandler = [
   http.post<PathParams<string>, AdminEmailAuthRequest, AdminEmailAuthResponse>(
-    getURL(adminPath.sendAdminAuthEmail),
+    getURL(API_ROUTE_PATH.ADMIN.AUTH.SEND_ADMIN_AUTH_EMAIL),
     async () => {
       return HttpResponse.json(
         {
@@ -26,7 +27,7 @@ export const adminHandler = [
     },
   ),
   http.post<PathParams<string>, AdminEmailVerifyRequest, AdminEmailVerifyResponse>(
-    getURL(adminPath.adminEmailVerify),
+    getURL(API_ROUTE_PATH.ADMIN.AUTH.ADMIN_EMAIL_VERIFY),
     async ({ request }) => {
       const { email, code } = await request.json();
 
@@ -35,6 +36,19 @@ export const adminHandler = [
           {
             status: HttpStatusCode.BadRequest,
             msg: '잘못된 요청입니다',
+            data: 'badRequest',
+          },
+          { status: HttpStatusCode.BadRequest },
+        );
+      }
+
+      const testMockCode = 'testemailcode';
+
+      if (testMockCode !== code) {
+        return HttpResponse.json(
+          {
+            status: HttpStatusCode.BadRequest,
+            msg: '유효한 코드가 아닙니다.',
             data: 'badRequest',
           },
           { status: HttpStatusCode.BadRequest },
@@ -51,29 +65,21 @@ export const adminHandler = [
       );
     },
   ),
-  http.get<PathParams<string>, GetSiteUsersRequest, GetSiteUsersResponse>(getURL(adminPath.siteUsers), async () => {
-    return HttpResponse.json(
-      {
-        status: HttpStatusCode.Ok,
-        msg: '성공',
-        data: [
-          {
-            id: 1,
-            createdAt: '2023-11-30T15:03:58.32791+09:00',
-            email: 'testUser@email.com',
-            fullName: 'test',
-            newsLetter: true,
-            membership: 'PREMIUM',
-            memberRole: 'USER',
-            changeMembershipDate: null,
-          },
-        ],
-      },
-      { status: HttpStatusCode.Ok },
-    );
-  }),
+  http.get<PathParams<string>, GetSiteUsersRequest, GetSiteUsersResponse>(
+    getURL(API_ROUTE_PATH.ADMIN.GET_SITE_USERS),
+    async () => {
+      return HttpResponse.json(
+        {
+          status: HttpStatusCode.Ok,
+          msg: '성공',
+          data: [...siteUser],
+        },
+        { status: HttpStatusCode.Ok },
+      );
+    },
+  ),
   http.post<PathParams<string>, ChangeUserRoleRequest, ChangeUserRoleResponse>(
-    getURL(adminPath.changeUserRole),
+    getURL(API_ROUTE_PATH.ADMIN.MANAGE_USER.CHANGE_USER_ROLE),
     async ({ request }) => {
       const { email, role } = await request.json();
 
@@ -88,6 +94,12 @@ export const adminHandler = [
         );
       }
 
+      const targetUser = siteUser.find((user) => user.email === email);
+
+      if (targetUser) {
+        targetUser.memberRole = role;
+      }
+
       return HttpResponse.json(
         {
           status: HttpStatusCode.Ok,
@@ -98,8 +110,8 @@ export const adminHandler = [
       );
     },
   ),
-  http.post<PathParams<'id'>, DeleteUserRequest, DeleteUserResponse>(
-    getURL(`${adminPath.deleteUser}/:id`),
+  http.post<{ id: string }, DeleteUserRequest, DeleteUserResponse>(
+    getURL(API_ROUTE_PATH.ADMIN.MANAGE_USER.DELETE_USER()),
     async ({ params }) => {
       const { id } = params;
 
@@ -114,6 +126,20 @@ export const adminHandler = [
         );
       }
 
+      const targetUserIndex = siteUser.findIndex((user) => user.id === Number(id));
+
+      if (targetUserIndex === -1) {
+        return HttpResponse.json(
+          {
+            status: HttpStatusCode.NotFound,
+            msg: '유저를 찾을 수 없습니다',
+          },
+          { status: HttpStatusCode.NotFound },
+        );
+      }
+
+      siteUser.splice(targetUserIndex, 1);
+
       return HttpResponse.json(
         {
           status: HttpStatusCode.Ok,
@@ -124,8 +150,8 @@ export const adminHandler = [
       );
     },
   ),
-  http.get<PathParams<string>, GetNumOfSiteUsersRequest, GetNumOfSiteUsersResponse>(
-    getURL(adminPath.numOfSiteUsers),
+  http.get<PathParams, GetNumOfSiteUsersRequest, GetNumOfSiteUsersResponse>(
+    getURL(API_ROUTE_PATH.ADMIN.GET_SITE_USERS_NUMS),
     async () => {
       return HttpResponse.json(
         {
@@ -141,8 +167,8 @@ export const adminHandler = [
       );
     },
   ),
-  http.get<PathParams<string>, undefined, SearchSiteUserResponse | APIResponse>(
-    getURL(adminPath.searchSiteUser),
+  http.get<PathParams, DefaultBodyType, SearchSiteUserResponse | APIResponse>(
+    getURL(API_ROUTE_PATH.ADMIN.SEARCH),
     async ({ request }) => {
       const url = new URL(request.url);
 
@@ -160,22 +186,20 @@ export const adminHandler = [
         );
       }
 
+      const matchedUser = siteUser.filter((user) => {
+        if (type === 'email') return user.email.search(content) > -1;
+        if (type === 'fullName') return user.fullName.search(content) > -1;
+        if (type === 'membership') return user.membership === content;
+        if (type === 'memberRole') return user.memberRole === content;
+
+        return false;
+      });
+
       return HttpResponse.json(
         {
           status: HttpStatusCode.Ok,
           msg: '성공',
-          data: [
-            {
-              id: 2,
-              createdAt: '2023-12-01T13:14:09+09:00',
-              email: 'test@test.com',
-              fullName: 'test',
-              newsLetter: false,
-              membership: 'BASIC',
-              memberRole: 'USER',
-              changeMembershipDate: null,
-            },
-          ],
+          data: matchedUser.length ? [...matchedUser] : [],
         },
         { status: HttpStatusCode.Ok },
       );

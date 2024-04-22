@@ -2,6 +2,7 @@
 
 import React, { useLayoutEffect, useRef } from 'react';
 import { throttle } from 'lodash';
+import { twMerge } from 'tailwind-merge';
 
 interface HeaderProps {
   children?: React.ReactNode;
@@ -14,6 +15,13 @@ interface HeaderProps {
 
 function Header({ fixed, scrollDownCallback, scrollUpCallback, className, headerClassName, children }: HeaderProps) {
   const headerRef = useRef<HTMLElement>(null);
+
+  const headerClassNames = twMerge([
+    `fixed left-0 right-0 top-0 z-10 mx-auto w-full max-w-screen-pc bg-white mobile:min-w-[390px]`,
+    headerClassName,
+  ]);
+
+  const classNames = twMerge([`box-border flex items-center justify-between px-4 py-3.5`, className]);
 
   useLayoutEffect(() => {
     let scroll = 0;
@@ -42,22 +50,18 @@ function Header({ fixed, scrollDownCallback, scrollUpCallback, className, header
     }
 
     const headerScrollEventHandler = throttle(handleHeaderScroll, 400);
+    const headerScrollEventListenerOptions: AddEventListenerOptions = { passive: true };
 
-    !fixed && window.addEventListener('scroll', headerScrollEventHandler, { passive: true });
+    !fixed && window.addEventListener('scroll', headerScrollEventHandler, headerScrollEventListenerOptions);
 
     return () => {
-      !fixed && window.removeEventListener('scroll', headerScrollEventHandler);
+      !fixed && window.removeEventListener('scroll', headerScrollEventHandler, headerScrollEventListenerOptions);
     };
   }, []); /* eslint-disable-line */
 
   return (
-    <header
-      ref={headerRef}
-      className={`fixed left-0 right-0 top-0 z-10 mx-auto w-full max-w-screen-pc bg-white mobile:min-w-[390px] ${
-        headerClassName ?? ''
-      }`}
-    >
-      <div className={`${className ?? ''} box-border flex  items-center justify-between px-4 py-3.5`}>{children}</div>
+    <header ref={headerRef} className={headerClassNames}>
+      <div className={classNames}>{children}</div>
     </header>
   );
 }

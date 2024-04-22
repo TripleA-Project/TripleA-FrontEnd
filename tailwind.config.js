@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+
 module.exports = {
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -27,6 +28,11 @@ module.exports = {
       colors: {
         error: '#F60606',
       },
+      zIndex: {
+        dimmed: 10,
+        toolbar: 3,
+        component: 2,
+      },
       animation: {
         clock: 'rotate-clock 4s forwards infinite',
         clockTop: 'clock-top-fill 4s linear forwards infinite',
@@ -35,5 +41,5 @@ module.exports = {
       },
     },
   },
-  plugins: [require('tailwind-scrollbar')({ nocompatible: true })],
+  plugins: [require('tailwind-scrollbar')({ nocompatible: true }), require('@tailwindcss/container-queries')],
 };

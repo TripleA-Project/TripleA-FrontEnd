@@ -1,3 +1,20 @@
+import { JwtPayload } from 'jsonwebtoken';
+
+export type JwtAuthTokenPayload = {
+  id: number;
+  role: keyof typeof MEMBER_ROLE;
+};
+
+export type jwtVerifiedTokenPayload = {
+  email: string;
+  codeVerified: boolean;
+  sendTimeStamp?: number;
+};
+
+export type JwtAuthToken = JwtPayload & JwtAuthTokenPayload;
+
+export type jwtVerifiedToken = JwtPayload & jwtVerifiedTokenPayload;
+
 /**
  * 회원 종류 enum 상수
  *

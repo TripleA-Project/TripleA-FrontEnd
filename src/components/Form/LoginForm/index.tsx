@@ -14,6 +14,12 @@ import { ReactQueryHashKeys } from '@/constants/queryHashKeys';
 import { login } from '@/service/auth';
 import { validateEmail } from '@/util/validate';
 import { deleteCookie, getCookie, setCookie } from '@/util/cookies';
+import { getProfile } from '@/service/user';
+import AdminVerifyForm from './AdminVerifyForm';
+import MuiSpinner from '@/components/UI/Spinner/MuiSpinner';
+import { ProfilePayload } from '@/interfaces/Dto/User';
+import dayjs from 'dayjs';
+import { jwtAuthTokenDecode } from '@/util/actions/jwt';
 
 export interface LoginFormProps {
   continueURL?: string;
@@ -21,11 +27,16 @@ export interface LoginFormProps {
 export interface LoginForm {
   email: string;
   password: string;
-  continue?: string;
 }
 
 function LoginForm({ continueURL }: LoginFormProps) {
   const queryClient = useQueryClient();
+
+  const { replace, refresh } = useRouter();
+
+  const autoLoginRef = useRef<HTMLInputElement>(null);
+
+  const [adminUser, setAdminUser] = useState<ProfilePayload | null>(null);
 
   const {
     register,
@@ -34,12 +45,8 @@ function LoginForm({ continueURL }: LoginFormProps) {
     clearErrors,
     setError,
     watch,
-    formState: { isValid, errors },
+    formState: { isValid, errors, isSubmitting },
   } = useForm<LoginForm>();
-
-  const { replace, refresh } = useRouter();
-
-  const autoLoginRef = useRef<HTMLInputElement>(null);
 
   watch((value, { type }) => {
     if (type === 'change' && errors.root) {
@@ -55,18 +62,40 @@ function LoginForm({ continueURL }: LoginFormProps) {
 
   const onSubmit = async ({ email, password }: LoginForm) => {
     try {
+      if (isSubmitting) return;
+
       await deleteCookie('accessToken');
 
       const response = await login({ email, password });
 
-      const accessToken = response.headers['authorization'] as string;
+      const authorization = response.headers['authorization'] as string;
+
+      const accessToken = authorization.replace(/^Bearer /g, '');
       const autoLogin = await getCookie('autoLogin');
 
       if (accessToken) {
-        await setCookie('accessToken', accessToken.replace('Bearer ', ''), {
+        const decodedAccessToken = await jwtAuthTokenDecode(accessToken);
+
+        const expiresDate = dayjs(decodedAccessToken.exp! * 1000).toDate();
+
+        await setCookie('accessToken', accessToken, {
           path: '/',
-          maxAge: Number(process.env.NEXT_PUBLIC_ACCESS_TOKEN_MAXAGE),
+          expires: expiresDate,
         });
+      }
+
+      const profileResponse = await getProfile();
+      const profile = profileResponse.data.data;
+
+      if (profile?.memberRole === 'ADMIN') {
+        await deleteCookie('autoLogin');
+
+        setAdminUser((prev) => ({
+          ...prev,
+          ...profile,
+        }));
+
+        return;
       }
 
       if (autoLoginRef?.current) {
@@ -94,6 +123,10 @@ function LoginForm({ continueURL }: LoginFormProps) {
       setError('root', { type: 'validate', message: 'login error' });
     }
   };
+
+  if (adminUser) {
+    return <AdminVerifyForm email={adminUser.email} continueURL={continueURL} />;
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="-mt-[52px] box-border px-4">
@@ -194,13 +227,19 @@ function LoginForm({ continueURL }: LoginFormProps) {
             </div>
           ) : null}
           <Button
-            disabled={!isValid}
-            className="mt-10 box-border font-bold"
+            disabled={!isValid || isSubmitting}
+            className={`mt-10 box-border font-bold`}
             sizeTheme="fullWidth"
             bgColorTheme={isValid ? 'orange' : 'lightgray'}
             textColorTheme="white"
           >
-            로그인
+            {isSubmitting ? (
+              <div className="flex h-full w-full items-center justify-center bg-white/70">
+                <MuiSpinner size={16} />
+              </div>
+            ) : (
+              '로그인'
+            )}
           </Button>
         </div>
         <div className="flex items-center justify-between">
