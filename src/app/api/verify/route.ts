@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.NEXT_JWT_VERIFY_SECRET!) as jwtVerifiedToken;
+    const decoded = jwt.verify(token, process.env.NEXT_PUBLIC_JWT_VERIFY_SECRET!) as jwtVerifiedToken;
 
     if (!decoded?.codeVerified) {
       return NextResponse.json(

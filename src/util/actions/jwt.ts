@@ -42,7 +42,7 @@ export async function jwtAuthTokenDecode(token: string, options?: DecodeOptions)
 
 // verifiedToken
 export async function jwtVerifiedTokenSign(payload: jwtVerifiedTokenPayload, options?: SignOptions) {
-  return jwt.sign(payload, process.env.NEXT_JWT_VERIFY_SECRET!, options);
+  return jwt.sign(payload, process.env.NEXT_PUBLIC_JWT_VERIFY_SECRET!, options);
 }
 
 export async function jwtVerifiedTokenDecode(token: string, options?: DecodeOptions) {
@@ -50,5 +50,5 @@ export async function jwtVerifiedTokenDecode(token: string, options?: DecodeOpti
 }
 
 export async function jwtVerifiedTokenVerify(token: string, options?: VerifyOptions) {
-  return jwt.verify(token, process.env.NEXT_JWT_VERIFY_SECRET!, options) as jwtVerifiedToken;
+  return jwt.verify(token, process.env.NEXT_PUBLIC_JWT_VERIFY_SECRET!, options) as jwtVerifiedToken;
 }
