@@ -10,7 +10,7 @@ permissions:
   contents: read
 jobs:
   deploy:
-    if: github.repository == 'TripleA-Project/TripleA-Frontend' && github.event.pull_request.merged == true
+    if: github.repository == 'TripleA-Project/TripleA-FrontEnd' && github.event.pull_request.merged == true
     name: ec2Deploy
     runs-on: ubuntu-latest
     steps:
