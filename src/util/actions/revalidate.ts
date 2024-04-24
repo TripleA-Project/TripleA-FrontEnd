@@ -8,8 +8,3 @@ type RevalidateActionFn = (path: RevalidatePathParams[0], type?: RevalidatePathP
 export const revalidateAction: RevalidateActionFn = async (path, type) => {
   revalidatePath(path, type);
 };
-
-export const revalidateNoticeListPage = async () => {
-  revalidatePath('/notice');
-  revalidatePath('/admin/notice');
-};

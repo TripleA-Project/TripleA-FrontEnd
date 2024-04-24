@@ -53,10 +53,7 @@ export async function syncCookie(email: string) {
   const existAccessToken = await getCookie('accessToken');
   const existServerUserTokenCookie = ServerUserTokenCookies.get(email);
 
-  console.log('serverCookies: ', ServerUserTokenCookies.getAll());
-
   if (!existAccessToken && existServerUserTokenCookie) {
-    console.log('serverCookie 설정');
     const { value, ...options } = existServerUserTokenCookie.accessToken!;
 
     await setCookie('accessToken', value, {

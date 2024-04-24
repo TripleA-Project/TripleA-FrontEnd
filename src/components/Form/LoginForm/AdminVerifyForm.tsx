@@ -2,7 +2,7 @@
 
 import Button from '@/components/Button/Button';
 import { AppLogos } from '@/components/Icons';
-import Timer, { timerInit, timerInitSeconds, timerReset, timerStart, timerStop } from '@/components/Timer';
+import Timer, { timerInit, timerInitSeconds, timerReset, timerStart } from '@/components/Timer';
 import MuiSpinner from '@/components/UI/Spinner/MuiSpinner';
 import { ReactQueryHashKeys } from '@/constants/queryHashKeys';
 import { ROUTE_PATH } from '@/constants/routePath';
@@ -15,7 +15,7 @@ import { toastNotify } from '@/util/toastNotify';
 import { useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/navigation';
-import { useLayoutEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { ToastContainer } from 'react-toastify';
 import { twMerge } from 'tailwind-merge';
@@ -152,7 +152,7 @@ function AdminVerifyForm({ email, continueURL }: AdminVerifyFormProps) {
     adminEmailVerify({ email, code: data.code });
   };
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     (async () => {
       const accessToken = await getCookie('accessToken');
 
@@ -245,7 +245,7 @@ function AdminVerifyForm({ email, continueURL }: AdminVerifyFormProps) {
               sizeTheme="fullWidth"
               bgColorTheme="orange"
               textColorTheme="white"
-              disabled={!isValid || adminEmailVerifyStatus === 'loading'}
+              disabled={!isValid || adminEmailVerifyStatus === 'loading' || adminEmailVerifyStatus === 'success'}
             >
               이메일 인증하기
             </Button>

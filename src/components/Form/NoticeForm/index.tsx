@@ -16,7 +16,6 @@ import { AxiosError, HttpStatusCode } from 'axios';
 import { APIResponse } from '@/interfaces/Dto/Core';
 import { FaRegCircleCheck } from 'react-icons/fa6';
 import Link from 'next/link';
-import { revalidateNoticeListPage } from '@/util/actions/revalidate';
 
 export type NoticeAction = 'create' | 'change';
 
@@ -207,12 +206,6 @@ function StatusIndicator({
   isSuccess?: boolean;
 }) {
   const open = isLoading || isSubmit || isSuccess;
-
-  useEffect(() => {
-    if (isSuccess) {
-      revalidateNoticeListPage();
-    }
-  }, [isSuccess]);
 
   return open ? (
     <div className="fixed_inner fixed top-[52px] z-[5] flex h-[calc(100vh-113.5px)]">

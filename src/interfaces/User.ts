@@ -5,7 +5,7 @@ export type JwtAuthTokenPayload = {
   role: keyof typeof MEMBER_ROLE;
 };
 
-export type jwtVerifiedTokenPayload = {
+export type JwtVerifiedTokenPayload = {
   email: string;
   codeVerified: boolean;
   sendTimeStamp?: number;
@@ -13,7 +13,7 @@ export type jwtVerifiedTokenPayload = {
 
 export type JwtAuthToken = JwtPayload & JwtAuthTokenPayload;
 
-export type jwtVerifiedToken = JwtPayload & jwtVerifiedTokenPayload;
+export type JwtVerifiedToken = JwtPayload & JwtVerifiedTokenPayload;
 
 /**
  * 회원 종류 enum 상수
