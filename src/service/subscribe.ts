@@ -25,15 +25,11 @@ export async function subscribe({ url }: { url: string }) {
  * `order_code` subscribe API를 통해 결제가 완료된 이후 리다이렉트 된 URL의 order_code 파라미터 값 [**string**]
  */
 export async function successSubscribe({ order_code }: SuccessSubscribeSearchParams) {
-  console.log('[api order_code]', { order_code });
-
   const checkSubscribedUserResponse = await axiosInstance.get<SuccessSubscribeResponse>(`${subscribeBaseURL}/success`, {
     params: {
       order_code,
     },
   } as SuccessSubscribeRequestConfig);
-
-  console.log('[url]', checkSubscribedUserResponse.config.url);
 
   return checkSubscribedUserResponse;
 }

@@ -17,6 +17,14 @@ async function MypageUserFetcher({ children }: MypageUserFetcherProps) {
     return err as AxiosError;
   });
 
+  if (profileResponse.status === HttpStatusCode.Ok) {
+    if ('data' in profileResponse) {
+      if (profileResponse.data.status === HttpStatusCode.Unauthorized) {
+        return <MyPageUnauthorized />;
+      }
+    }
+  }
+
   if (profileResponse instanceof AxiosError) {
     const { code, response } = profileResponse as AxiosError<APIResponse>;
 

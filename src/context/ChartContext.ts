@@ -1,5 +1,4 @@
-import { DataMinMaxReturnType } from '@/util/chart';
-import { IChartApi, ISeriesApi, LineData, SeriesOptionsMap } from 'lightweight-charts';
+import { IChartApi, ISeriesApi, SeriesOptionsMap } from 'lightweight-charts';
 import { createContext } from 'react';
 
 export interface ChartContextState {

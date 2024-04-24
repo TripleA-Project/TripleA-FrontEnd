@@ -1,4 +1,4 @@
-import { SetupWorker } from 'msw';
+import { SetupWorker } from 'msw/browser';
 import { SetupServer } from 'msw/lib/node';
 
 let mswServer: SetupServer | null = null;
