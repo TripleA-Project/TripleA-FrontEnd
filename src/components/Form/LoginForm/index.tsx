@@ -23,20 +23,23 @@ import { jwtAuthTokenDecode } from '@/util/actions/jwt';
 
 export interface LoginFormProps {
   continueURL?: string;
+  userPayload?: ProfilePayload | null;
 }
 export interface LoginForm {
   email: string;
   password: string;
 }
 
-function LoginForm({ continueURL }: LoginFormProps) {
+function LoginForm({ continueURL, userPayload }: LoginFormProps) {
   const queryClient = useQueryClient();
 
   const { replace, refresh } = useRouter();
 
   const autoLoginRef = useRef<HTMLInputElement>(null);
 
-  const [adminUser, setAdminUser] = useState<ProfilePayload | null>(null);
+  const [adminUser, setAdminUser] = useState<ProfilePayload | null>(
+    userPayload?.memberRole === 'ADMIN' ? userPayload : null,
+  );
 
   const {
     register,
