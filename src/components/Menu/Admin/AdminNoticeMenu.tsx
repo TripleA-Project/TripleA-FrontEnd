@@ -8,32 +8,35 @@ import { FaRegFile } from 'react-icons/fa';
 import { RiFileEditLine } from 'react-icons/ri';
 import { IoMenu } from 'react-icons/io5';
 import { IoClose } from 'react-icons/io5';
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useLayoutEffect, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { ROUTE_PATH } from '@/constants/routePath';
 import { useModal } from '@/redux/slice/modalSlice';
-import { useQuery } from '@tanstack/react-query';
-import { getProfile } from '@/service/user';
+import { useAdminVerify } from '@/hooks/useAdminVerify';
 
 export type NoticeMenuAction = 'list' | 'detail';
 
-function AdminNoticeMenu({ action, id }: { action: NoticeMenuAction; id?: number }) {
-  const { data: profile, error: profileError } = useQuery(['profile'], () => getProfile(), {
-    suspense: true,
-    useErrorBoundary: false,
-    retry: 0,
-    refetchOnWindowFocus: false,
-    select(response) {
-      return response.data.data;
-    },
-  });
+interface MenuAction {
+  icon: React.ReactNode;
+  name: string;
+  onClick: () => void;
+}
 
+type MenuActions = MenuAction[];
+
+function AdminNoticeMenu() {
   const { push } = useRouter();
+  const pathname = usePathname();
 
+  const { verified, adminVerify } = useAdminVerify();
   const [open, setOpen] = useState(false);
   const { modal, openModal } = useModal('admin:deleteNotice');
 
-  const noticeDetailPageActions = [
+  const hidden = modal.open || (!pathname.startsWith('/notice') && !pathname.startsWith('/admin/notice'));
+
+  const id = Number(pathname.replace(/^(\/notice\/)|(\/admin\/notice\/)/g, ''));
+
+  const noticeDetailPageActions: MenuActions = [
     {
       icon: <RiFileEditLine className="text-xl" />,
       name: '공지 수정',
@@ -52,7 +55,7 @@ function AdminNoticeMenu({ action, id }: { action: NoticeMenuAction; id?: number
     },
   ];
 
-  const noticeListPageActions = [
+  const noticeListPageActions: MenuActions = [
     {
       icon: <FaRegFile className="text-lg" />,
       name: '공지 작성',
@@ -62,11 +65,15 @@ function AdminNoticeMenu({ action, id }: { action: NoticeMenuAction; id?: number
     },
   ];
 
+  const action: NoticeMenuAction =
+    pathname === ROUTE_PATH.NOTICE.LIST || pathname === ROUTE_PATH.ADMIN.NOTICE.LIST ? 'list' : 'detail';
   const actions = action === 'list' ? noticeListPageActions : noticeDetailPageActions;
 
-  if (!profile || !!profileError || profile.memberRole !== 'ADMIN') return null;
+  useLayoutEffect(() => {
+    adminVerify();
+  }, [pathname]); /* eslint-disable-line */
 
-  return (
+  return !hidden && verified ? (
     <div className="fixed_inner fixed bottom-[78.5px] h-[40px] !p-0">
       <SpeedDial
         hidden={modal.open}
@@ -127,7 +134,7 @@ function AdminNoticeMenu({ action, id }: { action: NoticeMenuAction; id?: number
         })}
       </SpeedDial>
     </div>
-  );
+  ) : null;
 }
 
 export default AdminNoticeMenu;

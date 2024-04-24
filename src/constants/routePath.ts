@@ -35,6 +35,10 @@ export const ROUTE_PATH = {
   LOGOUT: `/logout`,
   ADMIN: {
     DASH_BOARD: '/admin/dashboard',
+    MANAGE_USER: '/admin/users',
+    NOTICE: {
+      LIST: '/admin/notice',
+    },
   },
   NOTICE: {
     LIST: `/notice`,

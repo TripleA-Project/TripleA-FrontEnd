@@ -1,8 +1,9 @@
 'use server';
 
-import { JwtAuthToken, JwtAuthTokenPayload, jwtVerifiedToken, jwtVerifiedTokenPayload } from '@/interfaces/User';
+import { JwtAuthToken, JwtAuthTokenPayload, JwtVerifiedToken, JwtVerifiedTokenPayload } from '@/interfaces/User';
 import { mockJwtSecret } from '@/mocks/handler/auth/login';
 import jwt, { Secret, SignOptions, VerifyOptions, DecodeOptions, JwtPayload } from 'jsonwebtoken';
+import { cookies } from 'next/headers';
 
 // common
 export async function jwtSign(payload: string | object | Buffer, secretOrPrivateKey: Secret, options?: SignOptions) {
@@ -41,14 +42,29 @@ export async function jwtAuthTokenDecode(token: string, options?: DecodeOptions)
 }
 
 // verifiedToken
-export async function jwtVerifiedTokenSign(payload: jwtVerifiedTokenPayload, options?: SignOptions) {
+export async function jwtVerifiedTokenSign(payload: JwtVerifiedTokenPayload, options?: SignOptions) {
   return jwt.sign(payload, process.env.NEXT_PUBLIC_JWT_VERIFY_SECRET!, options);
 }
 
 export async function jwtVerifiedTokenDecode(token: string, options?: DecodeOptions) {
-  return jwt.decode(token, options) as jwtVerifiedToken;
+  return jwt.decode(token, options) as JwtVerifiedToken;
 }
 
 export async function jwtVerifiedTokenVerify(token: string, options?: VerifyOptions) {
-  return jwt.verify(token, process.env.NEXT_PUBLIC_JWT_VERIFY_SECRET!, options) as jwtVerifiedToken;
+  return jwt.verify(token, process.env.NEXT_PUBLIC_JWT_VERIFY_SECRET!, options) as JwtVerifiedToken;
+}
+
+// token util
+export async function adminTokenVerify() {
+  const token = cookies().get('verifiedToken')?.value;
+  if (!token) return false;
+
+  let decoded: JwtVerifiedToken | null = null;
+  try {
+    decoded = jwt.verify(token, process.env.NEXT_PUBLIC_JWT_VERIFY_SECRET!) as JwtVerifiedToken;
+  } catch (error) {
+    decoded = null;
+  }
+
+  return !!decoded?.codeVerified;
 }

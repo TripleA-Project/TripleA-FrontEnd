@@ -5,6 +5,8 @@ import AdminNavItem, { AdminNavItemType } from './AdminNavItem';
 import { FaChartBar } from 'react-icons/fa';
 import { MdManageAccounts } from 'react-icons/md';
 import { TfiWrite } from 'react-icons/tfi';
+import { ImExit } from 'react-icons/im';
+import { AppLogos } from '@/components/Icons';
 
 function AdminNavbar() {
   const pathName = usePathname();
@@ -27,6 +29,18 @@ function AdminNavbar() {
       icon: <TfiWrite />,
       href: '/admin/notice',
       text: '공지 관리',
+    },
+    {
+      active: false,
+      icon: <AppLogos.Orange className="h-6 w-6" />,
+      href: '/',
+      text: '사이트 홈',
+    },
+    {
+      active: false,
+      icon: <ImExit />,
+      href: '/logout',
+      text: '로그아웃',
     },
   ];
 

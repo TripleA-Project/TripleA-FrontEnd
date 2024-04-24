@@ -10,6 +10,8 @@ import SetupClientMSW from '@/components/MSW/SetupClientMSW';
 import SetupServerMSW from '@/components/MSW/SetupServerMSW';
 import DomainHeader from './_layouts/header/DomainHeader';
 import NavigationEvents from './_layouts/NavigationEvents';
+import AdminLinkMenu from '@/components/Menu/Admin/AdminLinkMenu';
+import AdminNoticeMenu from '@/components/Menu/Admin/AdminNoticeMenu';
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -50,6 +52,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
             <Page>{children}</Page>
             <Navbar />
             <Footer />
+            <AdminLinkMenu />
+            <AdminNoticeMenu />
           </ReactQueryProvider>
         </ReduxProvider>
       </body>
