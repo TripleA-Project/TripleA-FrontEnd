@@ -56,7 +56,6 @@ export async function GET(request: NextRequest) {
 
   // verifiedToken 검증 (2차 확인)
   const authorization = headers.get('Authorization');
-  console.log({ authorization });
 
   if (!authorization) {
     return NextResponse.json(

@@ -1,5 +1,4 @@
 import LoginForm from '@/components/Form/LoginForm';
-import AdminVerifyForm from '@/components/Form/LoginForm/AdminVerifyForm';
 import { getProfile } from '@/service/user';
 import { Metadata } from 'next';
 import { cookies } from 'next/headers';
@@ -31,7 +30,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
     const verifiedToken = cookies().get('verifiedToken')?.value;
 
-    const adminVerifiedResponse = await fetch(new URL('/api/verify', process.env.NEXT_PUBLIC_SITE_URL).toString(), {
+    const adminVerifiedResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/verify`, {
       cache: 'no-store',
       headers: {
         Authorization: verifiedToken ? `Bearer ${verifiedToken}` : '',
@@ -42,9 +41,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     if (adminVerifiedResponse.ok) {
       redirect(searchParams.continueURL ? decodeURIComponent(searchParams.continueURL) : '/');
     }
-
-    return <AdminVerifyForm email={userPayload.email} continueURL={searchParams.continueURL} />;
   }
 
-  return <LoginForm continueURL={searchParams?.continueURL} />;
+  return <LoginForm continueURL={searchParams?.continueURL} userPayload={userPayload} />;
 }
