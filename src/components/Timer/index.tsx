@@ -23,7 +23,7 @@ function Timer({ minute, seconds, autoStart = true, loading, className, onTimeEn
     const timerWorker = new Worker('/timerWorker.js');
     timerWorkerAPI = timerWorker;
 
-    timerInit(seconds ?? (minute ? minute * 60 : 300));
+    timerInitSeconds(time);
     autoStart && timerStart();
 
     timerWorker.onmessage = (e) => {
