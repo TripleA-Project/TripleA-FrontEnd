@@ -15,6 +15,7 @@ import { login, signup } from '@/service/auth';
 import { deleteCookie, getCookie, setCookie } from '@/util/cookies';
 import { toastNotify } from '@/util/toastNotify';
 import type { FormData } from '@/interfaces/FormData';
+import { stibeeAddressApiAction } from '@/util/actions/stibee';
 
 export interface TermsFormData {
   newsLetter: boolean;
@@ -81,6 +82,12 @@ function TermsForm() {
         newsLetter: newsLetter!,
         emailKey: emailKey!,
       });
+
+      if (newsLetter === true) {
+        const stibeeResponse = await stibeeAddressApiAction({
+          subscribers: [{ email: email!, name: fullName, $ad_agreed: 'Y' }],
+        });
+      }
 
       // login
       try {

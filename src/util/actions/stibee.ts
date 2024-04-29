@@ -10,6 +10,8 @@ export async function stibeeAddressApiAction({
   subscribers,
   groupIds,
 }: PostStibeeAddressRequest) {
+  'use server';
+
   try {
     const res = await stibeeAddressApi({
       eventOccuredBy,
@@ -18,19 +20,17 @@ export async function stibeeAddressApiAction({
       groupIds,
     });
 
-    console.log('stibee response', { res: res.data });
-
-    return res;
+    return res.data;
   } catch (error) {
     if (error instanceof AxiosError) {
       const { response } = error as AxiosError<PostStibeeAdressResponse>;
 
       console.log('stibee error', { error: response?.data });
 
-      throw error;
+      return response?.data;
     }
 
     console.log('stibee error', { error });
-    throw error;
+    return error;
   }
 }
