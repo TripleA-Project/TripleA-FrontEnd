@@ -2,6 +2,11 @@ export const API_ROUTE_PATH = {
   LOGIN: `/api/login`,
   LOGOUT: `/api/auth/logout`,
   REQUEST_ACCESS_TOKEN: '/api/refresh',
+  VERIFY: {
+    EMAIL_SEND: '/api/email',
+    VERIFY_EMAIL: '/api/email/verify',
+  },
+  SIGNUP: '/api/join',
   USER: {
     PROFILE: `/api/auth/user/me`,
   },
