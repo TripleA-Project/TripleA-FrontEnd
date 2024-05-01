@@ -3,7 +3,6 @@
 import { useLayoutEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { isMobile } from 'react-device-detect';
-import { useRouter } from 'next/navigation';
 import { ToastContainer } from 'react-toastify';
 import { HttpStatusCode } from 'axios';
 import Button from '@/components/Button/Button';
@@ -13,7 +12,8 @@ import { deleteCookie } from '@/util/cookies';
 import { type UseStepFormContext } from '../StepForm';
 import { type ProfilePayload } from '@/interfaces/Dto/User';
 import { useQueryClient } from '@tanstack/react-query';
-import { unSubscribe } from '@/service/subscribe';
+import { stibeeDeleteAddressApiAction } from '@/util/actions/stibee';
+// import { unSubscribe } from '@/service/subscribe';
 
 interface WithDrawalFormProps {
   user: ProfilePayload;
@@ -26,7 +26,6 @@ interface WithDrawalReason {
 
 function WithDrawalForm({ user }: WithDrawalFormProps) {
   const queryClient = useQueryClient();
-  const { push } = useRouter();
 
   const {
     register,
@@ -45,14 +44,16 @@ function WithDrawalForm({ user }: WithDrawalFormProps) {
       const { data: payload } = await membershipWithDrawal();
 
       if (payload.status === HttpStatusCode.Ok) {
-        await deleteCookie('accessToken');
-
-        queryClient.removeQueries({ queryKey: ['auth'] });
-        queryClient.removeQueries({ queryKey: ['profile'] });
+        await stibeeDeleteAddressApiAction({ deleteEmailList: [user.email] });
 
         done();
 
-        push('/');
+        setTimeout(async () => {
+          await deleteCookie('accessToken');
+
+          queryClient.removeQueries({ queryKey: ['auth'] });
+          queryClient.removeQueries({ queryKey: ['profile'] });
+        }, 0);
 
         return;
       }

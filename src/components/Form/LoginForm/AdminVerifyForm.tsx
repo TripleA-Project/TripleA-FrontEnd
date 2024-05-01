@@ -79,7 +79,14 @@ function AdminVerifyForm({ email, continueURL }: AdminVerifyFormProps) {
         httpOnly: true,
       });
 
+      queryClient.removeQueries({
+        predicate(query) {
+          return !query.queryHash.includes('profile');
+        },
+      });
       queryClient.invalidateQueries(ReactQueryHashKeys.getProfile);
+
+      revalidateAction('*');
 
       setTimeout(() => {
         replace(decodeURIComponent(continueURL ?? ROUTE_PATH.ADMIN.DASH_BOARD));
