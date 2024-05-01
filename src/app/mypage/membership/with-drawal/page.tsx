@@ -4,6 +4,7 @@ import { HttpStatusCode } from 'axios';
 import StepForm from '@/components/Form/StepForm';
 import { CheckWillProcess, WithDrawalForm } from '@/components/Form/MembershipWithDrawalForm';
 import { getProfile } from '@/service/user';
+import Redirect from './_components/Redirect';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -27,6 +28,7 @@ async function MembershipPage() {
     >
       <CheckWillProcess />
       <WithDrawalForm user={profilePayload.data} />
+      <Redirect />
     </StepForm>
   );
 }

@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import UserManageModalWrapper from './UserManageModalWrapper';
 import Button from '@/components/Button/Button';
 import { deleteUser } from '@/service/admin';
-import { clearSelectedUsers, deleteUsers } from '@/redux/slice/adminUserListSlice';
+import { clearSelectedUsers, deleteUsers, useAdminUserList } from '@/redux/slice/adminUserListSlice';
 import { useEffect } from 'react';
 import ProgressView, {
   ProgressDoneViewProps,
@@ -15,6 +15,7 @@ import ProgressView, {
 } from '@/components/ProgressView';
 import { DeleteUserResponse } from '@/interfaces/Dto/Admin/DeleteUserDto';
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { stibeeDeleteAddressApiAction } from '@/util/actions/stibee';
 
 function DeleteUserModal() {
   const { modal } = useModal('admin:deleteUser');
@@ -36,6 +37,8 @@ export default DeleteUserModal;
 const DeleteUserModalContent = () => {
   const { modal, closeModal, dispatch } = useModal('admin:deleteUser');
 
+  const { users } = useAdminUserList();
+
   const onDone: NonNullable<ProgressViewProps['onDone']> = ({ completedTaskResult }) => {
     const targetUserIdsPayload = (completedTaskResult as AxiosResponse<DeleteUserResponse>[]).map((result) => {
       const config = result.config as AxiosRequestConfig;
@@ -43,10 +46,16 @@ const DeleteUserModalContent = () => {
       return Number(config.url!.replace('/api/admin/user/delete/', ''));
     });
 
+    const deleteEmailList = users.filter((user) => targetUserIdsPayload.includes(user.id)).map((user) => user.email);
+
     dispatch(deleteUsers(targetUserIdsPayload));
 
     setTimeout(() => {
       dispatch(clearSelectedUsers());
+
+      stibeeDeleteAddressApiAction({
+        deleteEmailList,
+      }).then((res) => console.log('stibee delete', { res }));
     }, 0);
   };
 
