@@ -1,3 +1,7 @@
+import {
+  DeleteStibeeAddressRequest,
+  DeleteStibeeAddressResponse,
+} from '@/interfaces/Dto/Stibee/DeleteStibeeAddressDto';
 import { PostStibeeAddressRequest, PostStibeeAdressResponse } from '@/interfaces/Dto/Stibee/PostStibeeAddressDto';
 import axios, { AxiosResponse } from 'axios';
 
@@ -30,6 +34,21 @@ export async function stibeeAddressApi({
       },
     },
   );
+
+  return res;
+}
+
+export async function stibeeDeleteAddressApi({ deleteEmailList }: DeleteStibeeAddressRequest) {
+  const res = await axios.delete<
+    any,
+    AxiosResponse<DeleteStibeeAddressResponse>,
+    DeleteStibeeAddressRequest['deleteEmailList']
+  >(`https://api.stibee.com/v1/lists/${process.env.NEXT_PUBLIC_STIBEE_ID}/subscribers`, {
+    data: [...deleteEmailList],
+    headers: {
+      AccessToken: process.env.NEXT_PUBLIC_STIBEE_KEY,
+    },
+  });
 
   return res;
 }

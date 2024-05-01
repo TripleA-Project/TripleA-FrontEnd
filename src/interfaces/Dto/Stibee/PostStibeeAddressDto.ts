@@ -1,17 +1,4 @@
-interface KnownUserInfoKeyValue {
-  /**
-   * 이메일
-   */
-  email: string;
-  /**
-   * 이름
-   */
-  name?: string;
-  /**
-   * 광고성 정보 수신 동의 여부
-   */
-  $ad_agreed?: 'Y' | 'N';
-}
+import { KnownStibeeUserInfo } from './core';
 
 interface ResponseKeyValue {
   Key:
@@ -25,7 +12,7 @@ interface ResponseKeyValue {
     | 'failDuplicatedEmail'
     | 'failDuplicatedPhone'
     | 'failUnknown';
-  Value: KnownUserInfoKeyValue[];
+  Value: KnownStibeeUserInfo[];
 }
 
 export interface PostStibeeAddressRequest {
@@ -56,7 +43,7 @@ export interface PostStibeeAddressRequest {
    *
    * `$ad_agreed` (기본값: 'N') 광고성 정보 수신 여부
    */
-  subscribers: KnownUserInfoKeyValue[];
+  subscribers: KnownStibeeUserInfo[];
 }
 
 export interface PostStibeeAdressResponse {
@@ -71,9 +58,9 @@ export interface PostStibeeAdressResponse {
   /**
    * Ok 가 false 인 경우 에러 내용
    *
-   * `Code` 에러 코드
+   * `code` 에러 코드
    *
-   * `Message` 에러 메시지
+   * `message` 에러 메시지
    */
   Error: {
     code: string;
