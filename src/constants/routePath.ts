@@ -7,6 +7,7 @@ export const API_ROUTE_PATH = {
     VERIFY_EMAIL: '/api/email/verify',
   },
   SIGNUP: '/api/join',
+  WITH_DRAWAL: '/api/auth/user',
   USER: {
     PROFILE: `/api/auth/user/me`,
   },

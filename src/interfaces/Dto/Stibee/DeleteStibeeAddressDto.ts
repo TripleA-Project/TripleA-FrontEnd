@@ -4,6 +4,10 @@ interface ResponseKeyValue {
 }
 
 export interface DeleteStibeeAddressRequest {
+  /**
+   * 삭제 요청 이메일 리스트
+   * **string[]**
+   */
   deleteEmailList: string[];
 }
 
