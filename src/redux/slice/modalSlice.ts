@@ -1,7 +1,7 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { SiteUser } from '@/interfaces/Dto/Admin/GetSiteUsersDto';
+import { SiteUserPayload } from '@/interfaces/Dto/Admin/GetSiteUsersDto';
 import { useCallback } from 'react';
 
 export type DefaultModalType = 'modal:default';
@@ -13,11 +13,11 @@ export type ModalType = DefaultModalType | SelectedUserModalType | AdminModalTyp
 type ModalPayload<T> = T extends DefaultModalType
   ? any
   : T extends AdminModalType
-  ? { selectedUsers: SiteUser[] }
+  ? { selectedUsers: SiteUserPayload[] }
   : T extends AdminNoticeType
   ? { noticeId: number }
   : T extends SelectedUserModalType
-  ? { selectedUsers: SiteUser[] }
+  ? { selectedUsers: SiteUserPayload[] }
   : never;
 
 export interface ModalState<T extends ModalType = any> {

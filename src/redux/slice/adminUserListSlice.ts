@@ -1,13 +1,13 @@
-import { SiteUser } from '@/interfaces/Dto/Admin/GetSiteUsersDto';
+import { SiteUser, SiteUserPayload } from '@/interfaces/Dto/Admin/GetSiteUsersDto';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { uniqBy } from 'lodash';
 
 interface AdminUserListState {
-  users: SiteUser[];
-  defaultUsers: SiteUser[];
-  selectedUsers: SiteUser[];
+  users: SiteUserPayload[];
+  defaultUsers: SiteUserPayload[];
+  selectedUsers: SiteUserPayload[];
 }
 
 const initialState: AdminUserListState = {
@@ -74,10 +74,10 @@ export const adminUserListSlice = createSlice({
     resetUsers: (state: AdminUserListState) => {
       state.users = [...state.defaultUsers];
     },
-    selectUser: (state: AdminUserListState, actions: PayloadAction<SiteUser>) => {
+    selectUser: (state: AdminUserListState, actions: PayloadAction<SiteUserPayload>) => {
       state.selectedUsers = uniqBy([...state.selectedUsers, actions.payload], 'email');
     },
-    unSelectUser: (state: AdminUserListState, actions: PayloadAction<SiteUser>) => {
+    unSelectUser: (state: AdminUserListState, actions: PayloadAction<SiteUserPayload>) => {
       state.selectedUsers = state.selectedUsers.filter((user) => user.email !== actions.payload.email);
     },
     clearSelectedUsers: (state: AdminUserListState) => {

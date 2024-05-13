@@ -6,7 +6,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TableBody from '@mui/material/TableBody';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import { SiteUser } from '@/interfaces/Dto/Admin/GetSiteUsersDto';
+import { SiteUserPayload } from '@/interfaces/Dto/Admin/GetSiteUsersDto';
 import dayjs from 'dayjs';
 import UserTableSearching from './UserTableSearching';
 import UserCheckBox from './CheckBox';
@@ -17,7 +17,7 @@ export const membershipLabel = {
 } as const;
 
 interface UserTableProps {
-  userList: SiteUser[];
+  userList: SiteUserPayload[];
   withCheckBox?: boolean;
 }
 

@@ -1,4 +1,5 @@
 import { API_ROUTE_PATH } from '@/constants/routePath';
+import { SiteUserPayload } from '@/interfaces/Dto/Admin/GetSiteUsersDto';
 import { SearchSiteUserResponse } from '@/interfaces/Dto/Admin/SearchSiteUserDto';
 import { APIResponse } from '@/interfaces/Dto/Core';
 import { siteUser } from '@/mocks/db/siteUser';
@@ -38,7 +39,25 @@ export const mockSearchSiteUserApi = http.get<PathParams, DefaultBodyType, Searc
       {
         status: HttpStatusCode.Ok,
         msg: '성공',
-        data: matchedUser.length ? [...matchedUser] : [],
+        data: matchedUser.length
+          ? [
+              ...matchedUser.map((user) => {
+                const { id, createAt, email, fullName, memberRole, membership, newsLetter, changeMembershipDate } =
+                  user;
+
+                return {
+                  id,
+                  createAt,
+                  email,
+                  fullName,
+                  memberRole,
+                  membership,
+                  newLetter: newsLetter ?? false,
+                  changeMembershipDate,
+                } as SiteUserPayload;
+              }),
+            ]
+          : [],
       },
       { status: HttpStatusCode.Ok },
     );

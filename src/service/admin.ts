@@ -24,6 +24,10 @@ import {
   DeleteFreeTrialUserRequest,
   DeleteFreeTrialUserResponse,
 } from '@/interfaces/Dto/Admin/free-trial/DeleteFreeTrialUserDto';
+import {
+  GetFreeTrialUsersRequest,
+  GetFreeTrialUsersResponse,
+} from '@/interfaces/Dto/Admin/free-trial/GetFreeTrialUsersDto';
 
 /**
  * [Admin] 관리자 인증 메일 발송 API (POST)
@@ -128,18 +132,37 @@ export async function searchSiteUser({ type, content }: SearchSiteUserRequest) {
 // 무료체험
 
 /**
+ * [Admin] 무료체험 유저 목록 조회 (POST)
+ *
+ */
+export async function getFreeTrialUsers() {
+  const res = await axiosInstance.post<any, AxiosResponse<GetFreeTrialUsersResponse>>(
+    API_ROUTE_PATH.ADMIN.FREE_TRIAL.GET_FREE_TRIAL_USERS,
+    {},
+  );
+
+  return res;
+}
+
+/**
  * [Admin] 무료체험 등록 (POST)
  *
  * `id` 무료체험 등록할 유저의 아이디 [**number**]
  *
- * `endDate` 무료체험 종료 일자 문자 포멧 [**"YYYY-MM-DD"**]
+ * `freeTierStartDate` 무료체험 시작 일자 문자 포멧 [**"YYYY-MM-DD"**]
+ *
+ * `freeTierEndDate` 무료체험 종료 일자 문자 포멧 [**"YYYY-MM-DD"**]
+ *
+ * `memo` 무료체험 유저 관련 메모 [**string**]
  */
-export async function registerFreeTrial({ id, endDate }: RegisterFreeTrialRequest) {
+export async function registerFreeTrial({ id, freeTierStartDate, freeTierEndDate, memo }: RegisterFreeTrialRequest) {
   const res = await axiosInstance.post<any, AxiosResponse<RegisterFreeTrialResponse>, RegisterFreeTrialRequest>(
     API_ROUTE_PATH.ADMIN.FREE_TRIAL.REGISTER_FERR_TRIAL,
     {
       id,
-      endDate,
+      freeTierStartDate,
+      freeTierEndDate,
+      memo,
     },
   );
 
@@ -149,16 +172,27 @@ export async function registerFreeTrial({ id, endDate }: RegisterFreeTrialReques
 /**
  * [Admin] 무료체험 수정 (POST)
  *
- * `id` 무료체험 등록할 유저의 아이디 [**number**]
+ * `id` 무료체험 수정할 유저의 아이디 [**number**]
  *
- * `endDate` 무료체험 종료 일자 문자 포멧 [**"YYYY-MM-DD"**]
+ * `freeTierStartDate` 무료체험 시작 일자 문자 포멧 [**"YYYY-MM-DD"**]
+ *
+ * `freeTierEndDate` 무료체험 종료 일자 문자 포멧 [**"YYYY-MM-DD"**]
+ *
+ * `memo` 무료체험 유저 관련 메모 [**string**]
  */
-export async function updateFreeTrialDate({ id, endDate }: UpdateFreeTrialDateRequest) {
+export async function updateFreeTrialDate({
+  id,
+  freeTierStartDate,
+  freeTierEndDate,
+  memo,
+}: UpdateFreeTrialDateRequest) {
   const res = await axiosInstance.post<any, AxiosResponse<UpdateFreeTrialDateResponse>, UpdateFreeTrialDateRequest>(
     API_ROUTE_PATH.ADMIN.FREE_TRIAL.UPDATE_FREE_TRIAL_DATE,
     {
       id,
-      endDate,
+      freeTierStartDate,
+      freeTierEndDate,
+      memo,
     },
   );
 

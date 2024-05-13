@@ -24,6 +24,7 @@ export const API_ROUTE_PATH = {
       DELETE_USER: (id?: number) => `/api/admin/user/delete/${id ?? ':id'}`,
     },
     FREE_TRIAL: {
+      GET_FREE_TRIAL_USERS: `/api/admin/user/freeTier/list`,
       REGISTER_FERR_TRIAL: `/api/admin/experience/insert`,
       UPDATE_FREE_TRIAL_DATE: `/api/admin/experience/update`,
       DELETE_FREE_TRIAL_USER: (id?: number) => `/api/admin/experience/delete/${id ?? ':id'}`,

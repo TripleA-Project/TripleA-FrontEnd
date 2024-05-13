@@ -1,11 +1,11 @@
 'use client';
 
-import { SiteUser } from '@/interfaces/Dto/Admin/GetSiteUsersDto';
+import { SiteUserPayload } from '@/interfaces/Dto/Admin/GetSiteUsersDto';
 import { selectUser, unSelectUser, useAdminSelectedUserList } from '@/redux/slice/adminUserListSlice';
 import { Checkbox } from '@mui/material';
 
 interface UserCheckBoxProps {
-  user: SiteUser;
+  user: SiteUserPayload;
 }
 
 function UserCheckBox({ user }: UserCheckBoxProps) {

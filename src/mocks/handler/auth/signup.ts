@@ -21,7 +21,12 @@ export const signup = http.post<PathParams, SignupRequest, SignupResponse>(
       membership: 'BASIC',
       newsLetter,
       createAt: new Date().toISOString(),
+      nextPaymentDate: '',
       changeMembershipDate: null,
+      freeTrial: false,
+      freeTierStartDate: '',
+      freeTierEndDate: '',
+      memo: '',
     });
 
     return HttpResponse.json(
