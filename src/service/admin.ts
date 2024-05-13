@@ -12,6 +12,18 @@ import {
   SearchSiteUserResponse,
 } from '@/interfaces/Dto/Admin/SearchSiteUserDto';
 import { API_ROUTE_PATH } from '@/constants/routePath';
+import {
+  RegisterFreeTrialRequest,
+  RegisterFreeTrialResponse,
+} from '@/interfaces/Dto/Admin/free-trial/RegisterFreeTrialDto';
+import {
+  UpdateFreeTrialDateRequest,
+  UpdateFreeTrialDateResponse,
+} from '@/interfaces/Dto/Admin/free-trial/UpdateFreeTrialDateDto';
+import {
+  DeleteFreeTrialUserRequest,
+  DeleteFreeTrialUserResponse,
+} from '@/interfaces/Dto/Admin/free-trial/DeleteFreeTrialUserDto';
 
 /**
  * [Admin] 관리자 인증 메일 발송 API (POST)
@@ -109,6 +121,60 @@ export async function searchSiteUser({ type, content }: SearchSiteUserRequest) {
       content,
     },
   } as SearchSiteUserRequestConfig);
+
+  return res;
+}
+
+// 무료체험
+
+/**
+ * [Admin] 무료체험 등록 (POST)
+ *
+ * `id` 무료체험 등록할 유저의 아이디 [**number**]
+ *
+ * `endDate` 무료체험 종료 일자 문자 포멧 [**"YYYY-MM-DD"**]
+ */
+export async function registerFreeTrial({ id, endDate }: RegisterFreeTrialRequest) {
+  const res = await axiosInstance.post<any, AxiosResponse<RegisterFreeTrialResponse>, RegisterFreeTrialRequest>(
+    API_ROUTE_PATH.ADMIN.FREE_TRIAL.REGISTER_FERR_TRIAL,
+    {
+      id,
+      endDate,
+    },
+  );
+
+  return res;
+}
+
+/**
+ * [Admin] 무료체험 수정 (POST)
+ *
+ * `id` 무료체험 등록할 유저의 아이디 [**number**]
+ *
+ * `endDate` 무료체험 종료 일자 문자 포멧 [**"YYYY-MM-DD"**]
+ */
+export async function updateFreeTrialDate({ id, endDate }: UpdateFreeTrialDateRequest) {
+  const res = await axiosInstance.post<any, AxiosResponse<UpdateFreeTrialDateResponse>, UpdateFreeTrialDateRequest>(
+    API_ROUTE_PATH.ADMIN.FREE_TRIAL.UPDATE_FREE_TRIAL_DATE,
+    {
+      id,
+      endDate,
+    },
+  );
+
+  return res;
+}
+
+/**
+ * [Admin] 무료체험 삭제 (DELETE)
+ *
+ * `id` 무료체험을 해제할 유저의 아이디 [**number**]
+ *
+ */
+export async function deleteFreeTrialUser({ id }: DeleteFreeTrialUserRequest) {
+  const res = await axiosInstance.delete<DeleteFreeTrialUserResponse>(
+    API_ROUTE_PATH.ADMIN.FREE_TRIAL.DELETE_FREE_TRIAL_USER(id),
+  );
 
   return res;
 }
