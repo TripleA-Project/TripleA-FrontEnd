@@ -70,8 +70,8 @@ export const siteUser: SiteUser[] = [
     nextPaymentDate: '',
     changeMembershipDate: null,
     freeTrial: false,
-    freeTierStartDate: '',
-    freeTierEndDate: '',
+    freeTierStartDate: null,
+    freeTierEndDate: null,
     memo: '',
   },
   {
@@ -85,8 +85,8 @@ export const siteUser: SiteUser[] = [
     nextPaymentDate: '',
     changeMembershipDate: null,
     freeTrial: false,
-    freeTierStartDate: '',
-    freeTierEndDate: '',
+    freeTierStartDate: null,
+    freeTierEndDate: null,
     memo: '',
   },
   {
@@ -100,8 +100,8 @@ export const siteUser: SiteUser[] = [
     nextPaymentDate: '2024-06-13T00:00:00',
     changeMembershipDate: null,
     freeTrial: false,
-    freeTierStartDate: '',
-    freeTierEndDate: '',
+    freeTierStartDate: null,
+    freeTierEndDate: null,
     memo: '',
   },
 ];

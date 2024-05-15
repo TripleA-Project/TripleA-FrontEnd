@@ -24,8 +24,8 @@ export const signup = http.post<PathParams, SignupRequest, SignupResponse>(
       nextPaymentDate: '',
       changeMembershipDate: null,
       freeTrial: false,
-      freeTierStartDate: '',
-      freeTierEndDate: '',
+      freeTierStartDate: null,
+      freeTierEndDate: null,
       memo: '',
     });
 

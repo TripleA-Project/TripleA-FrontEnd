@@ -6,7 +6,6 @@ import {
 import { siteUser } from '@/mocks/db/siteUser';
 import { getURL } from '@/util/url';
 import { HttpStatusCode } from 'axios';
-import dayjs from 'dayjs';
 import { HttpResponse, PathParams, http } from 'msw';
 
 export const mockRegisterFreeTrialApi = http.post<PathParams, RegisterFreeTrialRequest, RegisterFreeTrialResponse>(

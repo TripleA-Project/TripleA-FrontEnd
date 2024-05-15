@@ -51,6 +51,10 @@ export const ROUTE_PATH = {
     NOTICE: {
       LIST: '/admin/notice',
     },
+    FREE_TRIAL: {
+      MANAGE_FREE_TRIAL: '/admin/users/free',
+      REGISTER_FERR_TRIAL: '/admin/users/free/register',
+    },
   },
   NOTICE: {
     LIST: `/notice`,

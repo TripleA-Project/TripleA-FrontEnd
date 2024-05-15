@@ -42,7 +42,16 @@ export const profile = http.get<PathParams, DefaultBodyType, ProfileResponse>(
         );
       }
 
-      const { email, fullName, membership, memberRole, freeTrial, freeTierEndDate, nextPaymentDate } = user;
+      const {
+        email,
+        fullName,
+        membership,
+        memberRole,
+        freeTrial,
+        freeTierStartDate,
+        freeTierEndDate,
+        nextPaymentDate,
+      } = user;
 
       return HttpResponse.json(
         {
@@ -55,6 +64,8 @@ export const profile = http.get<PathParams, DefaultBodyType, ProfileResponse>(
             memberRole,
             nextPaymentDate: freeTrial ? freeTierEndDate : nextPaymentDate,
             freeTrial,
+            freeTierStartDate,
+            freeTierEndDate,
           },
         },
         {

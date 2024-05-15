@@ -3,12 +3,24 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { SiteUserPayload } from '@/interfaces/Dto/Admin/GetSiteUsersDto';
 import { useCallback } from 'react';
+import { FreeTrialFormData } from '@/interfaces/FormData';
+
+type AdminFreeTrialRegisterType = 'admin:registerFreeTrial';
+type AdminFreeTrialUpdateType = 'admin:updateFreeTrial';
+type AdminFreeTrialDeleteType = 'admin:deleteFreeTrial';
 
 export type DefaultModalType = 'modal:default';
 export type SelectedUserModalType = 'selected:user';
 export type AdminModalType = 'admin:deleteUser' | 'admin:asAdmin' | 'admin:asUser';
 export type AdminNoticeType = 'admin:deleteNotice';
-export type ModalType = DefaultModalType | SelectedUserModalType | AdminModalType | AdminNoticeType;
+export type AdminFreeTrialType = AdminFreeTrialRegisterType | AdminFreeTrialUpdateType | AdminFreeTrialDeleteType;
+
+export type ModalType =
+  | DefaultModalType
+  | SelectedUserModalType
+  | AdminModalType
+  | AdminNoticeType
+  | AdminFreeTrialType;
 
 type ModalPayload<T> = T extends DefaultModalType
   ? any
@@ -16,6 +28,12 @@ type ModalPayload<T> = T extends DefaultModalType
   ? { selectedUsers: SiteUserPayload[] }
   : T extends AdminNoticeType
   ? { noticeId: number }
+  : T extends AdminFreeTrialRegisterType
+  ? Omit<FreeTrialFormData, 'idList'> & { idList: number[] }
+  : T extends AdminFreeTrialUpdateType
+  ? Omit<FreeTrialFormData, 'idList'> & { idList: number[] }
+  : T extends AdminFreeTrialDeleteType
+  ? { idList: number[] }
   : T extends SelectedUserModalType
   ? { selectedUsers: SiteUserPayload[] }
   : never;

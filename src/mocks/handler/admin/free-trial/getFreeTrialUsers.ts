@@ -5,7 +5,7 @@ import { getURL } from '@/util/url';
 import { HttpStatusCode } from 'axios';
 import { DefaultBodyType, HttpResponse, PathParams, http } from 'msw';
 
-export const mockGetFreeTrialUsersApi = http.get<PathParams, DefaultBodyType, GetFreeTrialUsersResponse>(
+export const mockGetFreeTrialUsersApi = http.post<PathParams, DefaultBodyType, GetFreeTrialUsersResponse>(
   getURL(API_ROUTE_PATH.ADMIN.FREE_TRIAL.GET_FREE_TRIAL_USERS),
   async () => {
     const freeTrialUsers = siteUser.filter((user) => user.freeTrial);

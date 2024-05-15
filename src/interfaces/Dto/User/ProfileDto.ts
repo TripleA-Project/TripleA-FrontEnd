@@ -6,6 +6,8 @@ export interface ProfilePayload extends Pick<User, 'email' | 'fullName' | 'membe
   nextPaymentDate?: string;
   memberRole: MEMBER_ROLE;
   freeTrial: boolean;
+  freeTierStartDate: string | null;
+  freeTierEndDate: string | null;
 }
 
 export interface ProfileResponse extends APIResponse<ProfilePayload> {}
