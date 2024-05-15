@@ -6,8 +6,14 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TableBody from '@mui/material/TableBody';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
+import { FreeTrialUsersPayload } from '@/interfaces/Dto/Admin/free-trial/GetFreeTrialUsersDto';
+import UserCheckBox from './UserCheckBox';
 
-// [TODO] API 데이터로 렌더링
+interface FreeTrialUserTableProps {
+  freeTierUsers: FreeTrialUsersPayload;
+  withCheckBox?: boolean;
+}
+
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   padding: '8px',
   [`&.${tableCellClasses.head}`]: {
@@ -30,9 +36,42 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   height: '48px',
 }));
 
-function FreeTrailUserTable() {
+function FreeTrialUserTable({ freeTierUsers, withCheckBox = true }: FreeTrialUserTableProps) {
   return (
     <Table stickyHeader className="min-w-max">
+      <TableHead>
+        <TableRow>
+          {withCheckBox ? <StyledTableCell align="center">선택</StyledTableCell> : null}
+          <StyledTableCell align="center">이메일</StyledTableCell>
+          <StyledTableCell align="center">무료체험 시작일</StyledTableCell>
+          <StyledTableCell align="center">무료체험 종료일</StyledTableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody className="relative">
+        {Array.from(freeTierUsers).map((freeTierUser) => {
+          return (
+            <StyledTableRow key={freeTierUser.email}>
+              {withCheckBox ? (
+                <StyledTableCell align="center">
+                  <UserCheckBox user={freeTierUser} />
+                </StyledTableCell>
+              ) : null}
+              <StyledTableCell align="center">{freeTierUser.email}</StyledTableCell>
+              <StyledTableCell align="center">{freeTierUser.freeTierStartDate}</StyledTableCell>
+              <StyledTableCell align="center">{freeTierUser.freeTierEndDate}</StyledTableCell>
+            </StyledTableRow>
+          );
+        })}
+      </TableBody>
+    </Table>
+  );
+}
+
+export default FreeTrialUserTable;
+
+FreeTrialUserTable.Loading = function FreeTrialUserTableLoading() {
+  return (
+    <Table className="min-w-max">
       <TableHead>
         <TableRow>
           <StyledTableCell align="center">선택</StyledTableCell>
@@ -41,18 +80,26 @@ function FreeTrailUserTable() {
           <StyledTableCell align="center">무료체험 종료일</StyledTableCell>
         </TableRow>
       </TableHead>
-      <TableBody className="relative">
-        <StyledTableRow>
-          <StyledTableCell align="center">
-            <input type="checkbox" />
-          </StyledTableCell>
-          <StyledTableCell align="center">test@email.com</StyledTableCell>
-          <StyledTableCell align="center">2022.03.05</StyledTableCell>
-          <StyledTableCell align="center">2022.03.06</StyledTableCell>
-        </StyledTableRow>
+      <TableBody>
+        {Array.from({ length: 4 }).map((_, idx) => {
+          return (
+            <StyledTableRow key={idx}>
+              <StyledTableCell align="center" className="skeleton_loading text-center">
+                <span className="inline-block h-6 w-8 rounded-lg" />
+              </StyledTableCell>
+              <StyledTableCell align="center" className="skeleton_loading text-center">
+                <span className="inline-block h-6 w-24 rounded-lg" />
+              </StyledTableCell>
+              <StyledTableCell align="center" className="skeleton_loading text-center">
+                <span className="inline-block h-6 w-16 rounded-lg" />
+              </StyledTableCell>
+              <StyledTableCell align="center" className="skeleton_loading text-center">
+                <span className="inline-block h-6 w-16 rounded-lg" />
+              </StyledTableCell>
+            </StyledTableRow>
+          );
+        })}
       </TableBody>
     </Table>
   );
-}
-
-export default FreeTrailUserTable;
+};

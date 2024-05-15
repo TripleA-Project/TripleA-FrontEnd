@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic';
 import UserTableContainer from './userTable/UserTableContainer';
 import { UserSearchProps } from './search/UserSearch';
-import { setSearchStatus, useAdminUserSearchStatus } from '@/redux/slice/adminUserSearchSlice';
+import { useAdminUserSearchStatus } from '@/redux/slice/adminUserSearchSlice';
 import Toolbar from './Toolbar';
 import AdminUsersTitle from './Title';
 import UserManageModal from './modal/UserManageModal';
@@ -21,7 +21,7 @@ const UserSearch = dynamic(() => import('./search/UserSearch'), {
 });
 
 function Page() {
-  const { dispatch } = useAdminUserSearchStatus();
+  const { dispatch, setSearchStatus } = useAdminUserSearchStatus();
 
   const onSearch: UserSearchProps['onSearch'] = (status) => {
     dispatch(setSearchStatus(status));

@@ -1,15 +1,16 @@
 'use client';
 
-import { SiteUserPayload } from '@/interfaces/Dto/Admin/GetSiteUsersDto';
-import { useAdminSelectedUserList } from '@/redux/slice/adminUserListSlice';
+import { FreeTrialUser } from '@/interfaces/Dto/Admin/free-trial/GetFreeTrialUsersDto';
+import { AdminUserTypeKey, useAdminSelectedUserList } from '@/redux/slice/adminUserListSlice';
 import { Checkbox } from '@mui/material';
 
 interface UserCheckBoxProps {
-  user: SiteUserPayload;
+  user: FreeTrialUser;
 }
 
 function UserCheckBox({ user }: UserCheckBoxProps) {
-  const { selectedUsers, selectUser, unSelectUser, dispatch } = useAdminSelectedUserList();
+  const { selectedUsers, selectUser, unSelectUser, dispatch } =
+    useAdminSelectedUserList<AdminUserTypeKey.FreeTierUsers>();
 
   const handleCheckBox = (e: React.ChangeEvent<HTMLInputElement>) => {
     const checked = e.target.checked;

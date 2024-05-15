@@ -3,19 +3,21 @@ import { getFreeTrialUsers } from '@/service/admin';
 import AdminFreeTrialManagePage from './_components/Page';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: 'Triple A 관리자 | 무료체험 관리',
   description: 'Triple A 관리자 | 무료체험 관리',
 };
 
-// [TODO] API 데이터 전달
 export default async function AdminFreeTrialManage() {
   const res = await getFreeTrialUsers();
 
+  const freeTierUsers = res.data.data?.length ? res.data.data : [];
+
   return (
-    <div className="relative min-h-[calc(100vh-115px)] px-2 pt-4">
-      <AdminFreeTrialManagePage />
+    <div className="relative min-h-[calc(100vh-115px)] overflow-auto px-2 pt-4">
+      <AdminFreeTrialManagePage freeTierUsers={freeTierUsers} />
     </div>
   );
 }

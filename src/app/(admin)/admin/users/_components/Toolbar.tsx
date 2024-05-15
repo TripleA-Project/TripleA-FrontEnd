@@ -2,13 +2,13 @@
 
 import Button from '@/components/Button/Button';
 import { AppIcons } from '@/components/Icons';
-import { clearSelectedUsers, useAdminSelectedUserList } from '@/redux/slice/adminUserListSlice';
+import { useAdminSelectedUserList } from '@/redux/slice/adminUserListSlice';
 import { useAdminUserSearchStatus } from '@/redux/slice/adminUserSearchSlice';
 import { AdminModalType, useModal } from '@/redux/slice/modalSlice';
 import { toastNotify } from '@/util/toastNotify';
 
 function Toolbar() {
-  const { selectedUsers, dispatch } = useAdminSelectedUserList();
+  const { selectedUsers, clearSelectedUsers, dispatch } = useAdminSelectedUserList();
   const { openModal } = useModal();
 
   const clear = () => {

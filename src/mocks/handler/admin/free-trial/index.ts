@@ -1,7 +1,7 @@
 import { mockDeleteFreeTrialUserApi } from './deleteFreeTrialUser';
 import { mockGetFreeTrialUsersApi } from './getFreeTrialUsers';
 import { mockRegisterFreeTrialApi } from './registerFreeTrial';
-import { mockUpdateFreeTrialApi } from './updateFreeTrialDate';
+import { mockUpdateFreeTrialApi } from './updateFreeTrial';
 
 export const mockFreeTrialApi = [
   mockGetFreeTrialUsersApi,
