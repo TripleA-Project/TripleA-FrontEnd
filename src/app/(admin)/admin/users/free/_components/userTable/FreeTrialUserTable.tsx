@@ -8,6 +8,7 @@ import TableBody from '@mui/material/TableBody';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import { FreeTrialUsersPayload } from '@/interfaces/Dto/Admin/free-trial/GetFreeTrialUsersDto';
 import UserCheckBox from './UserCheckBox';
+import UserTableSearching from '../../../_components/userTable/UserTableSearching';
 
 interface FreeTrialUserTableProps {
   freeTierUsers: FreeTrialUsersPayload;
@@ -48,6 +49,7 @@ function FreeTrialUserTable({ freeTierUsers, withCheckBox = true }: FreeTrialUse
         </TableRow>
       </TableHead>
       <TableBody className="relative">
+        <UserTableSearching />
         {Array.from(freeTierUsers).map((freeTierUser) => {
           return (
             <StyledTableRow key={freeTierUser.email}>
