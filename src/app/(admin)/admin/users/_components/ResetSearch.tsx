@@ -1,19 +1,14 @@
 'use client';
 
 import Button from '@/components/Button/Button';
-import { resetUsers, useAdminUserList } from '@/redux/slice/adminUserListSlice';
-import {
-  setSearch,
-  setSearchStatus,
-  useAdminUserSearch,
-  useAdminUserSearchStatus,
-} from '@/redux/slice/adminUserSearchSlice';
+import { useAdminUserList } from '@/redux/slice/adminUserListSlice';
+import { useAdminUserSearch, useAdminUserSearchStatus } from '@/redux/slice/adminUserSearchSlice';
 import { toastNotify } from '@/util/toastNotify';
 
 function ResetUsers() {
-  const { search } = useAdminUserSearch();
-  const { searchStatus } = useAdminUserSearchStatus();
-  const { dispatch } = useAdminUserList();
+  const { search, setSearch } = useAdminUserSearch();
+  const { searchStatus, setSearchStatus } = useAdminUserSearchStatus();
+  const { dispatch, resetUsers } = useAdminUserList();
 
   const getLabel = () => {
     switch (search.recent!.type) {

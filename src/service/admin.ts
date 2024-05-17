@@ -12,6 +12,22 @@ import {
   SearchSiteUserResponse,
 } from '@/interfaces/Dto/Admin/SearchSiteUserDto';
 import { API_ROUTE_PATH } from '@/constants/routePath';
+import {
+  RegisterFreeTrialRequest,
+  RegisterFreeTrialResponse,
+} from '@/interfaces/Dto/Admin/free-trial/RegisterFreeTrialDto';
+import {
+  UpdateFreeTrialUserRequest,
+  UpdateFreeTrialUserResponse,
+} from '@/interfaces/Dto/Admin/free-trial/UpdateFreeTrialUserDto';
+import {
+  DeleteFreeTrialUserRequest,
+  DeleteFreeTrialUserResponse,
+} from '@/interfaces/Dto/Admin/free-trial/DeleteFreeTrialUserDto';
+import {
+  GetFreeTrialUsersRequest,
+  GetFreeTrialUsersResponse,
+} from '@/interfaces/Dto/Admin/free-trial/GetFreeTrialUsersDto';
 
 /**
  * [Admin] 관리자 인증 메일 발송 API (POST)
@@ -109,6 +125,85 @@ export async function searchSiteUser({ type, content }: SearchSiteUserRequest) {
       content,
     },
   } as SearchSiteUserRequestConfig);
+
+  return res;
+}
+
+// 무료체험
+
+/**
+ * [Admin] 무료체험 유저 목록 조회 (POST)
+ *
+ */
+export async function getFreeTrialUsers() {
+  const res = await axiosInstance.post<any, AxiosResponse<GetFreeTrialUsersResponse>>(
+    API_ROUTE_PATH.ADMIN.FREE_TRIAL.GET_FREE_TRIAL_USERS,
+    {},
+  );
+
+  return res;
+}
+
+/**
+ * [Admin] 무료체험 등록 (POST)
+ *
+ * `id` 무료체험 등록할 유저의 아이디 [**number**]
+ *
+ * `freeTierStartDate` 무료체험 시작 일자 문자 포멧 [**"YYYY-MM-DD"**]
+ *
+ * `freeTierEndDate` 무료체험 종료 일자 문자 포멧 [**"YYYY-MM-DD"**]
+ *
+ * `memo` 무료체험 유저 관련 메모 [**string**]
+ */
+export async function registerFreeTrial({ id, freeTierStartDate, freeTierEndDate, memo }: RegisterFreeTrialRequest) {
+  const res = await axiosInstance.post<any, AxiosResponse<RegisterFreeTrialResponse>, RegisterFreeTrialRequest>(
+    API_ROUTE_PATH.ADMIN.FREE_TRIAL.REGISTER_FERR_TRIAL,
+    {
+      id,
+      freeTierStartDate,
+      freeTierEndDate,
+      memo,
+    },
+  );
+
+  return res;
+}
+
+/**
+ * [Admin] 무료체험 수정 (POST)
+ *
+ * `id` 무료체험 수정할 유저의 아이디 [**number**]
+ *
+ * `freeTierStartDate` 무료체험 시작 일자 문자 포멧 [**"YYYY-MM-DD"**]
+ *
+ * `freeTierEndDate` 무료체험 종료 일자 문자 포멧 [**"YYYY-MM-DD"**]
+ *
+ * `memo` 무료체험 유저 관련 메모 [**string**]
+ */
+export async function updateFreeTrial({ id, freeTierStartDate, freeTierEndDate, memo }: UpdateFreeTrialUserRequest) {
+  const res = await axiosInstance.post<any, AxiosResponse<UpdateFreeTrialUserResponse>, UpdateFreeTrialUserRequest>(
+    API_ROUTE_PATH.ADMIN.FREE_TRIAL.UPDATE_FREE_TRIAL_USER,
+    {
+      id,
+      freeTierStartDate,
+      freeTierEndDate,
+      memo,
+    },
+  );
+
+  return res;
+}
+
+/**
+ * [Admin] 무료체험 삭제 (DELETE)
+ *
+ * `id` 무료체험을 해제할 유저의 아이디 [**number**]
+ *
+ */
+export async function deleteFreeTrialUser({ id }: DeleteFreeTrialUserRequest) {
+  const res = await axiosInstance.delete<DeleteFreeTrialUserResponse>(
+    API_ROUTE_PATH.ADMIN.FREE_TRIAL.DELETE_FREE_TRIAL_USER(id),
+  );
 
   return res;
 }

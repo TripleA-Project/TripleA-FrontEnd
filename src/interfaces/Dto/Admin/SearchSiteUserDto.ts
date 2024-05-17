@@ -1,10 +1,10 @@
 import { AxiosRequestConfig } from 'axios';
 import { APIResponse } from '../Core';
-import { SiteUser } from './GetSiteUsersDto';
+import { SiteUser, SiteUserPayload } from './GetSiteUsersDto';
 
-export type SearchType = Extract<keyof SiteUser, 'email' | 'fullName' | 'membership' | 'memberRole'>;
+export type SearchTypeKey = Extract<keyof SiteUser, 'email' | 'fullName' | 'membership' | 'memberRole'>;
 
-export type SearchSiteUserRequest<T extends SearchType = SearchType> = T extends SearchType
+export type SearchSiteUserRequest<T extends SearchTypeKey = SearchTypeKey> = T extends SearchTypeKey
   ? T extends 'email'
     ? { type: 'email'; content: SiteUser['email'] }
     : T extends 'fullName'
@@ -20,6 +20,6 @@ export interface SearchSiteUserRequestConfig<T = SearchSiteUserRequest, D = any>
   params: T;
 }
 
-export type SearchSiteUserPayload = SiteUser[];
+export type SearchSiteUserPayload = SiteUserPayload[];
 
 export interface SearchSiteUserResponse extends APIResponse<SearchSiteUserPayload> {}

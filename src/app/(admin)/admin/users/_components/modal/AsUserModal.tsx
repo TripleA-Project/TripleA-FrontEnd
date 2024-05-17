@@ -3,7 +3,7 @@
 import { useModal } from '@/redux/slice/modalSlice';
 import { createPortal } from 'react-dom';
 import UserManageModalWrapper from './UserManageModalWrapper';
-import { clearSelectedUsers, updateUsers } from '@/redux/slice/adminUserListSlice';
+import { useAdminSelectedUserList, useAdminUserList } from '@/redux/slice/adminUserListSlice';
 import { changeUserRole } from '@/service/admin';
 import Button from '@/components/Button/Button';
 import { useEffect } from 'react';
@@ -35,6 +35,9 @@ export default AsUserModal;
 
 const AsUserModalContent = () => {
   const { modal, closeModal, dispatch } = useModal('admin:asUser');
+
+  const { updateUsers } = useAdminUserList();
+  const { clearSelectedUsers } = useAdminSelectedUserList();
 
   const onDone: NonNullable<ProgressViewProps['onDone']> = ({ completedTaskResult }) => {
     const targetUsersPayload = (completedTaskResult as AxiosResponse<ChangeUserRoleResponse>[]).map((result) => {

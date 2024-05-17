@@ -19,7 +19,7 @@ function AdminNavbar() {
       text: '통계',
     },
     {
-      active: pathName === '/admin/users',
+      active: pathName.startsWith('/admin/users'),
       icon: <MdManageAccounts />,
       href: '/admin/users',
       text: '회원 관리',

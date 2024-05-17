@@ -74,7 +74,14 @@ function LoginForm({ continueURL, userPayload }: LoginFormProps) {
       const authorization = response.headers['authorization'] as string;
 
       const accessToken = authorization.replace(/^Bearer /g, '');
-      const autoLogin = await getCookie('autoLogin');
+
+      if (autoLoginRef?.current) {
+        if (autoLoginRef.current.checked) {
+          await setCookie('autoLogin', 'true', { path: '/', maxAge: 60 * 60 * 24 * 365 });
+        } else {
+          await deleteCookie('autoLogin');
+        }
+      }
 
       if (accessToken) {
         const decodedAccessToken = await jwtAuthTokenDecode(accessToken);
@@ -99,15 +106,6 @@ function LoginForm({ continueURL, userPayload }: LoginFormProps) {
         }));
 
         return;
-      }
-
-      if (autoLoginRef?.current) {
-        if (autoLoginRef.current.checked && !autoLogin) {
-          setCookie('autoLogin', 'true', { path: '/', maxAge: 60 * 60 * 24 * 365 });
-        }
-        if (!autoLoginRef.current.checked && autoLogin) {
-          deleteCookie('autoLogin');
-        }
       }
 
       queryClient.removeQueries({

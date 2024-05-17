@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getSiteUsers } from '@/service/admin';
 import AdminUsersError from '../AdminUsersError';
 import { useLayoutEffect } from 'react';
-import { setDefaultUsers, useAdminUserList } from '@/redux/slice/adminUserListSlice';
+import { useAdminUserList } from '@/redux/slice/adminUserListSlice';
 
 export interface SearchFormData {
   searchType: AdminUserSearch['type'];
@@ -27,7 +27,7 @@ function UserTableContainer() {
     refetchOnWindowFocus: false,
   });
 
-  const { users, dispatch } = useAdminUserList();
+  const { users, dispatch, setDefaultUsers } = useAdminUserList();
 
   useLayoutEffect(() => {
     dispatch(setDefaultUsers(userList ?? []));

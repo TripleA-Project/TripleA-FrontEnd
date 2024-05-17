@@ -3,11 +3,12 @@
 import RowHeader from '@/components/Layout/Header/RowHeader';
 import { usePathname } from 'next/navigation';
 import NoticeDomainHeader from './NoticeDomainHeader';
+import AdminUserMenuHeader from './AdminUserMenuHeader';
 
 function AdminDomainHeader() {
   const pathname = usePathname();
   if (pathname.startsWith('/admin/notice')) return <NoticeDomainHeader />;
-
+  if (pathname.startsWith('/admin/users')) return <AdminUserMenuHeader />;
   return <RowHeader className="border-b" titleSection={<AdminTitle />} />;
 }
 

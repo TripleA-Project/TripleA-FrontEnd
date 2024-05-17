@@ -23,6 +23,12 @@ export const API_ROUTE_PATH = {
       CHANGE_USER_ROLE: `/api/admin/user/role`,
       DELETE_USER: (id?: number) => `/api/admin/user/delete/${id ?? ':id'}`,
     },
+    FREE_TRIAL: {
+      GET_FREE_TRIAL_USERS: `/api/admin/user/freeTier/list`,
+      REGISTER_FERR_TRIAL: `/api/admin/experience/insert`,
+      UPDATE_FREE_TRIAL_USER: `/api/admin/experience/update`,
+      DELETE_FREE_TRIAL_USER: (id?: number) => `/api/admin/experience/delete/${id ?? ':id'}`,
+    },
     NOTICE: {
       CREATE_NOTICE: `/api/admin/notice/save`,
       UPDATE_NOTICE: `/api/admin/notice/update`,
@@ -44,6 +50,10 @@ export const ROUTE_PATH = {
     MANAGE_USER: '/admin/users',
     NOTICE: {
       LIST: '/admin/notice',
+    },
+    FREE_TRIAL: {
+      MANAGE_FREE_TRIAL: '/admin/users/free',
+      REGISTER_FERR_TRIAL: '/admin/users/free/register',
     },
   },
   NOTICE: {
