@@ -3,6 +3,8 @@ import FreeTrialUserTableContainer from './userTable/FreeTrialUserTableContainer
 import SearchFormContext from './form-context/SearchFormContext';
 import dynamic from 'next/dynamic';
 import AdminFreeTrialTitle from './AdminFreeTrialTitle';
+import ActionControl from './action-control/ActionControl';
+import NotFoundFreeTierUsers from './NotFoundFreeTierUsers';
 
 interface AdminFreeTrialManagePageProps {
   freeTierUsers: FreeTrialUsersPayload;
@@ -20,11 +22,17 @@ const UserSearch = dynamic(() => import('./search/UserSearch'), {
 });
 
 function AdminFreeTrialManagePage({ freeTierUsers }: AdminFreeTrialManagePageProps) {
+  if (!freeTierUsers?.length) {
+    return (
+      <div>
+        <AdminFreeTrialTitle />
+        <NotFoundFreeTierUsers />
+      </div>
+    );
+  }
+
   return (
     <div>
-      {/* <section className="h-[64px]">
-        <h2 className="text-xl font-bold">무료체험 관리</h2>
-      </section> */}
       <AdminFreeTrialTitle />
       <div className="sticky top-[52px] z-[4] bg-white">
         <SearchFormContext>
@@ -34,6 +42,7 @@ function AdminFreeTrialManagePage({ freeTierUsers }: AdminFreeTrialManagePagePro
       <section>
         <FreeTrialUserTableContainer freeTierUsers={freeTierUsers} />
       </section>
+      <ActionControl />
     </div>
   );
 }

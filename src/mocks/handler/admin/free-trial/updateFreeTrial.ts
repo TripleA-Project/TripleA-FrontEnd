@@ -1,15 +1,15 @@
 import { API_ROUTE_PATH } from '@/constants/routePath';
 import {
-  UpdateFreeTrialDateRequest,
-  UpdateFreeTrialDateResponse,
-} from '@/interfaces/Dto/Admin/free-trial/UpdateFreeTrialDateDto';
+  UpdateFreeTrialUserRequest,
+  UpdateFreeTrialUserResponse,
+} from '@/interfaces/Dto/Admin/free-trial/UpdateFreeTrialUserDto';
 import { siteUser } from '@/mocks/db/siteUser';
 import { getURL } from '@/util/url';
 import { HttpStatusCode } from 'axios';
 import { HttpResponse, PathParams, http } from 'msw';
 
-export const mockUpdateFreeTrialApi = http.post<PathParams, UpdateFreeTrialDateRequest, UpdateFreeTrialDateResponse>(
-  getURL(API_ROUTE_PATH.ADMIN.FREE_TRIAL.UPDATE_FREE_TRIAL_DATE),
+export const mockUpdateFreeTrialApi = http.post<PathParams, UpdateFreeTrialUserRequest, UpdateFreeTrialUserResponse>(
+  getURL(API_ROUTE_PATH.ADMIN.FREE_TRIAL.UPDATE_FREE_TRIAL_USER),
   async ({ request }) => {
     const { id, freeTierStartDate, freeTierEndDate, memo } = await request.json();
 
@@ -27,7 +27,7 @@ export const mockUpdateFreeTrialApi = http.post<PathParams, UpdateFreeTrialDateR
       );
     }
 
-    if (targetUser.membership === 'PREMIUM') {
+    if (!targetUser.freeTrial && targetUser.membership === 'PREMIUM') {
       return HttpResponse.json(
         { status: HttpStatusCode.BadRequest, msg: '구독중인 유저입니다.' },
         { status: HttpStatusCode.BadRequest },

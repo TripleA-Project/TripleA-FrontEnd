@@ -91,9 +91,9 @@ export const adminUserListSlice = createSlice({
       const users = [...state.users];
       const defaultUsers = [...state.defaultUsers];
 
-      for (const { email, ...targetUser } of targetUsers) {
-        const userIdx = users.findIndex((user) => user.email === email);
-        const defaultUserIdx = defaultUsers.findIndex((user) => user.email === email);
+      for (const { id, email, ...targetUser } of targetUsers) {
+        const userIdx = users.findIndex((user) => (email ? user.email === email : id === user.id));
+        const defaultUserIdx = defaultUsers.findIndex((user) => (email ? user.email === email : id === user.id));
 
         if (userIdx > -1) {
           users[userIdx] = {
@@ -145,6 +145,8 @@ type AdminUserListSliceActionType<T extends UserTypeKey> = T extends AdminUserTy
 
 export function useAdminUserList<T extends UserTypeKey = AdminUserTypeKey.Users>() {
   const users = useSelector((state: RootState) => state.adminUserList.users as UserType<T>[]);
+  const defaultUsers = useSelector((state: RootState) => state.adminUserList.defaultUsers as UserType<T>[]);
+
   const dispatch = useDispatch();
 
   const { setDefaultUsers, setUsers, updateUsers, deleteUsers, resetUsers } = adminUserListSlice.actions as {
@@ -157,6 +159,7 @@ export function useAdminUserList<T extends UserTypeKey = AdminUserTypeKey.Users>
 
   return {
     users,
+    defaultUsers,
     dispatch,
     setDefaultUsers,
     setUsers,

@@ -18,7 +18,7 @@ interface UserSearchProps {
 function UserSearch({ freeTierUsers }: UserSearchProps) {
   const { handleSubmit, reset } = useFormContext<FreeTierUserSearchFormData>();
 
-  const { setUsers } = useAdminUserList<AdminUserTypeKey.FreeTierUsers>();
+  const { defaultUsers, setUsers } = useAdminUserList<AdminUserTypeKey.FreeTierUsers>();
 
   const { search, setSearch, dispatch } = useAdminUserSearch<AdminUserTypeKey.FreeTierUsers>();
   const { setSearchStatus } = useAdminUserSearchStatus<AdminUserTypeKey.FreeTierUsers>();
@@ -74,6 +74,10 @@ function UserSearch({ freeTierUsers }: UserSearchProps) {
   useEffect(() => {
     dispatch(setSearchStatus(searchFreeTierUserStatus));
   }, [searchFreeTierUserStatus]); /* eslint-disable-line */
+
+  if (!defaultUsers?.length) {
+    return null;
+  }
 
   return (
     <div className="box-border flex h-full w-full flex-wrap items-center gap-1 py-4">

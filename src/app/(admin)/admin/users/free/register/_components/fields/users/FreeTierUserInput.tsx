@@ -130,7 +130,7 @@ const TargetFreeTrialUserList = ({ freeTrialableUsers }: { freeTrialableUsers: S
   };
 
   return (
-    <ul className="flex w-full flex-col items-center gap-y-2 overflow-y-auto overflow-x-hidden">
+    <ul className="flex max-h-[232px] w-full flex-col items-center gap-y-2 overflow-y-auto overflow-x-hidden">
       {targetFreeTrialUsers.map(({ id }) => {
         return (
           <li key={id} className="w-[90%] max-w-[340px]">

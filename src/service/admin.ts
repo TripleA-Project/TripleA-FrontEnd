@@ -17,9 +17,9 @@ import {
   RegisterFreeTrialResponse,
 } from '@/interfaces/Dto/Admin/free-trial/RegisterFreeTrialDto';
 import {
-  UpdateFreeTrialDateRequest,
-  UpdateFreeTrialDateResponse,
-} from '@/interfaces/Dto/Admin/free-trial/UpdateFreeTrialDateDto';
+  UpdateFreeTrialUserRequest,
+  UpdateFreeTrialUserResponse,
+} from '@/interfaces/Dto/Admin/free-trial/UpdateFreeTrialUserDto';
 import {
   DeleteFreeTrialUserRequest,
   DeleteFreeTrialUserResponse,
@@ -180,9 +180,9 @@ export async function registerFreeTrial({ id, freeTierStartDate, freeTierEndDate
  *
  * `memo` 무료체험 유저 관련 메모 [**string**]
  */
-export async function updateFreeTrial({ id, freeTierStartDate, freeTierEndDate, memo }: UpdateFreeTrialDateRequest) {
-  const res = await axiosInstance.post<any, AxiosResponse<UpdateFreeTrialDateResponse>, UpdateFreeTrialDateRequest>(
-    API_ROUTE_PATH.ADMIN.FREE_TRIAL.UPDATE_FREE_TRIAL_DATE,
+export async function updateFreeTrial({ id, freeTierStartDate, freeTierEndDate, memo }: UpdateFreeTrialUserRequest) {
+  const res = await axiosInstance.post<any, AxiosResponse<UpdateFreeTrialUserResponse>, UpdateFreeTrialUserRequest>(
+    API_ROUTE_PATH.ADMIN.FREE_TRIAL.UPDATE_FREE_TRIAL_USER,
     {
       id,
       freeTierStartDate,

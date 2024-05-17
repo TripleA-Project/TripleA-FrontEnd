@@ -34,7 +34,7 @@ export default RegisterModal;
 
 const RegisterModalContent = () => {
   const { reset } = useFormContext();
-  const { modal, closeModal, dispatch } = useModal('admin:registerFreeTrial');
+  const { modal, closeModal } = useModal('admin:registerFreeTrial');
 
   const onDone: NonNullable<ProgressViewProps['onDone']> = ({ completedTaskResult }) => {
     reset();

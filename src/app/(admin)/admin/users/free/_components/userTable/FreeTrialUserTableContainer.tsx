@@ -71,8 +71,10 @@ const FreeTrialUserTableLoading = function FreeTrialUserTableLoading() {
         <TableRow>
           <StyledTableCell align="center">선택</StyledTableCell>
           <StyledTableCell align="center">이메일</StyledTableCell>
+          <StyledTableCell align="center">이름</StyledTableCell>
           <StyledTableCell align="center">무료체험 시작일</StyledTableCell>
           <StyledTableCell align="center">무료체험 종료일</StyledTableCell>
+          <StyledTableCell align="center">메모</StyledTableCell>
         </TableRow>
       </TableHead>
       <TableBody>
@@ -84,6 +86,12 @@ const FreeTrialUserTableLoading = function FreeTrialUserTableLoading() {
               </StyledTableCell>
               <StyledTableCell align="center" className="skeleton_loading text-center">
                 <span className="inline-block h-6 w-24 rounded-lg" />
+              </StyledTableCell>
+              <StyledTableCell align="center" className="skeleton_loading text-center">
+                <span className="inline-block h-6 w-16 rounded-lg" />
+              </StyledTableCell>
+              <StyledTableCell align="center" className="skeleton_loading text-center">
+                <span className="inline-block h-6 w-16 rounded-lg" />
               </StyledTableCell>
               <StyledTableCell align="center" className="skeleton_loading text-center">
                 <span className="inline-block h-6 w-16 rounded-lg" />

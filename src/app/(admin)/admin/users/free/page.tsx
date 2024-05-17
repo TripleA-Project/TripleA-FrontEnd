@@ -1,6 +1,8 @@
 import { Metadata } from 'next';
 import { getFreeTrialUsers } from '@/service/admin';
 import AdminFreeTrialManagePage from './_components/Page';
+import FreeTrialManageModal from './_components/modal/FreeTrialManageModal';
+import SelectedFreeTierUsersModal from './_components/modal/SelectedFreeTierUsersModal';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -18,6 +20,8 @@ export default async function AdminFreeTrialManage() {
   return (
     <div className="relative min-h-[calc(100vh-115px)] overflow-auto px-2 pt-4">
       <AdminFreeTrialManagePage freeTierUsers={freeTierUsers} />
+      <FreeTrialManageModal />
+      <SelectedFreeTierUsersModal />
     </div>
   );
 }

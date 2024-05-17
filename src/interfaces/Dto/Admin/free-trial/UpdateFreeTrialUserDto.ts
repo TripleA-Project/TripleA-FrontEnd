@@ -1,10 +1,10 @@
 import { APIResponse } from '../../Core';
 
-export interface UpdateFreeTrialDateRequest {
+export interface UpdateFreeTrialUserRequest {
   id: number;
   freeTierStartDate: string;
   freeTierEndDate: string;
   memo: string;
 }
 
-export interface UpdateFreeTrialDateResponse extends APIResponse {}
+export interface UpdateFreeTrialUserResponse extends APIResponse {}

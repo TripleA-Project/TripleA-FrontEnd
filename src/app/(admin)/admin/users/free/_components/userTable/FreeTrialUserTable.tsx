@@ -9,6 +9,9 @@ import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import { FreeTrialUsersPayload } from '@/interfaces/Dto/Admin/free-trial/GetFreeTrialUsersDto';
 import UserCheckBox from './UserCheckBox';
 import UserTableSearching from '../../../_components/userTable/UserTableSearching';
+import dayjs from 'dayjs';
+import NotFoundFreeTierUsers from '../NotFoundFreeTierUsers';
+import { AdminUserTypeKey, useAdminUserList } from '@/redux/slice/adminUserListSlice';
 
 interface FreeTrialUserTableProps {
   freeTierUsers: FreeTrialUsersPayload;
@@ -38,14 +41,22 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 function FreeTrialUserTable({ freeTierUsers, withCheckBox = true }: FreeTrialUserTableProps) {
+  const { defaultUsers } = useAdminUserList<AdminUserTypeKey.FreeTierUsers>();
+
+  if (!freeTierUsers.length && !defaultUsers?.length) {
+    return <NotFoundFreeTierUsers />;
+  }
+
   return (
     <Table stickyHeader className="min-w-max">
       <TableHead>
         <TableRow>
           {withCheckBox ? <StyledTableCell align="center">선택</StyledTableCell> : null}
           <StyledTableCell align="center">이메일</StyledTableCell>
+          <StyledTableCell align="center">이름</StyledTableCell>
           <StyledTableCell align="center">무료체험 시작일</StyledTableCell>
           <StyledTableCell align="center">무료체험 종료일</StyledTableCell>
+          <StyledTableCell align="center">메모</StyledTableCell>
         </TableRow>
       </TableHead>
       <TableBody className="relative">
@@ -59,8 +70,14 @@ function FreeTrialUserTable({ freeTierUsers, withCheckBox = true }: FreeTrialUse
                 </StyledTableCell>
               ) : null}
               <StyledTableCell align="center">{freeTierUser.email}</StyledTableCell>
-              <StyledTableCell align="center">{freeTierUser.freeTierStartDate}</StyledTableCell>
-              <StyledTableCell align="center">{freeTierUser.freeTierEndDate}</StyledTableCell>
+              <StyledTableCell align="center">{freeTierUser.fullName}</StyledTableCell>
+              <StyledTableCell align="center">
+                {dayjs(freeTierUser.freeTierStartDate).format('YYYY-MM-DD')}
+              </StyledTableCell>
+              <StyledTableCell align="center">
+                {dayjs(freeTierUser.freeTierEndDate).format('YYYY-MM-DD')}
+              </StyledTableCell>
+              <StyledTableCell align="center">{freeTierUser.memo}</StyledTableCell>
             </StyledTableRow>
           );
         })}
