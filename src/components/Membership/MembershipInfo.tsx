@@ -45,31 +45,6 @@ function MembershipInfo({ user }: MembershipInfoProps) {
           unSubscribeStatus={unSubscribeStatus}
           {...user}
         />
-        {/* <div className={`${user?.membership === 'BASIC' ? 'mb-1.5' : ''}`}>
-          <span className="font-semibold text-[#5B6267]">현재 구독 상태 : </span>
-          <span className="font-semibold text-[#FD954A]">
-            {!user?.membership ? '' : user?.membership === 'BASIC' ? '일반회원' : '유료회원'}
-          </span>
-        </div>
-        {user?.membership === 'PREMIUM' ? (
-          <>
-            <div className="mt-1.5">
-              <span className="font-semibold text-[#5B6267]">다음 결제일 : </span>
-              <span className="font-semibold text-[#FD954A]">
-                {user.nextPaymentDate ? dayjs(user.nextPaymentDate).format('YYYY/MM/DD') : ''}
-              </span>
-            </div>
-            <button
-              className="mb-1.5 mt-[15px] border-b-2 border-b-[#777777] text-sm font-semibold text-[#777777] disabled:cursor-not-allowed disabled:text-violet-400/60"
-              disabled={unSubscribeStatus === 'loading'}
-              onClick={() => {
-                setOpenUnsubscribeDialog(true);
-              }}
-            >
-              해지하기
-            </button>
-          </>
-        ) : null} */}
       </div>
       <Link href="/mypage/membership">
         <HiOutlineChevronRight className="shrink-0 text-2xl text-[#FD954A]" />
