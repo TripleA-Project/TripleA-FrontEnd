@@ -25,6 +25,9 @@ function MypageHome({ user }: MypageHomeProps) {
           fullName: user!.fullName,
           membership: user!.membership,
           memberRole: user!.memberRole,
+          freeTrial: user!.freeTrial,
+          freeTierStartDate: user!.freeTierStartDate,
+          freeTierEndDate: user!.freeTierEndDate,
         }}
       />
       <MembershipInfo user={user} />

@@ -70,31 +70,31 @@ function createAxiosInstance() {
               try {
                 const refreshResponse = await requestAccessToken();
 
-                const accessToken = refreshResponse.headers['authorization'];
+                const authHeader = refreshResponse.headers['authorization'];
 
-                if (accessToken) {
+                if (authHeader) {
                   if (typeof window === 'undefined') {
                     const { data: profileResponse } = await axiosInstance.get<ProfileResponse>('/api/auth/user/me', {
                       headers: {
-                        Authorization: `Bearer ${accessToken}`,
+                        Authorization: `${authHeader}`,
                       },
                     });
 
                     ServerUserTokenCookies.set({
                       email: profileResponse.data!.email,
                       cookieName: 'accessToken',
-                      cookieValue: (accessToken as string).replace('Bearer ', ''),
+                      cookieValue: (authHeader as string).replace(/Bearer /g, ''),
                       cookieOptions: {
                         path: '/',
                         maxAge: Number(process.env.NEXT_PUBLIC_ACCESS_TOKEN_MAXAGE),
                       },
                     });
 
-                    config!.headers.Authorization = `Bearer ${accessToken}`;
+                    config!.headers.Authorization = `${authHeader}`;
                   } else {
-                    await setCookie('accessToken', (accessToken as string).replace('Bearer ', ''), {
-                      maxAge: Number(process.env.NEXT_PUBLIC_ACCESS_TOKEN_MAXAGE),
+                    await setCookie('accessToken', (authHeader as string).replace(/Bearer /g, ''), {
                       path: '/',
+                      maxAge: Number(process.env.NEXT_PUBLIC_ACCESS_TOKEN_MAXAGE),
                     });
                   }
                 }

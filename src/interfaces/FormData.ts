@@ -9,3 +9,10 @@ import { type EditProfilesForm } from '@/components/Form/EditProfileForm/EditPro
 export type FormData = Partial<EmailForm & EmailVerifyForm & PasswordForm & NameForm & TermsFormData>;
 
 export type EditProfileFormData = Partial<ValidatePasswordForm & EditProfilesForm>;
+
+export type FreeTrialFormData = {
+  idList: { id: number }[];
+  freeTierStartDate: string;
+  freeTierEndDate: string;
+  memo: string;
+};

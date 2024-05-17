@@ -26,7 +26,7 @@ function ActionSymbolChip({ symbol }: ActionSymbolChipProps) {
     if (loginRequired) return false;
 
     return !!likedSymbols.symbols?.find(
-      (likedSymbol) => likedSymbol.symbol.toUpperCase() === symbol.name.toUpperCase(),
+      (likedSymbol) => likedSymbol.symbol.toUpperCase() === symbol?.name?.toUpperCase(),
     );
   }
 

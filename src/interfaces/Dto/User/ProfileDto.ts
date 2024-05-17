@@ -5,6 +5,9 @@ import { type MEMBER_ROLE, type User } from '@/interfaces/User';
 export interface ProfilePayload extends Pick<User, 'email' | 'fullName' | 'membership'> {
   nextPaymentDate?: string;
   memberRole: MEMBER_ROLE;
+  freeTrial: boolean;
+  freeTierStartDate: string | null;
+  freeTierEndDate: string | null;
 }
 
 export interface ProfileResponse extends APIResponse<ProfilePayload> {}

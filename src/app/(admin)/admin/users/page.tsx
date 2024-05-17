@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function AdminUsersPage() {
   return (
-    <div className="relative min-h-[calc(100vh-115px)] px-2 pt-4">
+    <div className="relative min-h-[calc(100vh-115px)] overflow-auto px-2 pt-4">
       <Page />
     </div>
   );
