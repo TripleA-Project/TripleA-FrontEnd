@@ -34,6 +34,20 @@ function SubscribeButton({ subscribeRedirectURL }: SubscribeButtonProps) {
   const [showNotification, setShowNotification] = useState(false);
 
   const RenderSubscribeButton = () => {
+    if (user?.freeTrial) {
+      return (
+        <Button
+          className="disabled:!bg-[#898A8D]"
+          disabled={true}
+          bgColorTheme="orange"
+          textColorTheme="white"
+          fullWidth
+        >
+          무료체험 이용 중
+        </Button>
+      );
+    }
+
     switch (user?.membership) {
       case 'BASIC':
         return (
