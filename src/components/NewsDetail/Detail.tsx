@@ -126,8 +126,8 @@ function Detail({ newsDetailPayload, requestSymbol, user }: DetailProps) {
           <TopScrollButton />
         </NewsDetailContentWrapper>
       </article>
-      {newsDetailPayload.user.membership === 'BASIC' ? (
-        <BenefitBar benefitCount={newsDetailPayload.user.leftBenefitCount ?? 0} />
+      {newsDetailPayload.user.membership === 'BASIC' && newsDetailPayload.user.leftBenefitCount !== null ? (
+        <BenefitBar benefitCount={newsDetailPayload.user.leftBenefitCount} />
       ) : null}
       <ToastContainer
         position="bottom-center"
