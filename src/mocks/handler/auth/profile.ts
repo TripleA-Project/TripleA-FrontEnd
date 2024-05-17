@@ -4,15 +4,13 @@ import { users } from '@/mocks/db/user';
 import jwt from 'jsonwebtoken';
 import { getURL } from '@/util/url';
 import { HttpStatusCode } from 'axios';
-import dayjs from 'dayjs';
 import { DefaultBodyType, HttpResponse, PathParams, http } from 'msw';
-import { mockJwtSecret } from './login';
 import { JwtAuthToken } from '@/interfaces/User';
 
 export const profile = http.get<PathParams, DefaultBodyType, ProfileResponse>(
   getURL(API_ROUTE_PATH.USER.PROFILE),
   async ({ request }) => {
-    const authorization = request.headers.get('Authorization');
+    const authorization = request.headers.get('authorization');
 
     if (!authorization) {
       return HttpResponse.json(
@@ -29,9 +27,9 @@ export const profile = http.get<PathParams, DefaultBodyType, ProfileResponse>(
     const accessToken = authorization.replace(/^Bearer /g, '');
 
     try {
-      const decoded = jwt.verify(accessToken, mockJwtSecret.accessToken) as JwtAuthToken;
-
+      const decoded = jwt.decode(accessToken) as JwtAuthToken;
       const user = users.find((user) => user.id === decoded.id);
+
       if (!user) {
         return HttpResponse.json(
           {
@@ -44,7 +42,16 @@ export const profile = http.get<PathParams, DefaultBodyType, ProfileResponse>(
         );
       }
 
-      const { email, fullName, membership, memberRole } = user;
+      const {
+        email,
+        fullName,
+        membership,
+        memberRole,
+        freeTrial,
+        freeTierStartDate,
+        freeTierEndDate,
+        nextPaymentDate,
+      } = user;
 
       return HttpResponse.json(
         {
@@ -55,7 +62,10 @@ export const profile = http.get<PathParams, DefaultBodyType, ProfileResponse>(
             fullName,
             membership,
             memberRole,
-            nextPaymentDate: dayjs().add(1, 'months').toDate().toISOString(),
+            nextPaymentDate: freeTrial ? freeTierEndDate : nextPaymentDate,
+            freeTrial,
+            freeTierStartDate,
+            freeTierEndDate,
           },
         },
         {

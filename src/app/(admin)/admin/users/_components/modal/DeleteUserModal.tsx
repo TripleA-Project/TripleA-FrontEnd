@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import UserManageModalWrapper from './UserManageModalWrapper';
 import Button from '@/components/Button/Button';
 import { deleteUser } from '@/service/admin';
-import { clearSelectedUsers, deleteUsers, useAdminUserList } from '@/redux/slice/adminUserListSlice';
+import { useAdminSelectedUserList, useAdminUserList } from '@/redux/slice/adminUserListSlice';
 import { useEffect } from 'react';
 import ProgressView, {
   ProgressDoneViewProps,
@@ -37,7 +37,8 @@ export default DeleteUserModal;
 const DeleteUserModalContent = () => {
   const { modal, closeModal, dispatch } = useModal('admin:deleteUser');
 
-  const { users } = useAdminUserList();
+  const { users, deleteUsers } = useAdminUserList();
+  const { clearSelectedUsers } = useAdminSelectedUserList();
 
   const onDone: NonNullable<ProgressViewProps['onDone']> = ({ completedTaskResult }) => {
     const targetUserIdsPayload = (completedTaskResult as AxiosResponse<DeleteUserResponse>[]).map((result) => {

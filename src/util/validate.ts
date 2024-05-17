@@ -104,3 +104,14 @@ export function validateSignup({
 
   return { result: true };
 }
+
+/**
+ * 날짜 포멧 유효성 검사(YYYY-MM-DD)
+ *
+ * 날짜 포멧 문자열이 YYYY-MM-DD 형식인 경우 `true` , 아닌 경우 `false`
+ */
+export function validateDateFormat(dateFormat: string) {
+  const regexp = /^([0-9]{4})-([0-9]{2})-([0-9]{2})$/;
+
+  return regexp.test(dateFormat);
+}

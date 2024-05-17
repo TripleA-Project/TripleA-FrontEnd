@@ -1,11 +1,6 @@
 'use client';
 
-import {
-  AdminUserSearch,
-  setSearch,
-  useAdminUserSearch,
-  useAdminUserSearchStatus,
-} from '@/redux/slice/adminUserSearchSlice';
+import { AdminUserSearch, useAdminUserSearch, useAdminUserSearchStatus } from '@/redux/slice/adminUserSearchSlice';
 import { Control, Controller, ControllerRenderProps, UseFormResetField, useForm } from 'react-hook-form';
 import { useEffect, useRef } from 'react';
 import Select, { SingleValue } from 'react-select';
@@ -14,7 +9,7 @@ import { SearchFormData } from '../userTable/UserTableContainer';
 import { MutationObserverBaseResult, useMutation } from '@tanstack/react-query';
 import { searchSiteUser } from '@/service/admin';
 import { SearchSiteUserRequest } from '@/interfaces/Dto/Admin/SearchSiteUserDto';
-import { setUsers, useAdminUserList } from '@/redux/slice/adminUserListSlice';
+import { useAdminUserList } from '@/redux/slice/adminUserListSlice';
 import { MEMBERSHIP, MEMBER_ROLE } from '@/interfaces/User';
 import Button from '@/components/Button/Button';
 import { SearchIcon } from '@/components/Icons/SearchIcon';
@@ -46,14 +41,14 @@ function getFormInitialValues(type: AdminUserSearch['type']) {
   }
 }
 function UserSearch({ onSearch }: UserSearchProps) {
-  const { search: searchState } = useAdminUserSearch();
+  const { search: searchState, setSearch } = useAdminUserSearch();
   const { control, handleSubmit, resetField } = useForm<SearchFormData>({
     values: {
       ...(getFormInitialValues(searchState.type) as any),
     },
   });
 
-  const { dispatch } = useAdminUserList();
+  const { dispatch, setUsers } = useAdminUserList();
 
   const { mutate: search, status } = useMutation(
     ({ type, content }: SearchSiteUserRequest) => searchSiteUser({ type, content: content as any }),
@@ -143,7 +138,7 @@ UserSearch.SearchTypeSelect = function AdminUserSearchTypeSelect({
 }: {
   control: Control<SearchFormData, any, SearchFormData>;
 }) {
-  const { search, dispatch } = useAdminUserSearch();
+  const { search, dispatch, setSearch } = useAdminUserSearch();
   const { searchStatus } = useAdminUserSearchStatus();
 
   const selectRef = useRef<any>(null);
@@ -201,7 +196,7 @@ UserSearch.SearchInput = function UserSearchInput({
 }: {
   control: Control<SearchFormData, any, SearchFormData>;
 }) {
-  const { search, dispatch } = useAdminUserSearch();
+  const { search, dispatch, setSearch } = useAdminUserSearch();
   const { searchStatus } = useAdminUserSearchStatus();
 
   const handleSearch: (
@@ -265,7 +260,7 @@ UserSearch.MemberRoleSelect = function UserMemberRoleSelect({
 }: {
   control: Control<SearchFormData, any, SearchFormData>;
 }) {
-  const { search, dispatch } = useAdminUserSearch();
+  const { search, dispatch, setSearch } = useAdminUserSearch();
   const { searchStatus } = useAdminUserSearchStatus();
 
   const selectRef = useRef<any>(null);
@@ -316,7 +311,7 @@ UserSearch.MembershipSelect = function UserMembershipSelect({
 }: {
   control: Control<SearchFormData, any, SearchFormData>;
 }) {
-  const { search, dispatch } = useAdminUserSearch();
+  const { search, dispatch, setSearch } = useAdminUserSearch();
   const { searchStatus } = useAdminUserSearchStatus();
 
   const selectRef = useRef<any>(null);
